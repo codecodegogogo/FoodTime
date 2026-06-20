@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FoodTime 食物期限管理原型</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="board" aria-label="FoodTime static app prototype">
+      <section class="phone phone-home" aria-label="冰箱总览界面">
+        <header class="app-header">
+          <div>
+            <p class="eyebrow">FoodTime</p>
+            <h1>我的冰箱</h1>
+          </div>
+          <button class="icon-button" aria-label="扫描添加">
+            <span class="camera-icon"></span>
+          </button>
+        </header>
+
+        <section class="hero-panel">
+          <div class="hero-copy">
+            <p>今天先吃</p>
+            <strong>3 件食物快到提醒日</strong>
+          </div>
+          <div class="fridge-illustration" aria-hidden="true">
+            <div class="fridge-door">
+              <span class="fridge-handle"></span>
+              <span class="fruit fruit-a"></span>
+              <span class="fruit fruit-b"></span>
+              <span class="fruit fruit-c"></span>
+            </div>
+          </div>
+        </section>
+
+        <nav class="segmented" aria-label="食物区域">
+          <button class="active">全部</button>
+          <button>冷藏</button>
+          <button>冷冻</button>
+          <button>常温</button>
+        </nav>
+
+        <section class="food-list" aria-label="食物列表">
+          <article class="food-row urgent">
+            <div class="food-thumb milk"></div>
+            <div class="food-info">
+              <h2>鲜牛奶</h2>
+              <p>6 月 18 日购买</p>
+            </div>
+            <div class="food-state">今天提醒</div>
+          </article>
+
+          <article class="food-row soon">
+            <div class="food-thumb berry"></div>
+            <div class="food-info">
+              <h2>草莓</h2>
+              <p>6 月 19 日购买</p>
+            </div>
+            <div class="food-state">明天</div>
+          </article>
+
+          <article class="food-row safe">
+            <div class="food-thumb chicken"></div>
+            <div class="food-info">
+              <h2>鸡胸肉</h2>
+              <p>6 月 20 日购买</p>
+            </div>
+            <div class="food-state">3 天后</div>
+          </article>
+        </section>
+
+        <button class="primary-action">添加食物</button>
+
+        <footer class="tabbar" aria-label="底部导航">
+          <span class="active">冰箱</span>
+          <span>提醒</span>
+          <span>统计</span>
+          <span>我的</span>
+        </footer>
+      </section>
+
+      <section class="phone phone-add" aria-label="添加食物界面">
+        <header class="sub-header">
+          <button class="back-button" aria-label="返回"></button>
+          <h1>添加食物</h1>
+          <span></span>
+        </header>
+
+        <section class="photo-area">
+          <div class="plate-illustration" aria-hidden="true">
+            <span class="plate"></span>
+            <span class="tomato"></span>
+            <span class="leaf"></span>
+            <span class="bread"></span>
+          </div>
+          <button>拍照识别</button>
+        </section>
+
+        <form class="form-panel">
+          <label>
+            食物名称
+            <input value="草莓" aria-label="食物名称" />
+          </label>
+          <label>
+            购买时间
+            <input value="2026-06-20" aria-label="购买时间" />
+          </label>
+          <fieldset>
+            <legend>存放位置</legend>
+            <div class="chips">
+              <button type="button" class="active">冷藏</button>
+              <button type="button">冷冻</button>
+              <button type="button">常温</button>
+            </div>
+          </fieldset>
+          <label>
+            几天后提醒
+            <div class="stepper">
+              <button type="button">-</button>
+              <strong>3 天</strong>
+              <button type="button">+</button>
+            </div>
+          </label>
+        </form>
+
+        <button class="primary-action">保存到冰箱</button>
+      </section>
+
+      <section class="phone phone-reminder" aria-label="提醒设置界面">
+        <header class="sub-header">
+          <button class="back-button" aria-label="返回"></button>
+          <h1>提醒设置</h1>
+          <span></span>
+        </header>
+
+        <section class="reminder-hero">
+          <div class="bell-illustration" aria-hidden="true">
+            <span class="bell"></span>
+            <span class="spark spark-a"></span>
+            <span class="spark spark-b"></span>
+          </div>
+          <div>
+            <p>默认规则</p>
+            <strong>购买超过 3 天提醒</strong>
+          </div>
+        </section>
+
+        <section class="setting-list">
+          <article class="setting-row">
+            <div>
+              <h2>默认提醒天数</h2>
+              <p>新食物会自动套用</p>
+            </div>
+            <div class="mini-stepper">
+              <button>-</button>
+              <strong>3</strong>
+              <button>+</button>
+            </div>
+          </article>
+
+          <article class="setting-row">
+            <div>
+              <h2>到期当天推送</h2>
+              <p>每天 09:00 通知</p>
+            </div>
+            <span class="toggle on"></span>
+          </article>
+
+          <article class="setting-row">
+            <div>
+              <h2>提前一天提醒</h2>
+              <p>适合肉类和乳制品</p>
+            </div>
+            <span class="toggle"></span>
+          </article>
+        </section>
+
+        <section class="preview-card">
+          <p>提醒预览</p>
+          <strong>草莓已经放了 3 天，今天记得处理。</strong>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>
