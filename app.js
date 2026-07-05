@@ -120,6 +120,28 @@
   let currentHistoryFilter = "已吃完";
   let selectedFoodId = null;
   let capturedPhoto = "";
+  let syncTimer = 0;
+  let syncInFlight = false;
+  let syncQueued = false;
+
+  function nowIso() {
+    return new Date().toISOString();
+  }
+
+  function foodTimestamp(food) {
+    return food.updatedAt || food.handledAt || food.createdAt || food.purchaseDate || "1970-01-01T00:00:00.000Z";
+  }
+
+  function normalizeFood(food) {
+    return {
+      ...food,
+      updatedAt: foodTimestamp(food),
+    };
+  }
+
+  function normalizeFoods(foods) {
+    return Array.isArray(foods) ? foods.map(normalizeFood) : [];
+  }
 
   function screenElement(name) {
     return document.querySelector(screens[name]);
@@ -134,17 +156,141 @@
   function loadFoods() {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) return JSON.parse(saved);
+      if (saved) return normalizeFoods(JSON.parse(saved));
     } catch (error) {
       localStorage.removeItem(STORAGE_KEY);
     }
 
-    saveFoods(defaultFoods);
-    return defaultFoods.slice();
+    const initialFoods = normalizeFoods(defaultFoods);
+    saveFoods(initialFoods, { skipSync: true });
+    return initialFoods;
   }
 
-  function saveFoods(foods) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(foods));
+  function saveFoods(foods, options = {}) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(normalizeFoods(foods)));
+    if (!options.skipSync) {
+      scheduleSync();
+    }
+  }
+
+  function syncSettingsReady(settings = loadSyncSettings()) {
+    return Boolean(settings.webdavUrl && settings.account && settings.password && settings.remoteFile);
+  }
+
+  function nativeSyncAvailable() {
+    return Boolean(window.FoodTimeNative && typeof window.FoodTimeNative.pull === "function");
+  }
+
+  function updateSyncStatus(message) {
+    document.querySelectorAll(".sync-status-text").forEach((item) => {
+      item.textContent = message;
+    });
+  }
+
+  function syncPayload() {
+    return {
+      version: 1,
+      updatedAt: nowIso(),
+      foods: loadFoods(),
+    };
+  }
+
+  function parseRemoteFoods(body) {
+    if (!body) return [];
+    const parsed = JSON.parse(body);
+    if (Array.isArray(parsed)) return normalizeFoods(parsed);
+    return normalizeFoods(parsed.foods);
+  }
+
+  function mergeFoods(localFoods, remoteFoods) {
+    const byId = new Map();
+
+    [...normalizeFoods(localFoods), ...normalizeFoods(remoteFoods)].forEach((food) => {
+      const current = byId.get(food.id);
+      if (!current || Date.parse(foodTimestamp(food)) >= Date.parse(foodTimestamp(current))) {
+        byId.set(food.id, food);
+      }
+    });
+
+    return Array.from(byId.values()).sort((left, right) => Date.parse(foodTimestamp(right)) - Date.parse(foodTimestamp(left)));
+  }
+
+  function scheduleSync(options = {}) {
+    const settings = loadSyncSettings();
+    if (!syncSettingsReady(settings)) {
+      updateSyncStatus("本地数据 · 坚果云同步待设置");
+      return;
+    }
+
+    if (!nativeSyncAvailable()) {
+      updateSyncStatus("同步设置已保存 · 需在 APK 中执行同步");
+      return;
+    }
+
+    window.clearTimeout(syncTimer);
+    syncTimer = window.setTimeout(startSync, options.immediate ? 0 : 800);
+  }
+
+  function startSync() {
+    const settings = loadSyncSettings();
+    if (!syncSettingsReady(settings) || !nativeSyncAvailable()) return;
+
+    if (syncInFlight) {
+      syncQueued = true;
+      return;
+    }
+
+    syncInFlight = true;
+    updateSyncStatus("坚果云同步中...");
+    window.FoodTimeNative.pull(JSON.stringify(settings));
+  }
+
+  function pushCloudPayload() {
+    const settings = loadSyncSettings();
+    if (!syncSettingsReady(settings) || !nativeSyncAvailable()) return;
+    window.FoodTimeNative.push(JSON.stringify(settings), JSON.stringify(syncPayload()));
+  }
+
+  function handlePullResult(result) {
+    if (!result.ok) {
+      syncInFlight = false;
+      updateSyncStatus(`同步失败 · ${result.message || "请检查坚果云设置"}`);
+      return;
+    }
+
+    if (!result.missing && result.body) {
+      try {
+        const merged = mergeFoods(loadFoods(), parseRemoteFoods(result.body));
+        saveFoods(merged, { skipSync: true });
+        renderAll();
+      } catch (error) {
+        syncInFlight = false;
+        updateSyncStatus("同步失败 · 云端数据格式不正确");
+        return;
+      }
+    }
+
+    pushCloudPayload();
+  }
+
+  function handlePushResult(result) {
+    syncInFlight = false;
+    if (result.ok) {
+      updateSyncStatus(`已同步 · ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`);
+    } else {
+      updateSyncStatus(`同步失败 · ${result.message || "上传失败"}`);
+    }
+
+    if (syncQueued) {
+      syncQueued = false;
+      scheduleSync({ immediate: true });
+    }
+  }
+
+  function onNativeSyncResult(result) {
+    if (!result || !result.type) return;
+    if (result.type === "pull") handlePullResult(result);
+    if (result.type === "push") handlePushResult(result);
   }
 
   function formatDate(dateString) {
@@ -500,6 +646,7 @@
       photo: capturedPhoto,
       photoText: capturedPhoto ? "" : name.slice(0, 3),
       createdAt: today.toISOString().slice(0, 10),
+      updatedAt: nowIso(),
     });
 
     saveFoods(foods);
@@ -557,6 +704,7 @@
 
     food.status = status;
     food.handledAt = today.toISOString().slice(0, 10);
+    food.updatedAt = nowIso();
     saveFoods(foods);
     selectedFoodId = null;
     showScreen("home", { reset: true });
@@ -569,6 +717,7 @@
     if (!food) return;
 
     food.remindDays = Number(food.remindDays || 3) + 1;
+    food.updatedAt = nowIso();
     saveFoods(foods);
     selectedFoodId = null;
     showScreen("home", { reset: true });
@@ -612,6 +761,7 @@
     };
 
     localStorage.setItem(SYNC_SETTINGS_KEY, JSON.stringify(settings));
+    scheduleSync({ immediate: true });
     const button = screen.querySelector(".sync-save-action");
     if (!button) return;
     button.textContent = "已保存";
@@ -803,9 +953,11 @@
     document.addEventListener("click", handleClick);
     document.addEventListener("change", handleChange);
     document.addEventListener("input", handleInput);
+    scheduleSync({ immediate: true });
   }
 
   window.FoodTimeApp = {
+    onNativeSyncResult,
     back: goBack,
     canGoBack() {
       return currentScreen !== "home" || routeStack.length > 1;
