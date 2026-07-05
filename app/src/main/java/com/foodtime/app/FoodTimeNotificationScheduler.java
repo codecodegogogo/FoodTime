@@ -69,17 +69,17 @@ final class FoodTimeNotificationScheduler {
     static void handleDaily(Context context) {
         ensureChannel(context);
         List<FoodItem> activeFoods = activeFoods(context);
-        int urgentCount = 0;
+        List<FoodItem> urgentFoods = new ArrayList<>();
         for (FoodItem food : activeFoods) {
             if (food.daysRemaining() <= food.emergencyDays(context)) {
-                urgentCount++;
+                urgentFoods.add(food);
             }
         }
 
-        String title = activeFoods.isEmpty() ? "FoodTime 今日提醒" : "FoodTime 今日食物提醒";
+        String title = urgentFoods.isEmpty() ? "FoodTime 今日提醒" : expiringTitle(urgentFoods);
         String text = activeFoods.isEmpty()
                 ? "今天没有正在储存的食物"
-                : "当前储存 " + activeFoods.size() + " 件，紧急范围内 " + urgentCount + " 件";
+                : (urgentFoods.isEmpty() ? "今天没有即将过期的食物" : expiringText(urgentFoods));
         notify(context, 5101, title, text);
         scheduleDaily(context);
     }
@@ -88,7 +88,7 @@ final class FoodTimeNotificationScheduler {
         ensureChannel(context);
         List<FoodItem> foods = emergencyFoods(context);
         if (!foods.isEmpty()) {
-            notify(context, 5102, "食物快到期了", emergencyText(foods));
+            notify(context, 5102, expiringTitle(foods), expiringText(foods));
             increaseEmergencyLevels(context, foods);
         }
         scheduleEmergency(context);
@@ -306,20 +306,20 @@ final class FoodTimeNotificationScheduler {
         editor.apply();
     }
 
-    private static String emergencyText(List<FoodItem> foods) {
-        StringBuilder builder = new StringBuilder();
-        int limit = Math.min(foods.size(), 3);
-        for (int index = 0; index < limit; index++) {
-            if (index > 0) {
-                builder.append("、");
-            }
-            builder.append(foods.get(index).name);
+    private static String expiringTitle(List<FoodItem> foods) {
+        if (foods.isEmpty()) {
+            return "FoodTime 今日提醒";
         }
-        if (foods.size() > limit) {
-            builder.append("等 ").append(foods.size()).append(" 件食物");
+        String name = foods.get(0).name;
+        return foods.size() > 1 ? name + "等即将过期" : name + "即将过期";
+    }
+
+    private static String expiringText(List<FoodItem> foods) {
+        if (foods.isEmpty()) {
+            return "今天没有即将过期的食物";
         }
-        builder.append("已进入紧急提醒范围，请尽快处理。");
-        return builder.toString();
+        String name = foods.get(0).name;
+        return foods.size() > 1 ? name + "等即将过期，请尽快处理。" : name + "即将过期，请尽快处理。";
     }
 
     private static int intervalForLevel(int level) {

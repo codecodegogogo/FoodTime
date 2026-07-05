@@ -165,8 +165,8 @@ button {
   width: 46px;
   height: 46px;
   place-items: center;
-  border-radius: 16px;
-  background: #e3f1e7;
+  border-radius: 0;
+  background: transparent;
 }
 
 .plus-icon,
@@ -176,8 +176,8 @@ button {
 }
 
 .plus-icon {
-  width: 30px;
-  height: 30px;
+  width: 38px;
+  height: 38px;
   border: 0;
   border-radius: 0;
   background: url("icons/add-provided.svg") center / contain no-repeat;
@@ -530,15 +530,13 @@ button {
 }
 
 .phone-add > .primary-action {
-  min-height: 58px;
-  margin-top: 20px;
-  margin-bottom: 34px;
-  border: 2px solid #26353a;
-  border-radius: 20px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 48%),
-    var(--mint-dark);
-  box-shadow: 0 12px 0 #1d4d3e, 0 18px 26px rgba(47, 143, 107, 0.24);
+  width: calc(100% - 88px);
+  min-height: 48px;
+  margin: 18px auto 32px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--mint-dark);
+  box-shadow: none;
 }
 
 .tabbar {
@@ -1037,6 +1035,11 @@ legend {
   margin-bottom: 0;
 }
 
+.quantity-grid input,
+.quantity-grid select {
+  margin-top: 0;
+}
+
 .reminder-grid {
   grid-template-columns: 1fr 1fr;
 }
@@ -1354,14 +1357,14 @@ legend {
   width: 42px;
   height: 42px;
   place-items: center;
-  border-radius: 15px;
-  background: #e4f2e8;
+  border-radius: 0;
+  background: transparent;
 }
 
 .settings-icon-img {
   display: block;
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   object-fit: contain;
 }
 
@@ -1413,22 +1416,22 @@ legend {
   width: 56px;
   height: 56px;
   place-items: center;
-  border: 2px solid #26353a;
-  border-radius: 18px;
+  border: 0;
+  border-radius: 0;
   color: #26353a;
-  background: #ffffff;
-  box-shadow: 0 6px 0 rgba(38, 53, 58, 0.1);
+  background: transparent;
+  box-shadow: none;
 }
 
 .sync-button-icon {
   display: block;
-  width: 34px;
-  height: 34px;
+  width: 42px;
+  height: 42px;
   object-fit: contain;
 }
 
 .sync-now-button.is-syncing {
-  background: #eef8ef;
+  background: transparent;
   transform: translateY(1px);
 }
 
@@ -1763,6 +1766,102 @@ html.theme-system-dark .empty-row {
   background: transparent;
 }
 
+html.theme-dark .back-button,
+html.theme-system-dark .back-button,
+html.theme-dark .sheet-close,
+html.theme-system-dark .sheet-close,
+html.theme-dark .row-action,
+html.theme-system-dark .row-action,
+html.theme-dark .sheet-actions button,
+html.theme-system-dark .sheet-actions button,
+html.theme-dark .stepper button,
+html.theme-system-dark .stepper button,
+html.theme-dark .mini-stepper button,
+html.theme-system-dark .mini-stepper button,
+html.theme-dark .restore-action,
+html.theme-system-dark .restore-action {
+  border-color: var(--line);
+  color: var(--ink);
+  background-color: #22332e;
+}
+
+html.theme-dark .icon-button,
+html.theme-system-dark .icon-button,
+html.theme-dark .settings-button,
+html.theme-system-dark .settings-button,
+html.theme-dark .sync-now-button,
+html.theme-system-dark .sync-now-button,
+html.theme-dark .sync-now-button.is-syncing,
+html.theme-system-dark .sync-now-button.is-syncing {
+  border-color: transparent;
+  color: var(--ink);
+  background-color: transparent;
+  box-shadow: none;
+}
+
+html.theme-dark .segmented button,
+html.theme-system-dark .segmented button,
+html.theme-dark .chips button,
+html.theme-system-dark .chips button,
+html.theme-dark .history-filters button,
+html.theme-system-dark .history-filters button,
+html.theme-dark .tabbar span,
+html.theme-system-dark .tabbar span {
+  color: var(--muted);
+  background-color: transparent;
+}
+
+html.theme-dark .segmented .active,
+html.theme-system-dark .segmented .active,
+html.theme-dark .chips .active,
+html.theme-system-dark .chips .active,
+html.theme-dark .theme-options button.active,
+html.theme-system-dark .theme-options button.active,
+html.theme-dark .history-filters .active,
+html.theme-system-dark .history-filters .active {
+  border-color: #59c292;
+  color: #07110e;
+  background-color: #78d6a8;
+}
+
+html.theme-dark .tabbar .active,
+html.theme-system-dark .tabbar .active {
+  color: #07110e;
+  background-color: #78d6a8;
+  box-shadow: none;
+}
+
+html.theme-dark .primary-action,
+html.theme-system-dark .primary-action,
+html.theme-dark .photo-area > button,
+html.theme-system-dark .photo-area > button,
+html.theme-dark .photo-area.is-captured button,
+html.theme-system-dark .photo-area.is-captured button {
+  color: #07110e;
+  background-color: #78d6a8;
+}
+
+html.theme-dark .phone-add > .primary-action,
+html.theme-system-dark .phone-add > .primary-action {
+  border-color: transparent;
+  background: #78d6a8;
+  box-shadow: none;
+}
+
+html.theme-dark .stepper button:active,
+html.theme-system-dark .stepper button:active,
+html.theme-dark .mini-stepper button:active,
+html.theme-system-dark .mini-stepper button:active {
+  color: #07110e;
+  background-color: #78d6a8;
+}
+
+html.theme-dark .sync-now-button.is-syncing,
+html.theme-system-dark .sync-now-button.is-syncing {
+  color: #07110e;
+  background-color: #78d6a8;
+}
+
 @media (prefers-color-scheme: dark) {
   html.theme-system body {
     background:
@@ -1808,6 +1907,75 @@ html.theme-system-dark .empty-row {
 
   html.theme-system .empty-row {
     background: transparent;
+  }
+
+  html.theme-system .back-button,
+  html.theme-system .sheet-close,
+  html.theme-system .row-action,
+  html.theme-system .sheet-actions button,
+  html.theme-system .stepper button,
+  html.theme-system .mini-stepper button,
+  html.theme-system .restore-action {
+    border-color: var(--line);
+    color: var(--ink);
+    background-color: #22332e;
+  }
+
+  html.theme-system .icon-button,
+  html.theme-system .settings-button,
+  html.theme-system .sync-now-button,
+  html.theme-system .sync-now-button.is-syncing {
+    border-color: transparent;
+    color: var(--ink);
+    background-color: transparent;
+    box-shadow: none;
+  }
+
+  html.theme-system .segmented button,
+  html.theme-system .chips button,
+  html.theme-system .history-filters button,
+  html.theme-system .tabbar span {
+    color: var(--muted);
+    background-color: transparent;
+  }
+
+  html.theme-system .segmented .active,
+  html.theme-system .chips .active,
+  html.theme-system .theme-options button.active,
+  html.theme-system .history-filters .active {
+    border-color: #59c292;
+    color: #07110e;
+    background-color: #78d6a8;
+  }
+
+  html.theme-system .tabbar .active {
+    color: #07110e;
+    background-color: #78d6a8;
+    box-shadow: none;
+  }
+
+  html.theme-system .primary-action,
+  html.theme-system .photo-area > button,
+  html.theme-system .photo-area.is-captured button {
+    color: #07110e;
+    background-color: #78d6a8;
+  }
+
+  html.theme-system .phone-add > .primary-action {
+    border-color: transparent;
+    background: #78d6a8;
+    box-shadow: none;
+  }
+
+  html.theme-system .stepper button:active,
+  html.theme-system .mini-stepper button:active {
+    color: #07110e;
+    background-color: #78d6a8;
+  }
+
+  html.theme-system .sync-now-button.is-syncing {
+    color: #07110e;
+    background-color: #78d6a8;
   }
 }
 
