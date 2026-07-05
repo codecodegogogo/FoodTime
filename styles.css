@@ -41,6 +41,22 @@ button {
   cursor: default;
 }
 
+.icon-button,
+.back-button,
+.row-action,
+.sheet-close,
+.sheet-actions button,
+.segmented button,
+.storage-chips button,
+.stepper button,
+.primary-action,
+.tabbar span,
+.stats-grid article,
+.history-filters button,
+.photo-area > button {
+  cursor: pointer;
+}
+
 .board {
   display: grid;
   grid-template-columns: repeat(4, minmax(300px, 390px));
@@ -1378,6 +1394,7 @@ legend {
   }
 
   .phone {
+    display: none;
     width: 100%;
     min-height: 100vh;
     border: 0;
@@ -1385,7 +1402,44 @@ legend {
     box-shadow: none;
   }
 
-  .phone:not(:first-child) {
+  .phone.is-active {
+    display: block;
+  }
+
+  .phone::before {
     display: none;
   }
+}
+
+.is-hidden {
+  display: none !important;
+}
+
+html.app-runtime,
+html.app-runtime body {
+  min-height: 100%;
+  background: var(--paper);
+}
+
+html.app-runtime .board {
+  display: block;
+  min-height: 100vh;
+  padding: 0;
+}
+
+html.app-runtime .phone {
+  display: none;
+  width: 100%;
+  min-height: 100vh;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+html.app-runtime .phone.is-active {
+  display: block;
+}
+
+html.app-runtime .phone::before {
+  display: none;
 }

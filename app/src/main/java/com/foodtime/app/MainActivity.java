@@ -31,8 +31,18 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        if (webView != null && webView.canGoBack()) {
-            webView.goBack();
+        if (webView != null) {
+            webView.evaluateJavascript(
+                    "Boolean(window.FoodTimeApp && window.FoodTimeApp.canGoBack && window.FoodTimeApp.canGoBack())",
+                    canGoBack -> {
+                        if ("true".equals(canGoBack)) {
+                            webView.evaluateJavascript("window.FoodTimeApp.back()", null);
+                        } else if (webView.canGoBack()) {
+                            webView.goBack();
+                        } else {
+                            finish();
+                        }
+                    });
             return;
         }
         super.onBackPressed();
