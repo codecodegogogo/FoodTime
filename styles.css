@@ -1528,7 +1528,7 @@ legend {
 
 .setting-dot {
   --setting-icon: url("icons/settings.svg");
-  --setting-icon-color: var(--mint-dark);
+  --setting-icon-filter: none;
   flex: 0 0 auto;
   display: grid;
   width: clamp(34px, 11vw, 42px);
@@ -1544,24 +1544,23 @@ legend {
   display: block;
   width: clamp(28px, 8.8vw, 36px);
   height: clamp(28px, 8.8vw, 36px);
-  background: var(--setting-icon-color);
-  mask: var(--setting-icon) center / contain no-repeat;
-  -webkit-mask: var(--setting-icon) center / contain no-repeat;
+  background: var(--setting-icon) center / contain no-repeat;
+  filter: var(--setting-icon-filter);
 }
 
 .cloud-dot {
   --setting-icon: url("icons/sync.svg");
-  --setting-icon-color: #158a6f;
+  --setting-icon-filter: none;
 }
 
 .theme-dot {
   --setting-icon: url("icons/settings.svg");
-  --setting-icon-color: #3a5f8f;
+  --setting-icon-filter: none;
 }
 
 .notice-dot {
   --setting-icon: url("icons/action-delay.svg");
-  --setting-icon-color: #a44d34;
+  --setting-icon-filter: none;
 }
 
 .settings-hint {
@@ -1573,13 +1572,12 @@ legend {
 }
 
 .row-chevron {
-  --chevron-color: #66756e;
+  --chevron-filter: none;
   width: 20px;
   height: 20px;
   margin-left: auto;
-  background: var(--chevron-color);
-  mask: url("icons/chevron-right.svg") center / contain no-repeat;
-  -webkit-mask: url("icons/chevron-right.svg") center / contain no-repeat;
+  background: url("icons/chevron-right.svg") center / contain no-repeat;
+  filter: var(--chevron-filter);
 }
 
 .sync-panel {
@@ -1676,6 +1674,22 @@ legend {
 
 .phone-history .history-filters {
   grid-template-columns: repeat(2, 1fr);
+}
+
+.history-tools {
+  display: flex;
+  justify-content: flex-end;
+  margin: -8px 20px 14px;
+}
+
+.history-clear-action {
+  min-height: 36px;
+  padding: 0;
+  border: 0;
+  color: #a43d34;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 900;
 }
 
 .history-list {
@@ -1828,22 +1842,27 @@ html.theme-system-dark .settings-hint {
 
 html.theme-dark .setting-dot,
 html.theme-system-dark .setting-dot {
-  --setting-icon-color: #78d6a8;
+  --setting-icon-filter: brightness(0) saturate(100%) invert(82%) sepia(22%) saturate(884%) hue-rotate(91deg) brightness(92%) contrast(84%);
 }
 
 html.theme-dark .theme-dot,
 html.theme-system-dark .theme-dot {
-  --setting-icon-color: #9fc7ff;
+  --setting-icon-filter: brightness(0) saturate(100%) invert(79%) sepia(22%) saturate(730%) hue-rotate(183deg) brightness(104%) contrast(101%);
 }
 
 html.theme-dark .notice-dot,
 html.theme-system-dark .notice-dot {
-  --setting-icon-color: #ffb18f;
+  --setting-icon-filter: brightness(0) saturate(100%) invert(78%) sepia(31%) saturate(743%) hue-rotate(322deg) brightness(103%) contrast(101%);
 }
 
 html.theme-dark .row-chevron,
 html.theme-system-dark .row-chevron {
-  --chevron-color: #a9bbb2;
+  --chevron-filter: brightness(0) saturate(100%) invert(78%) sepia(11%) saturate(366%) hue-rotate(101deg) brightness(94%) contrast(88%);
+}
+
+html.theme-dark .history-clear-action,
+html.theme-system-dark .history-clear-action {
+  color: #ffb0a7;
 }
 
 html.theme-dark input,
@@ -2039,19 +2058,23 @@ html.theme-system-dark .sync-now-button.is-syncing {
   }
 
   html.theme-system .setting-dot {
-    --setting-icon-color: #78d6a8;
+    --setting-icon-filter: brightness(0) saturate(100%) invert(82%) sepia(22%) saturate(884%) hue-rotate(91deg) brightness(92%) contrast(84%);
   }
 
   html.theme-system .theme-dot {
-    --setting-icon-color: #9fc7ff;
+    --setting-icon-filter: brightness(0) saturate(100%) invert(79%) sepia(22%) saturate(730%) hue-rotate(183deg) brightness(104%) contrast(101%);
   }
 
   html.theme-system .notice-dot {
-    --setting-icon-color: #ffb18f;
+    --setting-icon-filter: brightness(0) saturate(100%) invert(78%) sepia(31%) saturate(743%) hue-rotate(322deg) brightness(103%) contrast(101%);
   }
 
   html.theme-system .row-chevron {
-    --chevron-color: #a9bbb2;
+    --chevron-filter: brightness(0) saturate(100%) invert(78%) sepia(11%) saturate(366%) hue-rotate(101deg) brightness(94%) contrast(88%);
+  }
+
+  html.theme-system .history-clear-action {
+    color: #ffb0a7;
   }
 
   html.theme-system input,

@@ -2,6 +2,7 @@
   const STORAGE_KEY = "foodtime.foods.v1";
   const SYNC_SETTINGS_KEY = "foodtime.syncSettings.v1";
   const SYNC_LAST_AT_KEY = "foodtime.syncLastAt.v1";
+  const CLEAR_ALL_AT_KEY = "foodtime.clearAllAt.v1";
   const THEME_SETTINGS_KEY = "foodtime.themeSettings.v1";
   const NOTIFICATION_SETTINGS_KEY = "foodtime.notificationSettings.v1";
   const ONE_DAY = 24 * 60 * 60 * 1000;
@@ -261,6 +262,7 @@
     return {
       version: 1,
       updatedAt: nowIso(),
+      clearedAt: localStorage.getItem(CLEAR_ALL_AT_KEY) || "",
       foods: loadFoods().map(foodForSync),
     };
   }
@@ -283,11 +285,17 @@
     return { ...item, photo: "", photoText: "" };
   }
 
-  function parseRemoteFoods(body) {
-    if (!body) return [];
+  function parseRemotePayload(body) {
+    if (!body) return { foods: [], clearedAt: "" };
     const parsed = JSON.parse(body);
-    if (Array.isArray(parsed)) return normalizeFoods(parsed);
-    return normalizeFoods(parsed.foods);
+    if (Array.isArray(parsed)) {
+      return { foods: normalizeFoods(parsed), clearedAt: "" };
+    }
+
+    return {
+      foods: normalizeFoods(parsed.foods),
+      clearedAt: parsed.clearedAt || "",
+    };
   }
 
   function mergeFoods(localFoods, remoteFoods) {
@@ -301,6 +309,24 @@
     });
 
     return Array.from(byId.values()).sort((left, right) => Date.parse(foodTimestamp(right)) - Date.parse(foodTimestamp(left)));
+  }
+
+  function mergeRemotePayload(localFoods, remotePayload) {
+    const localClearedAt = localStorage.getItem(CLEAR_ALL_AT_KEY) || "";
+    const remoteClearedAt = remotePayload.clearedAt || "";
+    const clearMillis = Math.max(Date.parse(localClearedAt) || 0, Date.parse(remoteClearedAt) || 0);
+    if (clearMillis) {
+      const clearIso = new Date(clearMillis).toISOString();
+      if (clearIso !== localClearedAt) {
+        localStorage.setItem(CLEAR_ALL_AT_KEY, clearIso);
+      }
+    }
+
+    const afterClear = (food) => !clearMillis || (Date.parse(foodTimestamp(food)) || 0) > clearMillis;
+    return mergeFoods(
+      normalizeFoods(localFoods).filter(afterClear),
+      normalizeFoods(remotePayload.foods).filter(afterClear),
+    );
   }
 
   function scheduleSync(options = {}) {
@@ -348,7 +374,7 @@
 
     if (!result.missing && result.body) {
       try {
-        const merged = mergeFoods(loadFoods(), parseRemoteFoods(result.body));
+        const merged = mergeRemotePayload(loadFoods(), parseRemotePayload(result.body));
         saveFoods(merged, { skipSync: true });
         renderAll();
       } catch (error) {
@@ -1083,6 +1109,28 @@
     showScreen("history", { replace: true });
   }
 
+  function clearAllFoodData() {
+    const count = loadFoods().length;
+    if (!count) {
+      updateSyncStatus("本地没有需要清除的食物数据");
+      return;
+    }
+
+    const confirmed = typeof window.confirm !== "function"
+      || window.confirm("确认清除本地和云端的全部食物数据？同步后云端也会被清空。");
+    if (!confirmed) return;
+
+    localStorage.setItem(CLEAR_ALL_AT_KEY, nowIso());
+    selectedFoodId = null;
+    currentHomeFilter = "全部";
+    currentHistoryFilter = "已吃完";
+    saveFoods([], { skipSync: true });
+    renderAll();
+    showScreen("history", { replace: true });
+    updateSyncStatus(syncSettingsReady() ? "本地已清空 · 正在同步云端清空" : "本地已清空 · 云端清空待同步设置");
+    scheduleSync({ immediate: true });
+  }
+
   function loadSyncSettings() {
     try {
       return JSON.parse(localStorage.getItem(SYNC_SETTINGS_KEY) || "{}");
@@ -1417,6 +1465,12 @@
     if (recordFilter) {
       currentHistoryFilter = recordFilter.textContent.trim();
       renderHistory();
+      return;
+    }
+
+    const clearHistoryAction = target.closest(".history-clear-action");
+    if (clearHistoryAction) {
+      clearAllFoodData();
       return;
     }
 
