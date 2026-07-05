@@ -5,8 +5,10 @@
   const THEME_SETTINGS_KEY = "foodtime.themeSettings.v1";
   const NOTIFICATION_SETTINGS_KEY = "foodtime.notificationSettings.v1";
   const ONE_DAY = 24 * 60 * 60 * 1000;
-  const PHOTO_MAX_SIDE = 512;
-  const PHOTO_QUALITY = 0.38;
+  const PHOTO_THUMB_MAX_SIDE = 160;
+  const PHOTO_THUMB_MIN_SIDE = 96;
+  const PHOTO_THUMB_QUALITY = 0.24;
+  const PHOTO_SYNC_MAX_CHARS = 28000;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -259,8 +261,26 @@
     return {
       version: 1,
       updatedAt: nowIso(),
-      foods: loadFoods(),
+      foods: loadFoods().map(foodForSync),
     };
+  }
+
+  function isEmbeddedPhoto(value) {
+    return typeof value === "string" && value.startsWith("data:image/");
+  }
+
+  function minimalPhotoForSync(photo) {
+    if (!isEmbeddedPhoto(photo)) return "";
+    return photo.length <= PHOTO_SYNC_MAX_CHARS ? photo : "";
+  }
+
+  function foodForSync(food) {
+    const item = normalizeFood(food);
+    if (!item.photo) return item;
+
+    const photo = minimalPhotoForSync(item.photo);
+    if (photo) return { ...item, photo };
+    return { ...item, photo: "", photoText: "" };
   }
 
   function parseRemoteFoods(body) {
@@ -1147,26 +1167,74 @@
     });
   }
 
+  function drawImageThumb(image, maxSide) {
+    const ratio = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(image.naturalWidth * ratio));
+    canvas.height = Math.max(1, Math.round(image.naturalHeight * ratio));
+
+    const context = canvas.getContext("2d");
+    if (!context) return null;
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    return canvas;
+  }
+
   async function compressPhoto(dataUrl) {
     try {
       const image = await loadImage(dataUrl);
-      const ratio = Math.min(1, PHOTO_MAX_SIDE / Math.max(image.naturalWidth, image.naturalHeight));
-      const canvas = document.createElement("canvas");
-      canvas.width = Math.max(1, Math.round(image.naturalWidth * ratio));
-      canvas.height = Math.max(1, Math.round(image.naturalHeight * ratio));
+      let best = isEmbeddedPhoto(dataUrl) && dataUrl.length <= PHOTO_SYNC_MAX_CHARS ? dataUrl : "";
+      const sideSteps = [PHOTO_THUMB_MAX_SIDE, 128, PHOTO_THUMB_MIN_SIDE];
+      const qualitySteps = [PHOTO_THUMB_QUALITY, 0.18, 0.12];
 
-      const context = canvas.getContext("2d");
-      if (!context) return dataUrl;
-      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      for (const maxSide of sideSteps) {
+        const canvas = drawImageThumb(image, maxSide);
+        if (!canvas) continue;
 
-      let compressed = canvas.toDataURL("image/webp", PHOTO_QUALITY);
-      if (!compressed.startsWith("data:image/webp")) {
-        compressed = canvas.toDataURL("image/jpeg", 0.45);
+        for (const quality of qualitySteps) {
+          let candidate = canvas.toDataURL("image/webp", quality);
+          if (!candidate.startsWith("data:image/webp")) {
+            candidate = canvas.toDataURL("image/jpeg", quality);
+          }
+
+          if (candidate && (!best || candidate.length < best.length)) {
+            best = candidate;
+          }
+          if (candidate && candidate.length <= PHOTO_SYNC_MAX_CHARS) {
+            return candidate;
+          }
+        }
       }
 
-      return compressed.length < dataUrl.length ? compressed : dataUrl;
+      return best || dataUrl;
     } catch (error) {
       return dataUrl;
+    }
+  }
+
+  async function compactStoredPhotos() {
+    const foods = loadFoods();
+    if (!foods.some((food) => isEmbeddedPhoto(food.photo) && food.photo.length > PHOTO_SYNC_MAX_CHARS)) return;
+
+    let changed = false;
+    const nextFoods = [];
+    for (const food of foods) {
+      if (!isEmbeddedPhoto(food.photo) || food.photo.length <= PHOTO_SYNC_MAX_CHARS) {
+        nextFoods.push(food);
+        continue;
+      }
+
+      const compactedPhoto = await compressPhoto(food.photo);
+      if (compactedPhoto && compactedPhoto.length < food.photo.length) {
+        changed = true;
+        nextFoods.push({ ...food, photo: compactedPhoto, updatedAt: nowIso() });
+      } else {
+        nextFoods.push(food);
+      }
+    }
+
+    if (changed) {
+      saveFoods(nextFoods);
+      renderAll();
     }
   }
 
@@ -1390,6 +1458,7 @@
     document.addEventListener("click", handleClick);
     document.addEventListener("change", handleChange);
     document.addEventListener("input", handleInput);
+    compactStoredPhotos();
     scheduleSync({ immediate: true });
     scheduleNativeNotifications({ immediate: true });
   }

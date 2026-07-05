@@ -1527,28 +1527,41 @@ legend {
 }
 
 .setting-dot {
+  --setting-icon: url("icons/settings.svg");
+  --setting-icon-color: var(--mint-dark);
   flex: 0 0 auto;
-  width: 42px;
-  height: 42px;
+  display: grid;
+  width: clamp(34px, 11vw, 42px);
+  height: clamp(34px, 11vw, 42px);
+  place-items: center;
   border: 0;
   border-radius: 0;
-  background-color: transparent;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 36px 36px;
+  background: transparent;
+}
+
+.setting-dot::before {
+  content: "";
+  display: block;
+  width: clamp(28px, 8.8vw, 36px);
+  height: clamp(28px, 8.8vw, 36px);
+  background: var(--setting-icon-color);
+  mask: var(--setting-icon) center / contain no-repeat;
+  -webkit-mask: var(--setting-icon) center / contain no-repeat;
 }
 
 .cloud-dot {
-  background-image: url("icons/sync.svg");
+  --setting-icon: url("icons/sync.svg");
+  --setting-icon-color: #158a6f;
 }
 
 .theme-dot {
-  background-color: transparent;
-  background-image: url("icons/settings.svg");
+  --setting-icon: url("icons/settings.svg");
+  --setting-icon-color: #3a5f8f;
 }
 
 .notice-dot {
-  background-image: url("icons/action-delay.svg");
+  --setting-icon: url("icons/action-delay.svg");
+  --setting-icon-color: #a44d34;
 }
 
 .settings-hint {
@@ -1560,10 +1573,13 @@ legend {
 }
 
 .row-chevron {
+  --chevron-color: #66756e;
   width: 20px;
   height: 20px;
   margin-left: auto;
-  background: url("icons/chevron-right.svg") center / contain no-repeat;
+  background: var(--chevron-color);
+  mask: url("icons/chevron-right.svg") center / contain no-repeat;
+  -webkit-mask: url("icons/chevron-right.svg") center / contain no-repeat;
 }
 
 .sync-panel {
@@ -1810,6 +1826,26 @@ html.theme-system-dark .settings-hint {
   color: var(--muted);
 }
 
+html.theme-dark .setting-dot,
+html.theme-system-dark .setting-dot {
+  --setting-icon-color: #78d6a8;
+}
+
+html.theme-dark .theme-dot,
+html.theme-system-dark .theme-dot {
+  --setting-icon-color: #9fc7ff;
+}
+
+html.theme-dark .notice-dot,
+html.theme-system-dark .notice-dot {
+  --setting-icon-color: #ffb18f;
+}
+
+html.theme-dark .row-chevron,
+html.theme-system-dark .row-chevron {
+  --chevron-color: #a9bbb2;
+}
+
 html.theme-dark input,
 html.theme-system-dark input,
 html.theme-dark select,
@@ -2000,6 +2036,22 @@ html.theme-system-dark .sync-now-button.is-syncing {
   html.theme-system .sync-card-copy p,
   html.theme-system .settings-hint {
     color: var(--muted);
+  }
+
+  html.theme-system .setting-dot {
+    --setting-icon-color: #78d6a8;
+  }
+
+  html.theme-system .theme-dot {
+    --setting-icon-color: #9fc7ff;
+  }
+
+  html.theme-system .notice-dot {
+    --setting-icon-color: #ffb18f;
+  }
+
+  html.theme-system .row-chevron {
+    --chevron-color: #a9bbb2;
   }
 
   html.theme-system input,
