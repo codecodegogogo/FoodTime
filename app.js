@@ -165,10 +165,22 @@
   }
 
   function remindInfo(food) {
-    const remaining = Number(food.remindDays || 3) - daysStored(food);
-    if (remaining <= 0) return { label: "今天提醒", className: "urgent" };
-    if (remaining === 1) return { label: "明天", className: "soon" };
-    return { label: `${remaining} 天后`, className: "safe" };
+    const purchasedAt = new Date(`${food.purchaseDate}T00:00:00`);
+    if (Number.isNaN(purchasedAt.getTime())) {
+      return { label: "待计算", className: "safe", remaining: 0 };
+    }
+
+    const remindDays = Number(food.remindDays || 3);
+    const dueAt = new Date(purchasedAt);
+    dueAt.setDate(dueAt.getDate() + remindDays);
+    const remaining = Math.ceil((dueAt - today) / ONE_DAY);
+
+    if (remaining < 0) {
+      return { label: `已过期 ${Math.abs(remaining)} 天`, className: "urgent", remaining };
+    }
+    if (remaining === 0) return { label: "今天到期", className: "urgent", remaining };
+    if (remaining === 1) return { label: "明天到期", className: "soon", remaining };
+    return { label: `${remaining} 天后到期`, className: "safe", remaining };
   }
 
   function classifyFood(name) {
@@ -454,7 +466,9 @@
     add.querySelector(".photo-area").classList.remove("is-captured");
     add.querySelector(".photo-area").style.removeProperty("--captured-photo");
     add.querySelector(".photo-area > button").textContent = "拍照";
-    add.querySelectorAll(".quantity-quick button").forEach((button, index) => {
+    add.querySelector(".quantity-picker-toggle").setAttribute("aria-expanded", "false");
+    add.querySelector(".quantity-picker").classList.remove("is-open");
+    add.querySelectorAll(".quantity-wheel button").forEach((button, index) => {
       button.classList.toggle("active", index === 0);
     });
     capturedPhoto = "";
@@ -500,6 +514,21 @@
     const current = Number.parseInt(value.textContent, 10) || 3;
     const next = Math.min(30, Math.max(1, current + direction));
     value.textContent = `${next} 天`;
+  }
+
+  function closeQuantityPicker() {
+    const add = screenElement("add");
+    if (!add) return;
+    add.querySelector(".quantity-picker")?.classList.remove("is-open");
+    add.querySelector(".quantity-picker-toggle")?.setAttribute("aria-expanded", "false");
+  }
+
+  function toggleQuantityPicker(button) {
+    const picker = button.nextElementSibling;
+    if (!picker || !picker.classList.contains("quantity-picker")) return;
+    const willOpen = !picker.classList.contains("is-open");
+    picker.classList.toggle("is-open", willOpen);
+    button.setAttribute("aria-expanded", String(willOpen));
   }
 
   function openSheet(foodId) {
@@ -584,12 +613,23 @@
       return;
     }
 
-    const quantityQuick = target.closest(".quantity-quick button");
-    if (quantityQuick) {
-      const input = document.querySelector(".phone-add [aria-label='数量']");
-      if (input) input.value = quantityQuick.textContent.trim();
-      activateItem(quantityQuick, "button");
+    const quantityToggle = target.closest(".quantity-picker-toggle");
+    if (quantityToggle) {
+      toggleQuantityPicker(quantityToggle);
       return;
+    }
+
+    const quantityChoice = target.closest(".quantity-wheel button");
+    if (quantityChoice) {
+      const input = document.querySelector(".phone-add [aria-label='数量']");
+      if (input) input.value = quantityChoice.textContent.trim();
+      activateItem(quantityChoice, "button");
+      closeQuantityPicker();
+      return;
+    }
+
+    if (!target.closest(".quantity-picker") && !target.closest(".quantity-picker-toggle")) {
+      closeQuantityPicker();
     }
 
     const storageButton = target.closest(".storage-chips button");
@@ -668,7 +708,7 @@
     const input = event.target.closest(".quantity-input");
     if (!input) return;
 
-    document.querySelectorAll(".quantity-quick button").forEach((button) => {
+    document.querySelectorAll(".quantity-wheel button").forEach((button) => {
       button.classList.toggle("active", button.textContent.trim() === input.value.trim());
     });
   }

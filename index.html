@@ -35,8 +35,8 @@
 
         <nav class="segmented" aria-label="食物区域">
           <button class="active">全部</button>
-          <button>冰箱</button>
-          <button>常温</button>
+              <button>冰箱</button>
+              <button>常温</button>
         </nav>
 
         <section class="food-list" aria-label="食物列表">
@@ -47,7 +47,7 @@
               <p>6 月 18 日购买</p>
             </div>
             <div class="food-actions">
-              <div class="food-state">今天提醒</div>
+              <div class="food-state">计算中</div>
               <button class="row-action" aria-label="操作鲜牛奶">操作</button>
             </div>
           </article>
@@ -59,7 +59,7 @@
               <p>6 月 19 日购买</p>
             </div>
             <div class="food-actions">
-              <div class="food-state">明天</div>
+              <div class="food-state">计算中</div>
               <button class="row-action" aria-label="操作草莓">操作</button>
             </div>
           </article>
@@ -71,7 +71,7 @@
               <p>6 月 20 日购买</p>
             </div>
             <div class="food-actions">
-              <div class="food-state">3 天后</div>
+              <div class="food-state">计算中</div>
               <button class="row-action" aria-label="操作鸡胸肉">操作</button>
             </div>
           </article>
@@ -122,7 +122,7 @@
               <p>6 月 18 日购买</p>
             </div>
             <div class="food-actions">
-              <div class="food-state">今天提醒</div>
+              <div class="food-state">计算中</div>
               <button class="row-action" aria-label="操作鲜牛奶">操作</button>
             </div>
           </article>
@@ -134,7 +134,7 @@
               <p>6 月 19 日购买</p>
             </div>
             <div class="food-actions">
-              <div class="food-state">明天</div>
+              <div class="food-state">计算中</div>
               <button class="row-action" aria-label="操作草莓">操作</button>
             </div>
           </article>
@@ -146,7 +146,7 @@
               <p>6 月 20 日购买</p>
             </div>
             <div class="food-actions">
-              <div class="food-state">3 天后</div>
+              <div class="food-state">计算中</div>
               <button class="row-action" aria-label="操作鸡胸肉">操作</button>
             </div>
           </article>
@@ -159,7 +159,7 @@
               <p>正在处理</p>
               <div class="sheet-title-row">
                 <h2>鲜牛奶</h2>
-                <span>今天提醒</span>
+                <span>计算中</span>
               </div>
             </div>
             <button class="sheet-close" aria-label="关闭操作面板">
@@ -229,20 +229,24 @@
             <div class="quantity-grid">
               <label>
                 数量
-                <input class="quantity-input" value="1" inputmode="decimal" list="quantity-options" aria-label="数量" />
-                <datalist id="quantity-options">
-                  <option value="1"></option>
-                  <option value="2"></option>
-                  <option value="3"></option>
-                  <option value="4"></option>
-                  <option value="5"></option>
-                </datalist>
-                <div class="quantity-quick" aria-label="数量快捷选择">
-                  <button type="button" class="active">1</button>
-                  <button type="button">2</button>
-                  <button type="button">3</button>
-                  <button type="button">4</button>
-                  <button type="button">5</button>
+                <input class="quantity-input" value="1" inputmode="decimal" aria-label="数量" />
+                <button type="button" class="quantity-picker-toggle" aria-expanded="false">选择数量</button>
+                <div class="quantity-picker" aria-label="数量滑动选择">
+                  <div class="quantity-wheel">
+                    <button type="button" class="active">1</button>
+                    <button type="button">2</button>
+                    <button type="button">3</button>
+                    <button type="button">4</button>
+                    <button type="button">5</button>
+                    <button type="button">6</button>
+                    <button type="button">7</button>
+                    <button type="button">8</button>
+                    <button type="button">9</button>
+                    <button type="button">10</button>
+                    <button type="button">12</button>
+                    <button type="button">15</button>
+                    <button type="button">20</button>
+                  </div>
                 </div>
               </label>
               <label>
@@ -374,7 +378,7 @@
               <h2>鲜牛奶</h2>
               <p>冰箱中，已存 2 天</p>
             </div>
-            <strong class="record-state storing">今天提醒</strong>
+            <strong class="record-state storing">计算中</strong>
           </article>
           <article>
             <div class="food-thumb chicken"></div>
