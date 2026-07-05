@@ -1,5 +1,6 @@
 (function () {
   const STORAGE_KEY = "foodtime.foods.v1";
+  const SYNC_SETTINGS_KEY = "foodtime.syncSettings.v1";
   const ONE_DAY = 24 * 60 * 60 * 1000;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -9,6 +10,9 @@
     homeSheet: ".phone-home-sheet",
     add: ".phone-add",
     stats: ".phone-stats",
+    profile: ".phone-profile",
+    settings: ".phone-settings",
+    syncSettings: ".phone-sync-settings",
     history: ".phone-history",
     fridge: ".phone-fridge-records",
     room: ".phone-room-records",
@@ -326,17 +330,16 @@
 
   function renderStats() {
     const foods = loadFoods();
-    const cards = screenElement("stats")?.querySelectorAll(".stats-grid article");
-    if (!cards) return;
-
     const fridge = foods.filter((food) => food.status === "active" && food.storage === "冰箱").length;
     const room = foods.filter((food) => food.status === "active" && food.storage === "常温").length;
     const history = foods.filter((food) => food.status === "eaten" || food.status === "spoiled").length;
     const values = [fridge, room, history];
 
-    cards.forEach((card, index) => {
-      const value = card.querySelector("strong");
-      if (value) value.textContent = String(values[index] || 0);
+    document.querySelectorAll(".stats-grid").forEach((grid) => {
+      grid.querySelectorAll("article").forEach((card, index) => {
+        const value = card.querySelector("strong");
+        if (value) value.textContent = String(values[index] || 0);
+      });
     });
   }
 
@@ -376,12 +379,13 @@
 
   function syncTabbars(screenName) {
     const fridgeActive = ["home", "homeSheet", "fridge", "room"].includes(screenName);
+    const profileActive = ["profile", "settings", "syncSettings"].includes(screenName);
     document.querySelectorAll(".tabbar").forEach((bar) => {
       const tabs = Array.from(bar.querySelectorAll("span"));
       tabs.forEach((tab, index) => {
         tab.classList.toggle(
           "active",
-          (index === 0 && fridgeActive) || (index === 1 && screenName === "stats"),
+          (index === 0 && fridgeActive) || (index === 1 && profileActive),
         );
       });
     });
@@ -570,6 +574,52 @@
     showScreen("home", { reset: true });
   }
 
+  function loadSyncSettings() {
+    try {
+      return JSON.parse(localStorage.getItem(SYNC_SETTINGS_KEY) || "{}");
+    } catch (error) {
+      localStorage.removeItem(SYNC_SETTINGS_KEY);
+      return {};
+    }
+  }
+
+  function fillSyncSettingsForm() {
+    const settings = loadSyncSettings();
+    const screen = screenElement("syncSettings");
+    if (!screen) return;
+
+    const webdav = screen.querySelector("[aria-label='WebDAV 地址']");
+    const account = screen.querySelector("[aria-label='坚果云账号']");
+    const password = screen.querySelector("[aria-label='坚果云应用密码']");
+    const remoteFile = screen.querySelector("[aria-label='同步远程文件']");
+
+    if (webdav) webdav.value = settings.webdavUrl || "https://dav.jianguoyun.com/dav/";
+    if (account) account.value = settings.account || "";
+    if (password) password.value = settings.password || "";
+    if (remoteFile) remoteFile.value = settings.remoteFile || "/FoodTime/foodtime-data.json";
+  }
+
+  function saveSyncSettings() {
+    const screen = screenElement("syncSettings");
+    if (!screen) return;
+
+    const settings = {
+      webdavUrl: screen.querySelector("[aria-label='WebDAV 地址']")?.value.trim() || "",
+      account: screen.querySelector("[aria-label='坚果云账号']")?.value.trim() || "",
+      password: screen.querySelector("[aria-label='坚果云应用密码']")?.value || "",
+      remoteFile: screen.querySelector("[aria-label='同步远程文件']")?.value.trim() || "",
+      updatedAt: new Date().toISOString(),
+    };
+
+    localStorage.setItem(SYNC_SETTINGS_KEY, JSON.stringify(settings));
+    const button = screen.querySelector(".sync-save-action");
+    if (!button) return;
+    button.textContent = "已保存";
+    window.setTimeout(() => {
+      button.textContent = "保存同步设置";
+    }, 1200);
+  }
+
   function handlePhotoFile(file) {
     if (!file) return;
     const reader = new FileReader();
@@ -670,7 +720,7 @@
     const tabItem = target.closest(".tabbar span");
     if (tabItem) {
       const index = itemIndex(tabItem, "span");
-      showScreen(index === 0 ? "home" : "stats");
+      showScreen(index === 0 ? "home" : "profile");
       return;
     }
 
@@ -681,7 +731,32 @@
       return;
     }
 
-    const statsCard = target.closest(".phone-stats .stats-grid article");
+    const settingsButton = target.closest(".settings-button");
+    if (settingsButton) {
+      showScreen("settings");
+      return;
+    }
+
+    const syncEntry = target.closest(".sync-entry");
+    if (syncEntry) {
+      showScreen("settings");
+      return;
+    }
+
+    const syncSettingsButton = target.closest(".sync-settings-button");
+    if (syncSettingsButton) {
+      fillSyncSettingsForm();
+      showScreen("syncSettings");
+      return;
+    }
+
+    const syncSave = target.closest(".sync-save-action");
+    if (syncSave) {
+      saveSyncSettings();
+      return;
+    }
+
+    const statsCard = target.closest(".phone-stats .stats-grid article, .phone-profile .stats-grid article");
     if (statsCard) {
       const index = itemIndex(statsCard, "article");
       if (index === 0) showScreen("fridge");
@@ -720,6 +795,7 @@
 
     renderAll();
     resetAddForm();
+    fillSyncSettingsForm();
     allScreens().forEach((screen, index) => {
       screen.classList.toggle("is-active", index === 0);
     });

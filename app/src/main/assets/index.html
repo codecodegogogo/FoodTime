@@ -79,7 +79,7 @@
 
         <footer class="tabbar" aria-label="底部导航">
           <span class="active">冰箱</span>
-          <span>统计</span>
+          <span>我的</span>
         </footer>
       </section>
 
@@ -187,7 +187,7 @@
 
         <footer class="tabbar" aria-label="底部导航">
           <span class="active">冰箱</span>
-          <span>统计</span>
+          <span>我的</span>
         </footer>
       </section>
 
@@ -282,7 +282,7 @@
         <button class="primary-action">保存</button>
       </section>
 
-      <section class="phone phone-stats" aria-label="统计界面">
+      <section class="phone phone-stats is-paused" aria-label="统计界面">
         <header class="sub-header">
           <button class="back-button" aria-label="返回"></button>
           <h1>统计</h1>
@@ -324,6 +324,127 @@
           <span>冰箱</span>
           <span class="active">统计</span>
         </footer>
+      </section>
+
+      <section class="phone phone-profile" aria-label="我的界面">
+        <header class="sub-header profile-header">
+          <span></span>
+          <h1>我的</h1>
+          <button class="settings-button" aria-label="设置">
+            <span class="settings-icon"></span>
+          </button>
+        </header>
+
+        <section class="profile-card">
+          <div class="profile-avatar" aria-hidden="true">F</div>
+          <div>
+            <h2>家庭冰箱</h2>
+            <p>本地数据 · 坚果云同步待设置</p>
+          </div>
+        </section>
+
+        <section class="stats-hero profile-stats-hero">
+          <div>
+            <p>本周节省</p>
+            <strong>7 件食物按时处理</strong>
+          </div>
+          <div class="chart-illustration" aria-hidden="true">
+            <span class="chart-plate"></span>
+            <span class="chart-bar bar-a"></span>
+            <span class="chart-bar bar-b"></span>
+            <span class="chart-bar bar-c"></span>
+          </div>
+        </section>
+
+        <section class="stats-grid" aria-label="我的统计摘要">
+          <article>
+            <span>冰箱中</span>
+            <strong>12</strong>
+            <p>件食物</p>
+          </article>
+          <article>
+            <span>常温中</span>
+            <strong>3</strong>
+            <p>件食物</p>
+          </article>
+          <article class="history-card">
+            <span>历史食物记录</span>
+            <strong>28</strong>
+            <p>条记录</p>
+          </article>
+        </section>
+
+        <section class="setting-list profile-actions" aria-label="我的操作">
+          <button class="setting-row sync-entry" type="button">
+            <div class="setting-dot cloud-dot"></div>
+            <div>
+              <h2>同步状态</h2>
+              <p>设置坚果云 WebDAV 后两台手机可交换数据</p>
+            </div>
+            <span class="row-chevron"></span>
+          </button>
+        </section>
+
+        <footer class="tabbar" aria-label="底部导航">
+          <span>冰箱</span>
+          <span class="active">我的</span>
+        </footer>
+      </section>
+
+      <section class="phone phone-settings" aria-label="设置界面">
+        <header class="sub-header">
+          <button class="back-button" aria-label="返回"></button>
+          <h1>设置</h1>
+          <span></span>
+        </header>
+
+        <section class="setting-list settings-menu" aria-label="设置列表">
+          <button class="setting-row sync-settings-button" type="button">
+            <div class="setting-dot cloud-dot"></div>
+            <div>
+              <h2>同步设置</h2>
+              <p>配置坚果云 WebDAV 地址、账号和应用密码</p>
+            </div>
+            <span class="row-chevron"></span>
+          </button>
+        </section>
+      </section>
+
+      <section class="phone phone-sync-settings" aria-label="同步设置界面">
+        <header class="sub-header">
+          <button class="back-button" aria-label="返回"></button>
+          <h1>同步设置</h1>
+          <span></span>
+        </header>
+
+        <section class="sync-panel">
+          <div class="sync-hero">
+            <div class="sync-cloud" aria-hidden="true"></div>
+            <div>
+              <p>坚果云 WebDAV</p>
+              <strong>让两台手机交换同一份食物数据</strong>
+            </div>
+          </div>
+
+          <label>
+            WebDAV 地址
+            <input value="https://dav.jianguoyun.com/dav/" aria-label="WebDAV 地址" />
+          </label>
+          <label>
+            账号
+            <input placeholder="填写坚果云账号邮箱" aria-label="坚果云账号" />
+          </label>
+          <label>
+            应用密码
+            <input type="password" placeholder="填写坚果云应用密码" aria-label="坚果云应用密码" />
+          </label>
+          <label>
+            远程文件
+            <input value="/FoodTime/foodtime-data.json" aria-label="同步远程文件" />
+          </label>
+
+          <button class="primary-action sync-save-action">保存同步设置</button>
+        </section>
       </section>
 
       <section class="phone phone-history" aria-label="历史食物记录界面">

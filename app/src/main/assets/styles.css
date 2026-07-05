@@ -44,6 +44,7 @@ button {
 
 .icon-button,
 .back-button,
+.settings-button,
 .row-action,
 .sheet-close,
 .sheet-actions button,
@@ -51,6 +52,7 @@ button {
 .storage-chips button,
 .stepper button,
 .primary-action,
+.setting-row[type="button"],
 .tabbar span,
 .stats-grid article,
 .history-filters button,
@@ -90,6 +92,10 @@ button {
   transform: translateX(-50%);
   border-radius: 0 0 18px 18px;
   background: #253339;
+}
+
+.phone.is-paused {
+  display: none;
 }
 
 .app-header,
@@ -572,7 +578,7 @@ button {
 }
 
 .tabbar span:nth-child(2) {
-  --tab-icon: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 19V9m7 10V5m7 14v-7' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E");
+  --tab-icon: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 8a7 7 0 0 1 14 0' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
 .tabbar .active {
@@ -1395,6 +1401,195 @@ legend {
   margin: 0;
   color: var(--muted);
   font-size: 13px;
+}
+
+.profile-header {
+  padding-bottom: 16px;
+}
+
+.settings-button {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 15px;
+  background: #e4f2e8;
+}
+
+.settings-icon {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+}
+
+.settings-icon::before,
+.settings-icon::after {
+  content: "";
+  position: absolute;
+  inset: -8px 6px;
+  border-radius: 999px;
+  background: var(--ink);
+}
+
+.settings-icon::after {
+  transform: rotate(90deg);
+}
+
+.profile-card,
+.sync-panel {
+  margin: 0 20px 18px;
+  border: 1px solid var(--line);
+  border-radius: 26px;
+  background: #ffffff;
+}
+
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+}
+
+.profile-avatar {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  border: 3px solid #26353a;
+  border-radius: 20px;
+  color: #ffffff;
+  background: var(--mint-dark);
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.profile-card h2,
+.sync-hero strong {
+  margin: 0;
+  font-size: 18px;
+}
+
+.profile-card p,
+.sync-hero p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.profile-stats-hero {
+  margin-top: 0;
+}
+
+.profile-actions,
+.settings-menu {
+  margin-top: 0;
+}
+
+.setting-row[type="button"] {
+  width: 100%;
+  color: inherit;
+  background: transparent;
+  text-align: left;
+}
+
+.setting-dot {
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  border: 2px solid #26353a;
+  border-radius: 15px;
+  background: #e4f2e8;
+}
+
+.cloud-dot {
+  position: relative;
+}
+
+.cloud-dot::before,
+.cloud-dot::after {
+  content: "";
+  position: absolute;
+  border: 2px solid #26353a;
+  background: var(--blue);
+}
+
+.cloud-dot::before {
+  left: 8px;
+  top: 15px;
+  width: 24px;
+  height: 12px;
+  border-radius: 12px;
+}
+
+.cloud-dot::after {
+  left: 14px;
+  top: 9px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+}
+
+.row-chevron {
+  width: 18px;
+  height: 18px;
+  margin-left: auto;
+  background: var(--muted);
+  -webkit-mask: var(--chevron-icon) center / contain no-repeat;
+  mask: var(--chevron-icon) center / contain no-repeat;
+  transform: rotate(-90deg);
+}
+
+.sync-panel {
+  padding: 18px;
+}
+
+.sync-hero {
+  display: grid;
+  grid-template-columns: 58px 1fr;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.sync-cloud {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  border: 3px solid #26353a;
+  border-radius: 20px;
+  background: #dceef7;
+}
+
+.sync-cloud::before {
+  content: "";
+  position: absolute;
+  left: 11px;
+  top: 23px;
+  width: 33px;
+  height: 16px;
+  border: 3px solid #26353a;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.sync-cloud::after {
+  content: "";
+  position: absolute;
+  left: 23px;
+  top: 15px;
+  width: 17px;
+  height: 17px;
+  border: 3px solid #26353a;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.sync-save-action {
+  width: 100%;
+  margin: 6px 0 0;
 }
 
 .rank-list h2 {
