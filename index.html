@@ -21,7 +21,7 @@
         <section class="hero-panel">
           <div class="hero-copy">
             <p>今天先吃</p>
-            <strong>3 件食物快到提醒日</strong>
+            <strong>所有东西都已经吃完</strong>
           </div>
           <div class="fridge-illustration" aria-hidden="true">
             <div class="fridge-door">
@@ -39,46 +39,15 @@
               <button>常温</button>
         </nav>
 
-        <section class="food-list" aria-label="食物列表">
-          <article class="food-row urgent">
-            <div class="food-thumb milk"></div>
-            <div class="food-info">
-              <h2>鲜牛奶</h2>
-              <p>6 月 18 日购买</p>
-            </div>
-            <div class="food-actions">
-              <div class="food-state">计算中</div>
-              <button class="row-action" aria-label="操作鲜牛奶">操作</button>
-            </div>
-          </article>
-
-          <article class="food-row soon">
-            <div class="food-thumb berry"></div>
-            <div class="food-info">
-              <h2>草莓</h2>
-              <p>6 月 19 日购买</p>
-            </div>
-            <div class="food-actions">
-              <div class="food-state">计算中</div>
-              <button class="row-action" aria-label="操作草莓">操作</button>
-            </div>
-          </article>
-
-          <article class="food-row safe">
-            <div class="food-thumb chicken"></div>
-            <div class="food-info">
-              <h2>鸡胸肉</h2>
-              <p>6 月 20 日购买</p>
-            </div>
-            <div class="food-actions">
-              <div class="food-state">计算中</div>
-              <button class="row-action" aria-label="操作鸡胸肉">操作</button>
-            </div>
+        <section class="food-list is-empty" aria-label="食物列表">
+          <article class="empty-row food-empty">
+            <strong>🍽️</strong>
+            <span>这里还没有食物</span>
           </article>
         </section>
 
         <footer class="tabbar" aria-label="底部导航">
-          <span class="active">冰箱</span>
+          <span class="active">首页</span>
           <span>我的</span>
         </footer>
       </section>
@@ -96,7 +65,7 @@
         <section class="hero-panel">
           <div class="hero-copy">
             <p>今天先吃</p>
-            <strong>3 件食物快到提醒日</strong>
+            <strong>所有东西都已经吃完</strong>
           </div>
           <div class="fridge-illustration" aria-hidden="true">
             <div class="fridge-door">
@@ -114,41 +83,10 @@
           <button>常温</button>
         </nav>
 
-        <section class="food-list" aria-label="食物列表">
-          <article class="food-row urgent">
-            <div class="food-thumb milk"></div>
-            <div class="food-info">
-              <h2>鲜牛奶</h2>
-              <p>6 月 18 日购买</p>
-            </div>
-            <div class="food-actions">
-              <div class="food-state">计算中</div>
-              <button class="row-action" aria-label="操作鲜牛奶">操作</button>
-            </div>
-          </article>
-
-          <article class="food-row soon">
-            <div class="food-thumb berry"></div>
-            <div class="food-info">
-              <h2>草莓</h2>
-              <p>6 月 19 日购买</p>
-            </div>
-            <div class="food-actions">
-              <div class="food-state">计算中</div>
-              <button class="row-action" aria-label="操作草莓">操作</button>
-            </div>
-          </article>
-
-          <article class="food-row safe">
-            <div class="food-thumb chicken"></div>
-            <div class="food-info">
-              <h2>鸡胸肉</h2>
-              <p>6 月 20 日购买</p>
-            </div>
-            <div class="food-actions">
-              <div class="food-state">计算中</div>
-              <button class="row-action" aria-label="操作鸡胸肉">操作</button>
-            </div>
+        <section class="food-list is-empty" aria-label="食物列表">
+          <article class="empty-row food-empty">
+            <strong>🍽️</strong>
+            <span>这里还没有食物</span>
           </article>
         </section>
 
@@ -186,7 +124,7 @@
         </section>
 
         <footer class="tabbar" aria-label="底部导航">
-          <span class="active">冰箱</span>
+          <span class="active">首页</span>
           <span>我的</span>
         </footer>
       </section>
@@ -212,7 +150,7 @@
             <span class="egg"></span>
           </div>
           <input class="camera-input" type="file" accept="image/*" capture="environment" aria-label="拍摄食物照片" hidden />
-          <button>拍照</button>
+          <button><img class="button-icon" src="icons/camera.svg" alt="" /><span>拍照</span></button>
         </section>
 
         <form class="form-panel">
@@ -230,24 +168,6 @@
               <label>
                 数量
                 <input class="quantity-input" value="1" inputmode="decimal" aria-label="数量" />
-                <button type="button" class="quantity-picker-toggle" aria-expanded="false">选择数量</button>
-                <div class="quantity-picker" aria-label="数量滑动选择">
-                  <div class="quantity-wheel">
-                    <button type="button" class="active">1</button>
-                    <button type="button">2</button>
-                    <button type="button">3</button>
-                    <button type="button">4</button>
-                    <button type="button">5</button>
-                    <button type="button">6</button>
-                    <button type="button">7</button>
-                    <button type="button">8</button>
-                    <button type="button">9</button>
-                    <button type="button">10</button>
-                    <button type="button">12</button>
-                    <button type="button">15</button>
-                    <button type="button">20</button>
-                  </div>
-                </div>
               </label>
               <label>
                 单位
@@ -321,19 +241,34 @@
         </section>
 
         <footer class="tabbar" aria-label="底部导航">
-          <span>冰箱</span>
-          <span class="active">统计</span>
+          <span>首页</span>
+          <span class="active">我的</span>
         </footer>
       </section>
 
       <section class="phone phone-profile" aria-label="我的界面">
         <header class="sub-header profile-header">
           <span></span>
-          <h1>我的</h1>
+          <p class="eyebrow">FoodTime</p>
           <button class="settings-button" aria-label="设置">
-            <img class="settings-icon-img" src="settings.svg" alt="" />
+            <img class="settings-icon-img" src="icons/settings.svg" alt="" />
           </button>
         </header>
+
+        <section class="profile-sync-card sync-entry" aria-label="同步状态">
+          <div class="sync-card-icon" aria-hidden="true">
+            <img class="sync-icon-img" src="icons/sync.svg" alt="" />
+          </div>
+          <div class="sync-card-copy">
+            <span>同步</span>
+            <strong class="sync-service-text">当前服务：未设置</strong>
+            <p class="sync-time-text">同步时间：未同步</p>
+          </div>
+          <button class="sync-now-button" type="button" aria-label="立即同步">
+            <img class="sync-button-icon" src="icons/sync.svg" alt="" />
+            <span>同步</span>
+          </button>
+        </section>
 
         <section class="stats-grid" aria-label="我的统计摘要">
           <article>
@@ -354,15 +289,15 @@
         </section>
 
         <footer class="tabbar" aria-label="底部导航">
-          <span>冰箱</span>
+          <span>首页</span>
           <span class="active">我的</span>
         </footer>
       </section>
 
       <section class="phone phone-settings" aria-label="设置界面">
-        <header class="sub-header">
+        <header class="sub-header settings-header">
           <button class="back-button" aria-label="返回"></button>
-          <h1>设置</h1>
+          <p class="eyebrow">FoodTime</p>
           <span></span>
         </header>
 
@@ -371,7 +306,23 @@
             <div class="setting-dot cloud-dot"></div>
             <div>
               <h2>同步设置</h2>
-              <p>配置坚果云 WebDAV 地址、账号和应用密码</p>
+              <p>默认坚果云，也支持其他 WebDAV 服务</p>
+            </div>
+            <span class="row-chevron"></span>
+          </button>
+          <button class="setting-row theme-settings-button" type="button">
+            <div class="setting-dot theme-dot"></div>
+            <div>
+              <h2>夜间模式</h2>
+              <p class="theme-summary-text">跟随系统</p>
+            </div>
+            <span class="row-chevron"></span>
+          </button>
+          <button class="setting-row notification-settings-button" type="button">
+            <div class="setting-dot notice-dot"></div>
+            <div>
+              <h2>提醒通知</h2>
+              <p class="notification-summary-text">每天 09:00，紧急提醒 3 天</p>
             </div>
             <span class="row-chevron"></span>
           </button>
@@ -387,10 +338,10 @@
 
         <section class="sync-panel">
           <div class="sync-hero">
-            <div class="sync-cloud" aria-hidden="true"></div>
+            <img class="sync-icon-img sync-hero-icon" src="icons/sync.svg" alt="" />
             <div>
-              <p>坚果云 WebDAV</p>
-              <strong>让两台手机交换同一份食物数据</strong>
+              <p>WebDAV 同步</p>
+              <strong>默认使用坚果云，也可以填写其他 DAV 服务</strong>
               <p class="sync-status-text">填写后保存，后续修改会自动同步</p>
             </div>
           </div>
@@ -401,11 +352,11 @@
           </label>
           <label>
             账号
-            <input placeholder="填写坚果云账号邮箱" aria-label="坚果云账号" />
+            <input placeholder="填写 WebDAV 账号或邮箱" aria-label="WebDAV 账号" />
           </label>
           <label>
-            应用密码
-            <input type="password" placeholder="填写坚果云应用密码" aria-label="坚果云应用密码" />
+            密码 / 应用密码
+            <input type="password" placeholder="填写 WebDAV 密码或应用密码" aria-label="WebDAV 密码" />
           </label>
           <label>
             远程文件
@@ -413,6 +364,52 @@
           </label>
 
           <button class="primary-action sync-save-action">保存同步设置</button>
+        </section>
+      </section>
+
+      <section class="phone phone-theme-settings" aria-label="夜间模式设置界面">
+        <header class="sub-header">
+          <button class="back-button" aria-label="返回"></button>
+          <h1>夜间模式</h1>
+          <span></span>
+        </header>
+
+        <section class="setting-list settings-form">
+          <fieldset>
+            <legend>显示模式</legend>
+            <div class="chips theme-options" aria-label="显示模式">
+              <button type="button" class="active" data-theme-mode="system">跟随系统</button>
+              <button type="button" data-theme-mode="light">浅色</button>
+              <button type="button" data-theme-mode="dark">夜间</button>
+            </div>
+          </fieldset>
+          <p class="settings-hint">跟随系统时，手机切换深色模式后应用会一起切换。</p>
+          <button class="primary-action theme-save-action">保存显示设置</button>
+        </section>
+      </section>
+
+      <section class="phone phone-notification-settings" aria-label="提醒通知设置界面">
+        <header class="sub-header">
+          <button class="back-button" aria-label="返回"></button>
+          <h1>提醒通知</h1>
+          <span></span>
+        </header>
+
+        <section class="setting-list settings-form">
+          <label>
+            每天提醒时间
+            <input type="time" value="09:00" aria-label="每天提醒时间" />
+          </label>
+          <label>
+            紧急提醒范围
+            <div class="stepper emergency-stepper">
+              <button type="button">-</button>
+              <strong>3 天</strong>
+              <button type="button">+</button>
+            </div>
+          </label>
+          <p class="settings-hint">进入紧急提醒范围后，第一次间隔 12 小时，之后 6 小时、3 小时递减，最短每 30 分钟提醒一次，直到你标记吃完、坏掉或延期。</p>
+          <button class="primary-action notification-save-action">保存提醒设置</button>
         </section>
       </section>
 
@@ -435,7 +432,7 @@
               <h2>草莓</h2>
               <p>手动标记，6 月 21 日吃完</p>
             </div>
-            <strong class="record-state eaten">已吃完</strong>
+            <button class="restore-action" type="button">还原</button>
           </article>
           <article>
             <div class="food-thumb chicken"></div>
@@ -443,7 +440,7 @@
               <h2>鱼肉</h2>
               <p>冷藏 3 天后坏掉</p>
             </div>
-            <strong class="record-state spoiled">已坏掉</strong>
+            <button class="restore-action" type="button">还原</button>
           </article>
         </section>
       </section>

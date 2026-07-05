@@ -2,8 +2,11 @@ package com.foodtime.app;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Base64;
@@ -32,6 +35,7 @@ import org.json.JSONObject;
 
 public class MainActivity extends Activity {
     private static final int FILE_CHOOSER_REQUEST = 1001;
+    private static final int NOTIFICATION_PERMISSION_REQUEST = 1002;
 
     private WebView webView;
     private ValueCallback<Uri[]> filePathCallback;
@@ -70,6 +74,7 @@ public class MainActivity extends Activity {
             }
         });
         webView.loadUrl("file:///android_asset/index.html");
+        requestNotificationPermissionIfNeeded();
     }
 
     private class FoodTimeBridge {
@@ -82,6 +87,28 @@ public class MainActivity extends Activity {
         public void push(String settingsJson, String payloadJson) {
             new Thread(() -> emitSyncResult(performPush(settingsJson, payloadJson))).start();
         }
+
+        @JavascriptInterface
+        public void updateNotificationPlan(String settingsJson, String payloadJson) {
+            new Thread(() -> FoodTimeNotificationScheduler.savePlan(
+                    MainActivity.this,
+                    settingsJson,
+                    payloadJson)).start();
+        }
+    }
+
+    private void requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            return;
+        }
+
+        if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        requestPermissions(
+                new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                NOTIFICATION_PERMISSION_REQUEST);
     }
 
     private JSONObject performPull(String settingsJson) {

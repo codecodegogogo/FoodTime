@@ -1,7 +1,12 @@
 (function () {
   const STORAGE_KEY = "foodtime.foods.v1";
   const SYNC_SETTINGS_KEY = "foodtime.syncSettings.v1";
+  const SYNC_LAST_AT_KEY = "foodtime.syncLastAt.v1";
+  const THEME_SETTINGS_KEY = "foodtime.themeSettings.v1";
+  const NOTIFICATION_SETTINGS_KEY = "foodtime.notificationSettings.v1";
   const ONE_DAY = 24 * 60 * 60 * 1000;
+  const PHOTO_MAX_SIDE = 768;
+  const PHOTO_QUALITY = 0.5;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -13,105 +18,97 @@
     profile: ".phone-profile",
     settings: ".phone-settings",
     syncSettings: ".phone-sync-settings",
+    themeSettings: ".phone-theme-settings",
+    notificationSettings: ".phone-notification-settings",
     history: ".phone-history",
     fridge: ".phone-fridge-records",
     room: ".phone-room-records",
   };
 
-  const defaultFoods = [
+  const FOOD_ICON_DEFS = [
     {
-      id: "milk-001",
-      name: "鲜牛奶",
-      purchaseDate: "2026-07-03",
-      storage: "冰箱",
-      quantity: "1",
-      unit: "瓶",
-      remindDays: 2,
-      status: "active",
       type: "milk",
-      photoText: "鲜牛奶",
-      createdAt: "2026-07-03",
+      file: "icons/food-milk.svg",
+      keywords: ["奶", "牛奶", "鲜奶", "酸奶", "奶酪", "芝士", "黄油", "豆浆", "燕麦", "饮料", "果汁"],
     },
     {
-      id: "berry-001",
-      name: "草莓",
-      purchaseDate: "2026-07-04",
-      storage: "冰箱",
-      quantity: "1",
-      unit: "斤",
-      remindDays: 3,
-      status: "active",
-      type: "berry",
-      photoText: "草莓",
-      createdAt: "2026-07-04",
-    },
-    {
-      id: "chicken-001",
-      name: "鸡胸肉",
-      purchaseDate: "2026-07-05",
-      storage: "冰箱",
-      quantity: "2",
-      unit: "袋",
-      remindDays: 3,
-      status: "active",
       type: "chicken",
-      photoText: "鸡肉",
-      createdAt: "2026-07-05",
+      file: "icons/food-meat.svg",
+      keywords: ["鸡", "鸡胸", "鸡肉", "肉", "猪", "牛", "羊", "鱼", "虾", "海鲜", "蛋", "鸡蛋", "排骨", "火腿", "香肠", "培根"],
     },
     {
-      id: "banana-001",
-      name: "香蕉",
-      purchaseDate: "2026-07-03",
-      storage: "常温",
-      quantity: "6",
-      unit: "个",
-      remindDays: 3,
-      status: "active",
+      type: "bread",
+      file: "icons/food-bread.svg",
+      keywords: ["面包", "吐司", "蛋糕", "饼", "包子", "馒头", "米饭", "面条", "饺子", "馄饨", "披萨", "粉"],
+    },
+    {
       type: "berry",
-      photoText: "香蕉",
-      createdAt: "2026-07-03",
+      file: "icons/food-berry.svg",
+      keywords: ["草莓", "蓝莓", "莓", "樱桃", "苹果", "梨", "香蕉", "葡萄", "橙", "橘", "桃", "芒果", "西瓜", "柠檬", "番茄", "西红柿", "黄瓜", "青菜", "蔬菜", "生菜", "菠菜", "白菜", "土豆", "胡萝卜", "玉米", "豆"],
     },
-    {
-      id: "bread-001",
-      name: "面包",
-      purchaseDate: "2026-07-02",
-      storage: "常温",
-      quantity: "1",
-      unit: "袋",
-      remindDays: 3,
-      status: "active",
-      type: "chicken",
-      photoText: "面包",
-      createdAt: "2026-07-02",
-    },
-    {
-      id: "strawberry-eaten",
-      name: "草莓",
-      purchaseDate: "2026-06-18",
-      storage: "冰箱",
-      quantity: "1",
-      unit: "盒",
-      remindDays: 3,
-      status: "eaten",
-      type: "berry",
-      photoText: "草莓",
-      handledAt: "2026-06-21",
-      createdAt: "2026-06-18",
-    },
-    {
-      id: "fish-spoiled",
-      name: "鱼肉",
-      purchaseDate: "2026-06-18",
-      storage: "冰箱",
-      quantity: "1",
-      unit: "袋",
-      remindDays: 3,
-      status: "spoiled",
-      type: "chicken",
-      photoText: "鱼肉",
-      handledAt: "2026-06-21",
-      createdAt: "2026-06-18",
-    },
+  ];
+
+  const FOOD_ICON_ALIASES = [
+    { type: "berry", file: "icons/food-strawberry.svg", keywords: ["草莓"] },
+    { type: "berry", file: "icons/food-apple.svg", keywords: ["苹果", "青苹果"] },
+    { type: "berry", file: "icons/food-banana.svg", keywords: ["香蕉"] },
+    { type: "berry", file: "icons/food-grape.svg", keywords: ["葡萄", "提子"] },
+    { type: "berry", file: "icons/food-orange.svg", keywords: ["橙", "橙子", "橘", "橘子"] },
+    { type: "berry", file: "icons/food-pear.svg", keywords: ["梨", "香梨"] },
+    { type: "berry", file: "icons/food-peach.svg", keywords: ["桃", "桃子"] },
+    { type: "berry", file: "icons/food-mango.svg", keywords: ["芒果"] },
+    { type: "berry", file: "icons/food-watermelon.svg", keywords: ["西瓜"] },
+    { type: "berry", file: "icons/food-lemon.svg", keywords: ["柠檬"] },
+    { type: "berry", file: "icons/food-cherry.svg", keywords: ["樱桃", "车厘子"] },
+    { type: "berry", file: "icons/food-blueberry.svg", keywords: ["蓝莓"] },
+    { type: "berry", file: "icons/food-kiwi.svg", keywords: ["猕猴桃", "奇异果"] },
+    { type: "berry", file: "icons/food-pineapple.svg", keywords: ["菠萝", "凤梨"] },
+    { type: "berry", file: "icons/food-lychee.svg", keywords: ["荔枝"] },
+    { type: "berry", file: "icons/food-plum.svg", keywords: ["李子", "梅子"] },
+    { type: "berry", file: "icons/food-tomato.svg", keywords: ["番茄", "西红柿"] },
+    { type: "berry", file: "icons/food-cucumber.svg", keywords: ["黄瓜"] },
+    { type: "berry", file: "icons/food-lettuce.svg", keywords: ["生菜", "油麦菜"] },
+    { type: "berry", file: "icons/food-spinach.svg", keywords: ["菠菜"] },
+    { type: "berry", file: "icons/food-cabbage.svg", keywords: ["白菜", "包菜", "卷心菜"] },
+    { type: "berry", file: "icons/food-potato.svg", keywords: ["土豆", "马铃薯"] },
+    { type: "berry", file: "icons/food-carrot.svg", keywords: ["胡萝卜"] },
+    { type: "berry", file: "icons/food-corn.svg", keywords: ["玉米"] },
+    { type: "berry", file: "icons/food-broccoli.svg", keywords: ["西兰花"] },
+    { type: "berry", file: "icons/food-onion.svg", keywords: ["洋葱"] },
+    { type: "berry", file: "icons/food-mushroom.svg", keywords: ["蘑菇", "香菇", "菌菇"] },
+    { type: "berry", file: "icons/food-pumpkin.svg", keywords: ["南瓜"] },
+    { type: "berry", file: "icons/food-avocado.svg", keywords: ["牛油果"] },
+    { type: "berry", file: "icons/food-pepper.svg", keywords: ["辣椒", "彩椒", "青椒"] },
+    { type: "milk", file: "icons/food-fresh-milk.svg", keywords: ["鲜牛奶", "牛奶", "奶"] },
+    { type: "milk", file: "icons/food-yogurt.svg", keywords: ["酸奶"] },
+    { type: "milk", file: "icons/food-cheese.svg", keywords: ["奶酪", "芝士"] },
+    { type: "milk", file: "icons/food-butter.svg", keywords: ["黄油"] },
+    { type: "milk", file: "icons/food-soy-milk.svg", keywords: ["豆浆"] },
+    { type: "chicken", file: "icons/food-egg.svg", keywords: ["鸡蛋", "蛋"] },
+    { type: "chicken", file: "icons/food-chicken.svg", keywords: ["鸡肉", "鸡胸", "鸡腿", "鸡翅", "鸡"] },
+    { type: "chicken", file: "icons/food-fish.svg", keywords: ["鱼", "鱼肉"] },
+    { type: "chicken", file: "icons/food-shrimp.svg", keywords: ["虾"] },
+    { type: "chicken", file: "icons/food-pork.svg", keywords: ["猪肉", "五花肉"] },
+    { type: "chicken", file: "icons/food-beef.svg", keywords: ["牛肉"] },
+    { type: "chicken", file: "icons/food-lamb.svg", keywords: ["羊肉"] },
+    { type: "chicken", file: "icons/food-ribs.svg", keywords: ["排骨"] },
+    { type: "chicken", file: "icons/food-sausage.svg", keywords: ["香肠", "腊肠"] },
+    { type: "chicken", file: "icons/food-ham.svg", keywords: ["火腿"] },
+    { type: "chicken", file: "icons/food-bacon.svg", keywords: ["培根"] },
+    { type: "bread", file: "icons/food-bread.svg", keywords: ["面包"] },
+    { type: "bread", file: "icons/food-toast.svg", keywords: ["吐司"] },
+    { type: "bread", file: "icons/food-cake.svg", keywords: ["蛋糕"] },
+    { type: "bread", file: "icons/food-bun.svg", keywords: ["包子", "馒头"] },
+    { type: "bread", file: "icons/food-rice.svg", keywords: ["米饭", "剩饭"] },
+    { type: "bread", file: "icons/food-noodle.svg", keywords: ["面条", "面"] },
+    { type: "bread", file: "icons/food-dumpling.svg", keywords: ["饺子", "馄饨"] },
+    { type: "bread", file: "icons/food-pizza.svg", keywords: ["披萨"] },
+    { type: "bread", file: "icons/food-pancake.svg", keywords: ["饼", "煎饼"] },
+    { type: "bread", file: "icons/food-cereal.svg", keywords: ["麦片", "燕麦"] },
+    { type: "bread", file: "icons/food-tofu.svg", keywords: ["豆腐"] },
+    { type: "bread", file: "icons/food-chocolate.svg", keywords: ["巧克力"] },
+    { type: "milk", file: "icons/food-juice.svg", keywords: ["果汁", "饮料"] },
+    { type: "milk", file: "icons/food-icecream.svg", keywords: ["冰淇淋", "雪糕"] },
   ];
 
   let currentScreen = "home";
@@ -123,9 +120,29 @@
   let syncTimer = 0;
   let syncInFlight = false;
   let syncQueued = false;
+  let notificationTimer = 0;
 
   function nowIso() {
     return new Date().toISOString();
+  }
+
+  function formatClock(value = new Date()) {
+    const date = value instanceof Date ? value : new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  }
+
+  function formatSyncMoment(value) {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "未同步";
+
+    const day = new Date(date);
+    day.setHours(0, 0, 0, 0);
+    const diff = Math.round((day - today) / ONE_DAY);
+    const clock = formatClock(date);
+    if (diff === 0) return `今天 ${clock}`;
+    if (diff === -1) return `昨天 ${clock}`;
+    return `${date.getMonth() + 1} 月 ${date.getDate()} 日 ${clock}`;
   }
 
   function foodTimestamp(food) {
@@ -161,13 +178,12 @@
       localStorage.removeItem(STORAGE_KEY);
     }
 
-    const initialFoods = normalizeFoods(defaultFoods);
-    saveFoods(initialFoods, { skipSync: true });
-    return initialFoods;
+    return [];
   }
 
   function saveFoods(foods, options = {}) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(normalizeFoods(foods)));
+    scheduleNativeNotifications();
     if (!options.skipSync) {
       scheduleSync();
     }
@@ -181,10 +197,62 @@
     return Boolean(window.FoodTimeNative && typeof window.FoodTimeNative.pull === "function");
   }
 
+  function nativeNotificationsAvailable() {
+    return Boolean(window.FoodTimeNative && typeof window.FoodTimeNative.updateNotificationPlan === "function");
+  }
+
+  function scheduleNativeNotifications(options = {}) {
+    if (!nativeNotificationsAvailable()) return;
+    window.clearTimeout(notificationTimer);
+    notificationTimer = window.setTimeout(() => {
+      window.FoodTimeNative.updateNotificationPlan(
+        JSON.stringify(loadNotificationSettings()),
+        JSON.stringify(syncPayload()),
+      );
+    }, options.immediate ? 0 : 500);
+  }
+
+  function syncServiceName(settings = loadSyncSettings()) {
+    const url = String(settings.webdavUrl || "").toLowerCase();
+    if (!url && !settings.account) return "当前服务：未设置";
+    if (url.includes("jianguoyun")) return "当前服务：坚果云 WebDAV";
+    if (url) return "当前服务：WebDAV";
+    return "当前服务：未完成设置";
+  }
+
+  function defaultSyncTimeLine(settings = loadSyncSettings()) {
+    if (!syncSettingsReady(settings)) return "同步时间：未设置";
+
+    const lastSyncAt = localStorage.getItem(SYNC_LAST_AT_KEY);
+    if (lastSyncAt) return `同步时间：${formatSyncMoment(lastSyncAt)}`;
+    return nativeSyncAvailable() ? "同步时间：尚未同步" : "同步时间：需在 APK 中执行";
+  }
+
+  function syncTimeLineFromMessage(message) {
+    if (!message) return defaultSyncTimeLine();
+    if (message.includes("同步中")) return "同步时间：正在同步";
+    if (message.startsWith("已同步")) return defaultSyncTimeLine();
+    if (message.includes("待设置") || message.includes("请先")) return "同步时间：待设置";
+    if (message.includes("需在 APK")) return "同步时间：需在 APK 中执行";
+    if (message.includes("失败")) return message;
+    return message;
+  }
+
+  function renderSyncSummary(message = "") {
+    const settings = loadSyncSettings();
+    document.querySelectorAll(".sync-service-text").forEach((item) => {
+      item.textContent = syncServiceName(settings);
+    });
+    document.querySelectorAll(".sync-time-text").forEach((item) => {
+      item.textContent = syncTimeLineFromMessage(message);
+    });
+  }
+
   function updateSyncStatus(message) {
     document.querySelectorAll(".sync-status-text").forEach((item) => {
       item.textContent = message;
     });
+    renderSyncSummary(message);
   }
 
   function syncPayload() {
@@ -218,7 +286,7 @@
   function scheduleSync(options = {}) {
     const settings = loadSyncSettings();
     if (!syncSettingsReady(settings)) {
-      updateSyncStatus("本地数据 · 坚果云同步待设置");
+      updateSyncStatus("本地数据 · WebDAV 同步待设置");
       return;
     }
 
@@ -241,7 +309,7 @@
     }
 
     syncInFlight = true;
-    updateSyncStatus("坚果云同步中...");
+    updateSyncStatus("WebDAV 同步中...");
     window.FoodTimeNative.pull(JSON.stringify(settings));
   }
 
@@ -254,7 +322,7 @@
   function handlePullResult(result) {
     if (!result.ok) {
       syncInFlight = false;
-      updateSyncStatus(`同步失败 · ${result.message || "请检查坚果云设置"}`);
+      updateSyncStatus(`同步失败 · ${result.message || "请检查 WebDAV 设置"}`);
       return;
     }
 
@@ -276,7 +344,9 @@
   function handlePushResult(result) {
     syncInFlight = false;
     if (result.ok) {
-      updateSyncStatus(`已同步 · ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`);
+      const syncedAt = nowIso();
+      localStorage.setItem(SYNC_LAST_AT_KEY, syncedAt);
+      updateSyncStatus(`已同步 · ${formatClock(syncedAt)}`);
     } else {
       updateSyncStatus(`同步失败 · ${result.message || "上传失败"}`);
     }
@@ -334,9 +404,22 @@
   }
 
   function classifyFood(name) {
-    if (/奶|酸奶|牛奶|燕麦/.test(name)) return "milk";
-    if (/鸡|肉|鱼|蛋/.test(name)) return "chicken";
-    return "berry";
+    return foodIconDefForName(name).type;
+  }
+
+  function foodIconDefForName(name) {
+    const normalized = String(name || "");
+    const alias = FOOD_ICON_ALIASES.find((item) => item.keywords.some((keyword) => normalized.includes(keyword)));
+    if (alias) return alias;
+    return FOOD_ICON_DEFS.find((item) => item.keywords.some((keyword) => normalized.includes(keyword))) || FOOD_ICON_DEFS[3];
+  }
+
+  function foodIconSrc(food) {
+    if (food.icon) return food.icon;
+    const namedIcon = foodIconDefForName(food.name);
+    if (namedIcon?.file) return namedIcon.file;
+    const type = food.type || classifyFood(food.name);
+    return FOOD_ICON_DEFS.find((item) => item.type === type)?.file || FOOD_ICON_DEFS[3].file;
   }
 
   function thumbMarkup(food) {
@@ -344,11 +427,10 @@
       return `<div class="food-thumb photo-thumb"><img src="${escapeHtml(food.photo)}" alt="${escapeHtml(food.name)}" /></div>`;
     }
 
-    if (food.photoText) {
-      return `<div class="food-thumb text-thumb ${escapeHtml(food.type || "berry")}"><span>${escapeHtml(food.photoText)}</span></div>`;
-    }
-
-    return `<div class="food-thumb ${escapeHtml(food.type || classifyFood(food.name))}"></div>`;
+    const type = escapeHtml(food.type || classifyFood(food.name));
+    const icon = escapeHtml(foodIconSrc(food));
+    const label = food.photoText ? `<span>${escapeHtml(food.photoText)}</span>` : "";
+    return `<div class="food-thumb icon-thumb ${type}"><img src="${icon}" alt="" />${label}</div>`;
   }
 
   function activeFoods(filter = currentHomeFilter) {
@@ -363,8 +445,14 @@
     if (!list) return;
 
     const foods = activeFoods(filter);
+    list.classList.toggle("is-empty", !foods.length);
     if (!foods.length) {
-      list.innerHTML = `<article class="empty-row">这里还没有食物</article>`;
+      list.innerHTML = `
+        <article class="empty-row food-empty">
+          <strong>🍽️</strong>
+          <span>这里还没有食物</span>
+        </article>
+      `;
       return;
     }
 
@@ -400,9 +488,10 @@
       renderHomeList(screen, currentHomeFilter);
     });
 
-    const dueCount = activeFoods().filter((food) => remindInfo(food).className === "urgent").length;
+    const allActiveFoods = loadFoods().filter((food) => food.status === "active");
+    const dueCount = allActiveFoods.filter((food) => remindInfo(food).className === "urgent").length;
     document.querySelectorAll(".hero-copy strong").forEach((item) => {
-      item.textContent = `${dueCount || 0} 件食物快到提醒日`;
+      item.textContent = allActiveFoods.length ? `${dueCount || 0} 件食物快到提醒日` : "所有东西都已经吃完";
     });
   }
 
@@ -440,6 +529,9 @@
     list.innerHTML = foods
       .map((food) => {
         const state = recordState(food);
+        const action = screenName === "history"
+          ? `<button class="restore-action" type="button" data-restore-id="${escapeHtml(food.id)}">还原</button>`
+          : `<strong class="record-state ${escapeHtml(state.className)}">${escapeHtml(state.label)}</strong>`;
         return `
           <article data-food-id="${escapeHtml(food.id)}">
             ${thumbMarkup(food)}
@@ -447,7 +539,7 @@
               <h2>${escapeHtml(food.name)}</h2>
               <p>${escapeHtml(recordDescription(food))}</p>
             </div>
-            <strong class="record-state ${escapeHtml(state.className)}">${escapeHtml(state.label)}</strong>
+            ${action}
           </article>
         `;
       })
@@ -494,6 +586,9 @@
     renderHistory();
     renderStorageScreens();
     renderStats();
+    renderSyncSummary();
+    renderThemeSummary();
+    renderNotificationSummary();
   }
 
   function isSingleScreenMode() {
@@ -525,7 +620,7 @@
 
   function syncTabbars(screenName) {
     const fridgeActive = ["home", "homeSheet", "fridge", "room"].includes(screenName);
-    const profileActive = ["profile", "settings", "syncSettings"].includes(screenName);
+    const profileActive = ["profile", "settings", "syncSettings", "themeSettings", "notificationSettings", "history"].includes(screenName);
     document.querySelectorAll(".tabbar").forEach((bar) => {
       const tabs = Array.from(bar.querySelectorAll("span"));
       tabs.forEach((tab, index) => {
@@ -602,6 +697,146 @@
     return document.querySelector(selector)?.value.trim() || "";
   }
 
+  function setPhotoButtonLabel(area, label) {
+    const button = area?.querySelector(".photo-area > button");
+    if (!button) return;
+    button.innerHTML = `<img class="button-icon" src="icons/camera.svg" alt="" /><span>${escapeHtml(label)}</span>`;
+  }
+
+  function updatePhotoPreviewFromName() {
+    if (capturedPhoto) return;
+    const add = screenElement("add");
+    const area = add?.querySelector(".photo-area");
+    if (!area) return;
+
+    const name = formValue(".phone-add [aria-label='食物名称']") || "食物";
+    const visual = foodIconDefForName(name);
+    area.classList.add("is-icon-preview");
+    area.style.setProperty("--preview-icon", `url("${visual.file}")`);
+    area.dataset.previewLabel = name.slice(0, 3);
+    const illustration = area.querySelector(".plate-illustration");
+    if (illustration) illustration.dataset.previewLabel = name.slice(0, 3);
+  }
+
+  function clearCapturedPhoto(area) {
+    capturedPhoto = "";
+    area?.classList.remove("is-captured");
+    area?.style.removeProperty("--captured-photo");
+    setPhotoButtonLabel(area, "拍照");
+    updatePhotoPreviewFromName();
+  }
+
+  function loadThemeSettings() {
+    try {
+      const settings = JSON.parse(localStorage.getItem(THEME_SETTINGS_KEY) || "{}");
+      const mode = ["system", "light", "dark"].includes(settings.mode) ? settings.mode : "system";
+      return { mode };
+    } catch (error) {
+      localStorage.removeItem(THEME_SETTINGS_KEY);
+      return { mode: "system" };
+    }
+  }
+
+  function themeModeLabel(mode) {
+    if (mode === "dark") return "夜间";
+    if (mode === "light") return "浅色";
+    return "跟随系统";
+  }
+
+  function applyTheme(settings = loadThemeSettings()) {
+    const mode = ["system", "light", "dark"].includes(settings.mode) ? settings.mode : "system";
+    document.documentElement.classList.remove("theme-system", "theme-light", "theme-dark");
+    document.documentElement.classList.add(`theme-${mode}`);
+  }
+
+  function renderThemeSummary(settings = loadThemeSettings()) {
+    document.querySelectorAll(".theme-summary-text").forEach((item) => {
+      item.textContent = themeModeLabel(settings.mode);
+    });
+  }
+
+  function fillThemeSettingsForm() {
+    const settings = loadThemeSettings();
+    screenElement("themeSettings")?.querySelectorAll(".theme-options button").forEach((button) => {
+      button.classList.toggle("active", button.dataset.themeMode === settings.mode);
+    });
+    renderThemeSummary(settings);
+  }
+
+  function saveThemeSettings() {
+    const screen = screenElement("themeSettings");
+    if (!screen) return;
+
+    const mode = screen.querySelector(".theme-options button.active")?.dataset.themeMode || "system";
+    const settings = { mode, updatedAt: nowIso() };
+    localStorage.setItem(THEME_SETTINGS_KEY, JSON.stringify(settings));
+    applyTheme(settings);
+    renderThemeSummary(settings);
+
+    const button = screen.querySelector(".theme-save-action");
+    if (!button) return;
+    button.textContent = "已保存";
+    window.setTimeout(() => {
+      button.textContent = "保存显示设置";
+    }, 1200);
+  }
+
+  function loadNotificationSettings() {
+    try {
+      const settings = JSON.parse(localStorage.getItem(NOTIFICATION_SETTINGS_KEY) || "{}");
+      const dailyTime = /^\d{2}:\d{2}$/.test(settings.dailyTime || "") ? settings.dailyTime : "09:00";
+      const emergencyDays = Math.min(30, Math.max(1, Number.parseInt(settings.emergencyDays, 10) || 3));
+      return { dailyTime, emergencyDays };
+    } catch (error) {
+      localStorage.removeItem(NOTIFICATION_SETTINGS_KEY);
+      return { dailyTime: "09:00", emergencyDays: 3 };
+    }
+  }
+
+  function notificationSummary(settings = loadNotificationSettings()) {
+    return `每天 ${settings.dailyTime}，紧急提醒 ${settings.emergencyDays} 天`;
+  }
+
+  function renderNotificationSummary(settings = loadNotificationSettings()) {
+    document.querySelectorAll(".notification-summary-text").forEach((item) => {
+      item.textContent = notificationSummary(settings);
+    });
+  }
+
+  function fillNotificationSettingsForm() {
+    const settings = loadNotificationSettings();
+    const screen = screenElement("notificationSettings");
+    if (!screen) return;
+
+    const dailyTime = screen.querySelector("[aria-label='每天提醒时间']");
+    const emergencyDays = screen.querySelector(".emergency-stepper strong");
+    if (dailyTime) dailyTime.value = settings.dailyTime;
+    if (emergencyDays) emergencyDays.textContent = `${settings.emergencyDays} 天`;
+    renderNotificationSummary(settings);
+  }
+
+  function saveNotificationSettings() {
+    const screen = screenElement("notificationSettings");
+    if (!screen) return;
+
+    const settings = {
+      dailyTime: screen.querySelector("[aria-label='每天提醒时间']")?.value || "09:00",
+      emergencyDays: Number.parseInt(screen.querySelector(".emergency-stepper strong")?.textContent, 10) || 3,
+      emergencySchedule: [720, 360, 180, 90, 45, 30],
+      updatedAt: nowIso(),
+    };
+    localStorage.setItem(NOTIFICATION_SETTINGS_KEY, JSON.stringify(settings));
+    renderNotificationSummary(settings);
+    scheduleNativeNotifications({ immediate: true });
+
+    const button = screen.querySelector(".notification-save-action");
+    if (!button) return;
+    button.textContent = "已保存";
+    window.setTimeout(() => {
+      button.textContent = "保存提醒设置";
+    }, 1200);
+  }
+
   function resetAddForm() {
     const add = screenElement("add");
     if (!add) return;
@@ -613,15 +848,7 @@
     add.querySelectorAll(".storage-chips button").forEach((button, index) => {
       button.classList.toggle("active", index === 0);
     });
-    add.querySelector(".photo-area").classList.remove("is-captured");
-    add.querySelector(".photo-area").style.removeProperty("--captured-photo");
-    add.querySelector(".photo-area > button").textContent = "拍照";
-    add.querySelector(".quantity-picker-toggle").setAttribute("aria-expanded", "false");
-    add.querySelector(".quantity-picker").classList.remove("is-open");
-    add.querySelectorAll(".quantity-wheel button").forEach((button, index) => {
-      button.classList.toggle("active", index === 0);
-    });
-    capturedPhoto = "";
+    clearCapturedPhoto(add.querySelector(".photo-area"));
   }
 
   function saveFoodFromForm() {
@@ -632,6 +859,7 @@
     const storage = selectedOption(".phone-add .storage-chips .active") || "冰箱";
     const remindDays = Number.parseInt(document.querySelector(".phone-add .stepper strong")?.textContent, 10) || 3;
     const foods = loadFoods();
+    const visual = foodIconDefForName(name);
 
     foods.unshift({
       id: `food-${Date.now()}`,
@@ -642,7 +870,8 @@
       unit,
       remindDays,
       status: "active",
-      type: classifyFood(name),
+      type: visual.type,
+      icon: visual.file,
       photo: capturedPhoto,
       photoText: capturedPhoto ? "" : name.slice(0, 3),
       createdAt: today.toISOString().slice(0, 10),
@@ -665,21 +894,6 @@
     const current = Number.parseInt(value.textContent, 10) || 3;
     const next = Math.min(30, Math.max(1, current + direction));
     value.textContent = `${next} 天`;
-  }
-
-  function closeQuantityPicker() {
-    const add = screenElement("add");
-    if (!add) return;
-    add.querySelector(".quantity-picker")?.classList.remove("is-open");
-    add.querySelector(".quantity-picker-toggle")?.setAttribute("aria-expanded", "false");
-  }
-
-  function toggleQuantityPicker(button) {
-    const picker = button.nextElementSibling;
-    if (!picker || !picker.classList.contains("quantity-picker")) return;
-    const willOpen = !picker.classList.contains("is-open");
-    picker.classList.toggle("is-open", willOpen);
-    button.setAttribute("aria-expanded", String(willOpen));
   }
 
   function openSheet(foodId) {
@@ -723,6 +937,19 @@
     showScreen("home", { reset: true });
   }
 
+  function restoreFood(foodId) {
+    const foods = loadFoods();
+    const food = foods.find((item) => item.id === foodId);
+    if (!food) return;
+
+    food.status = "active";
+    delete food.handledAt;
+    food.updatedAt = nowIso();
+    saveFoods(foods);
+    renderAll();
+    showScreen("history", { replace: true });
+  }
+
   function loadSyncSettings() {
     try {
       return JSON.parse(localStorage.getItem(SYNC_SETTINGS_KEY) || "{}");
@@ -738,8 +965,8 @@
     if (!screen) return;
 
     const webdav = screen.querySelector("[aria-label='WebDAV 地址']");
-    const account = screen.querySelector("[aria-label='坚果云账号']");
-    const password = screen.querySelector("[aria-label='坚果云应用密码']");
+    const account = screen.querySelector("[aria-label='WebDAV 账号'], [aria-label='坚果云账号']");
+    const password = screen.querySelector("[aria-label='WebDAV 密码'], [aria-label='坚果云应用密码']");
     const remoteFile = screen.querySelector("[aria-label='同步远程文件']");
 
     if (webdav) webdav.value = settings.webdavUrl || "https://dav.jianguoyun.com/dav/";
@@ -754,8 +981,8 @@
 
     const settings = {
       webdavUrl: screen.querySelector("[aria-label='WebDAV 地址']")?.value.trim() || "",
-      account: screen.querySelector("[aria-label='坚果云账号']")?.value.trim() || "",
-      password: screen.querySelector("[aria-label='坚果云应用密码']")?.value || "",
+      account: screen.querySelector("[aria-label='WebDAV 账号'], [aria-label='坚果云账号']")?.value.trim() || "",
+      password: screen.querySelector("[aria-label='WebDAV 密码'], [aria-label='坚果云应用密码']")?.value || "",
       remoteFile: screen.querySelector("[aria-label='同步远程文件']")?.value.trim() || "",
       updatedAt: new Date().toISOString(),
     };
@@ -770,18 +997,80 @@
     }, 1200);
   }
 
-  function handlePhotoFile(file) {
+  function requestSyncNow(button) {
+    const settings = loadSyncSettings();
+    if (!syncSettingsReady(settings)) {
+      updateSyncStatus("请先设置同步服务");
+      fillSyncSettingsForm();
+      showScreen("syncSettings");
+      return;
+    }
+
+    const label = button?.querySelector("span");
+    if (label) label.textContent = "同步中";
+    scheduleSync({ immediate: true });
+    window.setTimeout(() => {
+      if (label) label.textContent = "同步";
+    }, 1200);
+  }
+
+  function readFileAsDataUrl(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ""));
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function loadImage(dataUrl) {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = reject;
+      image.src = dataUrl;
+    });
+  }
+
+  async function compressPhoto(dataUrl) {
+    try {
+      const image = await loadImage(dataUrl);
+      const ratio = Math.min(1, PHOTO_MAX_SIDE / Math.max(image.naturalWidth, image.naturalHeight));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(image.naturalWidth * ratio));
+      canvas.height = Math.max(1, Math.round(image.naturalHeight * ratio));
+
+      const context = canvas.getContext("2d");
+      if (!context) return dataUrl;
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+      let compressed = canvas.toDataURL("image/webp", PHOTO_QUALITY);
+      if (!compressed.startsWith("data:image/webp")) {
+        compressed = canvas.toDataURL("image/jpeg", 0.58);
+      }
+
+      return compressed.length < dataUrl.length ? compressed : dataUrl;
+    } catch (error) {
+      return dataUrl;
+    }
+  }
+
+  async function handlePhotoFile(file) {
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      capturedPhoto = String(reader.result || "");
+    const area = screenElement("add")?.querySelector(".photo-area");
+    setPhotoButtonLabel(area, "处理中");
+    try {
+      const original = await readFileAsDataUrl(file);
+      capturedPhoto = await compressPhoto(original);
       const area = screenElement("add")?.querySelector(".photo-area");
       if (!area) return;
       area.classList.add("is-captured");
+      area.classList.remove("is-icon-preview");
       area.style.setProperty("--captured-photo", `url("${capturedPhoto}")`);
-      area.querySelector(".photo-area > button").textContent = "已拍照";
-    };
-    reader.readAsDataURL(file);
+      setPhotoButtonLabel(area, "已拍照");
+    } catch (error) {
+      setPhotoButtonLabel(area, "拍照");
+    }
   }
 
   function handleClick(event) {
@@ -811,25 +1100,6 @@
       const input = photoButton.closest(".photo-area").querySelector(".camera-input");
       if (input) input.click();
       return;
-    }
-
-    const quantityToggle = target.closest(".quantity-picker-toggle");
-    if (quantityToggle) {
-      toggleQuantityPicker(quantityToggle);
-      return;
-    }
-
-    const quantityChoice = target.closest(".quantity-wheel button");
-    if (quantityChoice) {
-      const input = document.querySelector(".phone-add [aria-label='数量']");
-      if (input) input.value = quantityChoice.textContent.trim();
-      activateItem(quantityChoice, "button");
-      closeQuantityPicker();
-      return;
-    }
-
-    if (!target.closest(".quantity-picker") && !target.closest(".quantity-picker-toggle")) {
-      closeQuantityPicker();
     }
 
     const storageButton = target.closest(".storage-chips button");
@@ -887,6 +1157,12 @@
       return;
     }
 
+    const syncNowButton = target.closest(".sync-now-button");
+    if (syncNowButton) {
+      requestSyncNow(syncNowButton);
+      return;
+    }
+
     const syncEntry = target.closest(".sync-entry");
     if (syncEntry) {
       showScreen("settings");
@@ -900,9 +1176,42 @@
       return;
     }
 
+    const themeSettingsButton = target.closest(".theme-settings-button");
+    if (themeSettingsButton) {
+      fillThemeSettingsForm();
+      showScreen("themeSettings");
+      return;
+    }
+
+    const notificationSettingsButton = target.closest(".notification-settings-button");
+    if (notificationSettingsButton) {
+      fillNotificationSettingsForm();
+      showScreen("notificationSettings");
+      return;
+    }
+
+    const themeOption = target.closest(".theme-options button");
+    if (themeOption) {
+      activateItem(themeOption, "button");
+      applyTheme({ mode: themeOption.dataset.themeMode || "system" });
+      return;
+    }
+
     const syncSave = target.closest(".sync-save-action");
     if (syncSave) {
       saveSyncSettings();
+      return;
+    }
+
+    const themeSave = target.closest(".theme-save-action");
+    if (themeSave) {
+      saveThemeSettings();
+      return;
+    }
+
+    const notificationSave = target.closest(".notification-save-action");
+    if (notificationSave) {
+      saveNotificationSettings();
       return;
     }
 
@@ -919,6 +1228,12 @@
     if (recordFilter) {
       currentHistoryFilter = recordFilter.textContent.trim();
       renderHistory();
+      return;
+    }
+
+    const restoreAction = target.closest(".restore-action");
+    if (restoreAction) {
+      restoreFood(restoreAction.dataset.restoreId);
     }
   }
 
@@ -930,22 +1245,22 @@
   }
 
   function handleInput(event) {
-    const input = event.target.closest(".quantity-input");
-    if (!input) return;
-
-    document.querySelectorAll(".quantity-wheel button").forEach((button) => {
-      button.classList.toggle("active", button.textContent.trim() === input.value.trim());
-    });
+    if (event.target.closest(".phone-add [aria-label='食物名称']")) {
+      updatePhotoPreviewFromName();
+    }
   }
 
   function init() {
     enableRuntimeMode();
+    applyTheme();
     const purchaseInput = document.querySelector(".phone-add [aria-label='购买时间']");
     if (purchaseInput) purchaseInput.type = "date";
 
     renderAll();
     resetAddForm();
     fillSyncSettingsForm();
+    fillThemeSettingsForm();
+    fillNotificationSettingsForm();
     allScreens().forEach((screen, index) => {
       screen.classList.toggle("is-active", index === 0);
     });
@@ -954,6 +1269,7 @@
     document.addEventListener("change", handleChange);
     document.addEventListener("input", handleInput);
     scheduleSync({ immediate: true });
+    scheduleNativeNotifications({ immediate: true });
   }
 
   window.FoodTimeApp = {
