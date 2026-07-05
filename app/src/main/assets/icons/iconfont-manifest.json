@@ -543,34 +543,34 @@
     "file": "nav-home-radish.svg",
     "name": "??",
     "keyword": "??",
-    "source": "user provided app/src/main/res/img/??.svg"
+    "source": "user provided app/src/main/icon-sources/??.svg"
   },
   {
     "id": null,
     "file": "nav-profile-active.svg",
     "name": "????",
     "keyword": "????",
-    "source": "user provided app/src/main/res/img/????.svg"
+    "source": "user provided app/src/main/icon-sources/????.svg"
   },
   {
     "id": null,
     "file": "settings-provided.svg",
     "name": "??",
     "keyword": "??",
-    "source": "user provided app/src/main/res/img/??.svg"
+    "source": "user provided app/src/main/icon-sources/??.svg"
   },
   {
     "id": null,
     "file": "add-provided.svg",
     "name": "??",
     "keyword": "??",
-    "source": "user provided app/src/main/res/img/??.svg"
+    "source": "user provided app/src/main/icon-sources/??.svg"
   },
   {
     "id": null,
     "file": "sync-cloud-provided.svg",
     "name": "???",
     "keyword": "???",
-    "source": "user provided app/src/main/res/img/???.svg"
+    "source": "user provided app/src/main/icon-sources/???.svg"
   }
 ]
