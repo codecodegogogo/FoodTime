@@ -5,8 +5,8 @@
   const THEME_SETTINGS_KEY = "foodtime.themeSettings.v1";
   const NOTIFICATION_SETTINGS_KEY = "foodtime.notificationSettings.v1";
   const ONE_DAY = 24 * 60 * 60 * 1000;
-  const PHOTO_MAX_SIDE = 768;
-  const PHOTO_QUALITY = 0.5;
+  const PHOTO_MAX_SIDE = 512;
+  const PHOTO_QUALITY = 0.38;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -384,23 +384,74 @@
     return Math.max(0, Math.floor((today - date) / ONE_DAY));
   }
 
+  function reminderAmount(value, fallback = 3) {
+    const amount = Number.parseFloat(value);
+    return Number.isFinite(amount) && amount > 0 ? amount : fallback;
+  }
+
+  function reminderUnit(value) {
+    return ["分钟", "小时", "天", "月"].includes(value) ? value : "天";
+  }
+
+  function reminderMinutes(value, unit) {
+    const amount = reminderAmount(value);
+    const normalizedUnit = reminderUnit(unit);
+    if (normalizedUnit === "分钟") return amount;
+    if (normalizedUnit === "小时") return amount * 60;
+    if (normalizedUnit === "月") return amount * 30 * 24 * 60;
+    return amount * 24 * 60;
+  }
+
+  function reminderDaysCompat(value, unit) {
+    return Math.max(1, Math.ceil(reminderMinutes(value, unit) / (24 * 60)));
+  }
+
+  function foodReminderMinutes(food) {
+    if (food.remindValue && food.remindUnit) {
+      return reminderMinutes(food.remindValue, food.remindUnit);
+    }
+    return reminderMinutes(food.remindDays || 3, "天");
+  }
+
+  function foodPurchaseDateTime(food) {
+    const date = new Date(food.purchaseAt || `${food.purchaseDate}T00:00:00`);
+    if (!Number.isNaN(date.getTime())) return date;
+    return new Date(`${food.purchaseDate}T00:00:00`);
+  }
+
+  function relativeExpiryLabel(remainingMs) {
+    const absMs = Math.abs(remainingMs);
+    if (absMs < 60 * 60 * 1000) return `${Math.max(1, Math.ceil(absMs / (60 * 1000)))} 分钟`;
+    if (absMs < ONE_DAY) return `${Math.ceil(absMs / (60 * 60 * 1000))} 小时`;
+    return `${Math.ceil(absMs / ONE_DAY)} 天`;
+  }
+
   function remindInfo(food) {
-    const purchasedAt = new Date(`${food.purchaseDate}T00:00:00`);
+    const purchasedAt = foodPurchaseDateTime(food);
     if (Number.isNaN(purchasedAt.getTime())) {
       return { label: "待计算", className: "safe", remaining: 0 };
     }
 
-    const remindDays = Number(food.remindDays || 3);
-    const dueAt = new Date(purchasedAt);
-    dueAt.setDate(dueAt.getDate() + remindDays);
-    const remaining = Math.ceil((dueAt - today) / ONE_DAY);
+    const dueAt = new Date(purchasedAt.getTime() + foodReminderMinutes(food) * 60 * 1000);
+    const remainingMs = dueAt - new Date();
+    const remaining = Math.ceil(remainingMs / ONE_DAY);
 
-    if (remaining < 0) {
-      return { label: `已过期 ${Math.abs(remaining)} 天`, className: "urgent", remaining };
+    if (remainingMs < 0) {
+      return { label: `已过期 ${relativeExpiryLabel(remainingMs)}`, className: "urgent", remaining };
     }
-    if (remaining === 0) return { label: "今天到期", className: "urgent", remaining };
-    if (remaining === 1) return { label: "明天到期", className: "soon", remaining };
-    return { label: `${remaining} 天后到期`, className: "safe", remaining };
+    if (remainingMs < 60 * 60 * 1000) {
+      return { label: `${relativeExpiryLabel(remainingMs)}后到期`, className: "urgent", remaining };
+    }
+    if (remainingMs < ONE_DAY) {
+      return { label: `${relativeExpiryLabel(remainingMs)}后到期`, className: "urgent", remaining };
+    }
+
+    const dueDay = new Date(dueAt);
+    dueDay.setHours(0, 0, 0, 0);
+    const dayRemaining = Math.ceil((dueDay - today) / ONE_DAY);
+    if (dayRemaining === 0) return { label: "今天到期", className: "urgent", remaining: dayRemaining };
+    if (dayRemaining === 1) return { label: "明天到期", className: "soon", remaining: dayRemaining };
+    return { label: `${dayRemaining} 天后到期`, className: "safe", remaining: dayRemaining };
   }
 
   function classifyFood(name) {
@@ -429,8 +480,7 @@
 
     const type = escapeHtml(food.type || classifyFood(food.name));
     const icon = escapeHtml(foodIconSrc(food));
-    const label = food.photoText ? `<span>${escapeHtml(food.photoText)}</span>` : "";
-    return `<div class="food-thumb icon-thumb ${type}"><img src="${icon}" alt="" />${label}</div>`;
+    return `<div class="food-thumb icon-thumb ${type}"><img src="${icon}" alt="" /></div>`;
   }
 
   function activeFoods(filter = currentHomeFilter) {
@@ -488,10 +538,9 @@
       renderHomeList(screen, currentHomeFilter);
     });
 
-    const allActiveFoods = loadFoods().filter((food) => food.status === "active");
-    const dueCount = allActiveFoods.filter((food) => remindInfo(food).className === "urgent").length;
+    const visibleFoods = activeFoods(currentHomeFilter);
     document.querySelectorAll(".hero-copy strong").forEach((item) => {
-      item.textContent = allActiveFoods.length ? `${dueCount || 0} 件食物快到提醒日` : "所有东西都已经吃完";
+      item.textContent = visibleFoods.length ? `${visibleFoods.length} 件食物正在储存` : "所有东西都已经吃完了";
     });
   }
 
@@ -745,8 +794,35 @@
 
   function applyTheme(settings = loadThemeSettings()) {
     const mode = ["system", "light", "dark"].includes(settings.mode) ? settings.mode : "system";
-    document.documentElement.classList.remove("theme-system", "theme-light", "theme-dark");
+    document.documentElement.classList.remove("theme-system", "theme-light", "theme-dark", "theme-system-light", "theme-system-dark");
+    if (mode === "system") {
+      document.documentElement.classList.add("theme-system", `theme-system-${systemThemeMode()}`);
+      return;
+    }
     document.documentElement.classList.add(`theme-${mode}`);
+  }
+
+  function systemThemeMode() {
+    try {
+      const nativeTheme = window.FoodTimeNative?.systemTheme?.();
+      if (nativeTheme === "dark" || nativeTheme === "light") return nativeTheme;
+    } catch (error) {
+      // Fall back to the browser media query below.
+    }
+    return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
+
+  function watchSystemTheme() {
+    const query = window.matchMedia?.("(prefers-color-scheme: dark)");
+    if (!query) return;
+    const refresh = () => {
+      if (loadThemeSettings().mode === "system") applyTheme();
+    };
+    if (typeof query.addEventListener === "function") {
+      query.addEventListener("change", refresh);
+    } else if (typeof query.addListener === "function") {
+      query.addListener(refresh);
+    }
   }
 
   function renderThemeSummary(settings = loadThemeSettings()) {
@@ -844,7 +920,8 @@
     add.querySelector("[aria-label='购买时间']").value = today.toISOString().slice(0, 10);
     add.querySelector("[aria-label='数量']").value = "1";
     add.querySelector("[aria-label='数量单位']").value = "斤";
-    add.querySelector(".stepper strong").textContent = "3 天";
+    add.querySelector("[aria-label='提醒数值']").value = "3";
+    add.querySelector("[aria-label='提醒单位']").value = "天";
     add.querySelectorAll(".storage-chips button").forEach((button, index) => {
       button.classList.toggle("active", index === 0);
     });
@@ -857,7 +934,10 @@
     const quantity = formValue(".phone-add [aria-label='数量']") || "1";
     const unit = formValue(".phone-add [aria-label='数量单位']") || "个";
     const storage = selectedOption(".phone-add .storage-chips .active") || "冰箱";
-    const remindDays = Number.parseInt(document.querySelector(".phone-add .stepper strong")?.textContent, 10) || 3;
+    const remindValue = reminderAmount(formValue(".phone-add [aria-label='提醒数值']"));
+    const remindUnit = reminderUnit(formValue(".phone-add [aria-label='提醒单位']"));
+    const remindDays = reminderDaysCompat(remindValue, remindUnit);
+    const purchaseAt = purchaseDate === today.toISOString().slice(0, 10) ? nowIso() : `${purchaseDate}T00:00:00`;
     const foods = loadFoods();
     const visual = foodIconDefForName(name);
 
@@ -868,12 +948,15 @@
       storage,
       quantity,
       unit,
+      purchaseAt,
+      remindValue,
+      remindUnit,
       remindDays,
       status: "active",
       type: visual.type,
       icon: visual.file,
       photo: capturedPhoto,
-      photoText: capturedPhoto ? "" : name.slice(0, 3),
+      photoText: "",
       createdAt: today.toISOString().slice(0, 10),
       updatedAt: nowIso(),
     });
@@ -930,7 +1013,10 @@
     const food = foods.find((item) => item.id === selectedFoodId);
     if (!food) return;
 
-    food.remindDays = Number(food.remindDays || 3) + 1;
+    const delayedDays = reminderDaysCompat(foodReminderMinutes(food) + 24 * 60, "分钟");
+    food.remindValue = delayedDays;
+    food.remindUnit = "天";
+    food.remindDays = delayedDays;
     food.updatedAt = nowIso();
     saveFoods(foods);
     selectedFoodId = null;
@@ -1007,9 +1093,11 @@
     }
 
     const label = button?.querySelector("span");
+    button?.classList.add("is-syncing");
     if (label) label.textContent = "同步中";
     scheduleSync({ immediate: true });
     window.setTimeout(() => {
+      button?.classList.remove("is-syncing");
       if (label) label.textContent = "同步";
     }, 1200);
   }
@@ -1046,7 +1134,7 @@
 
       let compressed = canvas.toDataURL("image/webp", PHOTO_QUALITY);
       if (!compressed.startsWith("data:image/webp")) {
-        compressed = canvas.toDataURL("image/jpeg", 0.58);
+        compressed = canvas.toDataURL("image/jpeg", 0.45);
       }
 
       return compressed.length < dataUrl.length ? compressed : dataUrl;
@@ -1108,7 +1196,7 @@
       return;
     }
 
-    const stepperButton = target.closest(".stepper button");
+    const stepperButton = target.closest(".emergency-stepper button");
     if (stepperButton) {
       updateReminderDays(stepperButton);
       return;
@@ -1134,6 +1222,12 @@
       if (index === 0) markSelectedFood("eaten");
       if (index === 1) markSelectedFood("spoiled");
       if (index === 2) delaySelectedFood();
+      return;
+    }
+
+    if (currentScreen === "homeSheet" && target.closest(".phone-home-sheet") && !target.closest(".action-sheet") && !target.closest(".tabbar")) {
+      selectedFoodId = null;
+      showScreen("home", { reset: true });
       return;
     }
 
@@ -1253,6 +1347,7 @@
   function init() {
     enableRuntimeMode();
     applyTheme();
+    watchSystemTheme();
     const purchaseInput = document.querySelector(".phone-add [aria-label='购买时间']");
     if (purchaseInput) purchaseInput.type = "date";
 
@@ -1274,6 +1369,7 @@
 
   window.FoodTimeApp = {
     onNativeSyncResult,
+    refreshTheme: applyTheme,
     back: goBack,
     canGoBack() {
       return currentScreen !== "home" || routeStack.length > 1;

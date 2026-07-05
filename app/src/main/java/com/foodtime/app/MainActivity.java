@@ -3,6 +3,7 @@ package com.foodtime.app;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.Manifest;
+import android.content.res.Configuration;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -77,6 +78,16 @@ public class MainActivity extends Activity {
         requestNotificationPermissionIfNeeded();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (webView != null) {
+            webView.evaluateJavascript(
+                    "window.FoodTimeApp&&window.FoodTimeApp.refreshTheme&&window.FoodTimeApp.refreshTheme()",
+                    null);
+        }
+    }
+
     private class FoodTimeBridge {
         @JavascriptInterface
         public void pull(String settingsJson) {
@@ -94,6 +105,12 @@ public class MainActivity extends Activity {
                     MainActivity.this,
                     settingsJson,
                     payloadJson)).start();
+        }
+
+        @JavascriptInterface
+        public String systemTheme() {
+            int nightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+            return nightMode == Configuration.UI_MODE_NIGHT_YES ? "dark" : "light";
         }
     }
 

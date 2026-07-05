@@ -537,5 +537,40 @@
     "name": "奶昔",
     "keyword": "奶昔",
     "source": "iconfont.cn collection 43742 cute food icons"
+  },
+  {
+    "id": null,
+    "file": "nav-home-radish.svg",
+    "name": "??",
+    "keyword": "??",
+    "source": "user provided app/src/main/res/img/??.svg"
+  },
+  {
+    "id": null,
+    "file": "nav-profile-active.svg",
+    "name": "????",
+    "keyword": "????",
+    "source": "user provided app/src/main/res/img/????.svg"
+  },
+  {
+    "id": null,
+    "file": "settings-provided.svg",
+    "name": "??",
+    "keyword": "??",
+    "source": "user provided app/src/main/res/img/??.svg"
+  },
+  {
+    "id": null,
+    "file": "add-provided.svg",
+    "name": "??",
+    "keyword": "??",
+    "source": "user provided app/src/main/res/img/??.svg"
+  },
+  {
+    "id": null,
+    "file": "sync-cloud-provided.svg",
+    "name": "???",
+    "keyword": "???",
+    "source": "user provided app/src/main/res/img/???.svg"
   }
 ]
