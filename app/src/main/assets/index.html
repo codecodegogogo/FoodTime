@@ -211,6 +211,7 @@
             <span class="greens"></span>
             <span class="egg"></span>
           </div>
+          <input class="camera-input" type="file" accept="image/*" capture="environment" aria-label="拍摄食物照片" hidden />
           <button>拍照</button>
         </section>
 
@@ -221,20 +222,28 @@
           </label>
           <label>
             购买时间
-            <input value="2026-06-20" aria-label="购买时间" />
+            <input type="date" value="2026-07-05" aria-label="购买时间" />
           </label>
           <fieldset>
             <legend>数量</legend>
             <div class="quantity-grid">
               <label>
-                量词
-                <select aria-label="数量量词">
-                  <option selected>1</option>
-                  <option>2</option>
-                  <option>3</option>
-                  <option>4</option>
-                  <option>5</option>
-                </select>
+                数量
+                <input class="quantity-input" value="1" inputmode="decimal" list="quantity-options" aria-label="数量" />
+                <datalist id="quantity-options">
+                  <option value="1"></option>
+                  <option value="2"></option>
+                  <option value="3"></option>
+                  <option value="4"></option>
+                  <option value="5"></option>
+                </datalist>
+                <div class="quantity-quick" aria-label="数量快捷选择">
+                  <button type="button" class="active">1</button>
+                  <button type="button">2</button>
+                  <button type="button">3</button>
+                  <button type="button">4</button>
+                  <button type="button">5</button>
+                </div>
               </label>
               <label>
                 单位
@@ -321,20 +330,11 @@
         </header>
 
         <nav class="history-filters" aria-label="历史记录筛选">
-          <button class="active">储存中</button>
-          <button>已吃完</button>
+          <button class="active">已吃完</button>
           <button>已坏掉</button>
         </nav>
 
         <section class="history-list" aria-label="过往食物列表">
-          <article>
-            <div class="food-thumb milk"></div>
-            <div>
-              <h2>鲜牛奶</h2>
-              <p>冰箱中，已存 2 天</p>
-            </div>
-            <strong class="record-state storing">储存中</strong>
-          </article>
           <article>
             <div class="food-thumb berry"></div>
             <div>
@@ -350,14 +350,6 @@
               <p>冷藏 3 天后坏掉</p>
             </div>
             <strong class="record-state spoiled">已坏掉</strong>
-          </article>
-          <article>
-            <div class="food-thumb berry"></div>
-            <div>
-              <h2>面包</h2>
-              <p>常温中，已存 1 天</p>
-            </div>
-            <strong class="record-state storing">储存中</strong>
           </article>
         </section>
       </section>
