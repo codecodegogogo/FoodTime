@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FoodTime 食物期限管理原型</title>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=20260706" />
   </head>
   <body>
     <main class="board" aria-label="FoodTime static app prototype">
@@ -398,18 +398,26 @@
         </header>
 
         <section class="setting-list settings-form">
-          <label>
-            每天提醒时间
-            <input type="time" value="09:00" aria-label="每天提醒时间" />
-          </label>
-          <label>
-            紧急提醒范围
-            <div class="stepper emergency-stepper">
-              <button type="button">-</button>
-              <strong>3 天</strong>
-              <button type="button">+</button>
+          <fieldset>
+            <legend>每天提醒时间</legend>
+            <div class="notification-input-grid">
+              <label>
+                <input type="number" value="9" min="0" max="23" inputmode="numeric" aria-label="提醒小时" />
+                <span>时</span>
+              </label>
+              <label>
+                <input type="number" value="0" min="0" max="59" inputmode="numeric" aria-label="提醒分钟" />
+                <span>分</span>
+              </label>
             </div>
-          </label>
+          </fieldset>
+          <fieldset>
+            <legend>紧急提醒范围</legend>
+            <label class="inline-number-field">
+              <input type="number" value="3" min="1" max="30" inputmode="numeric" aria-label="紧急提醒天数" />
+              <span>天内提醒</span>
+            </label>
+          </fieldset>
           <p class="settings-hint">进入紧急提醒范围后，第一次间隔 12 小时，之后 6 小时、3 小时递减，最短每 30 分钟提醒一次，直到你标记吃完、坏掉或延期。</p>
           <button class="primary-action notification-save-action">保存提醒设置</button>
         </section>
@@ -545,6 +553,6 @@
         </section>
       </section>
     </main>
-    <script src="app.js"></script>
+    <script src="app.js?v=20260706"></script>
   </body>
 </html>

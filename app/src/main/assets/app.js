@@ -873,6 +873,27 @@
     return `每天 ${settings.dailyTime}，紧急提醒 ${settings.emergencyDays} 天`;
   }
 
+  function clampNumber(value, min, max, fallback) {
+    const parsed = Number.parseInt(value, 10);
+    if (Number.isNaN(parsed)) return fallback;
+    return Math.min(max, Math.max(min, parsed));
+  }
+
+  function splitDailyTime(value) {
+    const normalized = /^\d{2}:\d{2}$/.test(value || "") ? value : "09:00";
+    const [hour, minute] = normalized.split(":").map((item) => Number.parseInt(item, 10));
+    return {
+      hour: clampNumber(hour, 0, 23, 9),
+      minute: clampNumber(minute, 0, 59, 0),
+    };
+  }
+
+  function joinDailyTime(hour, minute) {
+    const safeHour = String(clampNumber(hour, 0, 23, 9)).padStart(2, "0");
+    const safeMinute = String(clampNumber(minute, 0, 59, 0)).padStart(2, "0");
+    return `${safeHour}:${safeMinute}`;
+  }
+
   function renderNotificationSummary(settings = loadNotificationSettings()) {
     document.querySelectorAll(".notification-summary-text").forEach((item) => {
       item.textContent = notificationSummary(settings);
@@ -884,10 +905,13 @@
     const screen = screenElement("notificationSettings");
     if (!screen) return;
 
-    const dailyTime = screen.querySelector("[aria-label='每天提醒时间']");
-    const emergencyDays = screen.querySelector(".emergency-stepper strong");
-    if (dailyTime) dailyTime.value = settings.dailyTime;
-    if (emergencyDays) emergencyDays.textContent = `${settings.emergencyDays} 天`;
+    const dailyTime = splitDailyTime(settings.dailyTime);
+    const dailyHour = screen.querySelector("[aria-label='提醒小时']");
+    const dailyMinute = screen.querySelector("[aria-label='提醒分钟']");
+    const emergencyDays = screen.querySelector("[aria-label='紧急提醒天数']");
+    if (dailyHour) dailyHour.value = dailyTime.hour;
+    if (dailyMinute) dailyMinute.value = dailyTime.minute;
+    if (emergencyDays) emergencyDays.value = settings.emergencyDays;
     renderNotificationSummary(settings);
   }
 
@@ -896,8 +920,11 @@
     if (!screen) return;
 
     const settings = {
-      dailyTime: screen.querySelector("[aria-label='每天提醒时间']")?.value || "09:00",
-      emergencyDays: Number.parseInt(screen.querySelector(".emergency-stepper strong")?.textContent, 10) || 3,
+      dailyTime: joinDailyTime(
+        screen.querySelector("[aria-label='提醒小时']")?.value,
+        screen.querySelector("[aria-label='提醒分钟']")?.value,
+      ),
+      emergencyDays: clampNumber(screen.querySelector("[aria-label='紧急提醒天数']")?.value, 1, 30, 3),
       emergencySchedule: [720, 360, 180, 90, 45, 30],
       updatedAt: nowIso(),
     };
