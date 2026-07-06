@@ -151,6 +151,22 @@ button {
   height: 36px;
 }
 
+.confirm-add-button {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 0;
+  background: transparent;
+}
+
+.confirm-add-button img {
+  display: block;
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+
 .eyebrow {
   margin: 0;
   color: var(--mint-dark);
@@ -1056,6 +1072,35 @@ legend {
   margin-top: 0;
 }
 
+.choice-options {
+  display: grid;
+  gap: 6px;
+  margin-top: 0;
+}
+
+.unit-options {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.reminder-unit-options {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.choice-options button {
+  min-height: 34px;
+  border: 0;
+  border-radius: 12px;
+  color: var(--muted);
+  background: #f0eee6;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.choice-options button.active {
+  color: #ffffff;
+  background: var(--mint-dark);
+}
+
 .reminder-grid {
   grid-template-columns: 1fr 1fr;
 }
@@ -1946,6 +1991,8 @@ html.theme-dark .icon-button,
 html.theme-system-dark .icon-button,
 html.theme-dark .settings-button,
 html.theme-system-dark .settings-button,
+html.theme-dark .confirm-add-button,
+html.theme-system-dark .confirm-add-button,
 html.theme-dark .sync-now-button,
 html.theme-system-dark .sync-now-button,
 html.theme-dark .sync-now-button.is-syncing,
@@ -1960,6 +2007,8 @@ html.theme-dark .segmented button,
 html.theme-system-dark .segmented button,
 html.theme-dark .chips button,
 html.theme-system-dark .chips button,
+html.theme-dark .choice-options button,
+html.theme-system-dark .choice-options button,
 html.theme-dark .history-filters button,
 html.theme-system-dark .history-filters button,
 html.theme-dark .tabbar span,
@@ -1972,6 +2021,8 @@ html.theme-dark .segmented .active,
 html.theme-system-dark .segmented .active,
 html.theme-dark .chips .active,
 html.theme-system-dark .chips .active,
+html.theme-dark .choice-options .active,
+html.theme-system-dark .choice-options .active,
 html.theme-dark .theme-options button.active,
 html.theme-system-dark .theme-options button.active,
 html.theme-dark .history-filters .active,
@@ -2132,6 +2183,7 @@ html.theme-system-dark .sync-now-button.is-syncing {
 
   html.theme-system .icon-button,
   html.theme-system .settings-button,
+  html.theme-system .confirm-add-button,
   html.theme-system .sync-now-button,
   html.theme-system .sync-now-button.is-syncing {
     border-color: transparent;
@@ -2142,6 +2194,7 @@ html.theme-system-dark .sync-now-button.is-syncing {
 
   html.theme-system .segmented button,
   html.theme-system .chips button,
+  html.theme-system .choice-options button,
   html.theme-system .history-filters button,
   html.theme-system .tabbar span {
     color: var(--muted);
@@ -2150,6 +2203,7 @@ html.theme-system-dark .sync-now-button.is-syncing {
 
   html.theme-system .segmented .active,
   html.theme-system .chips .active,
+  html.theme-system .choice-options .active,
   html.theme-system .theme-options button.active,
   html.theme-system .history-filters .active {
     border-color: #59c292;

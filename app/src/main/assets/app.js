@@ -792,6 +792,15 @@
     return document.querySelector(selector)?.value.trim() || "";
   }
 
+  function setChoiceValue(container, value) {
+    if (!container) return;
+    const input = container.parentElement?.querySelector("input[type='hidden']");
+    if (input) input.value = value;
+    container.querySelectorAll("button").forEach((button) => {
+      button.classList.toggle("active", button.dataset.value === value);
+    });
+  }
+
   function setPhotoButtonLabel(area, label) {
     const button = area?.querySelector(".photo-area > button");
     if (!button) return;
@@ -992,9 +1001,9 @@
     add.querySelector("[aria-label='食物名称']").value = "草莓";
     add.querySelector("[aria-label='购买时间']").value = today.toISOString().slice(0, 10);
     add.querySelector("[aria-label='数量']").value = "1";
-    add.querySelector("[aria-label='数量单位']").value = "斤";
+    setChoiceValue(add.querySelector(".unit-options"), "斤");
     add.querySelector("[aria-label='提醒数值']").value = "3";
-    add.querySelector("[aria-label='提醒单位']").value = "天";
+    setChoiceValue(add.querySelector(".reminder-unit-options"), "天");
     add.querySelectorAll(".storage-chips button").forEach((button, index) => {
       button.classList.toggle("active", index === 0);
     });
@@ -1320,9 +1329,15 @@
       return;
     }
 
-    const saveButton = target.closest(".phone-add .primary-action");
+    const saveButton = target.closest(".phone-add .confirm-add-button");
     if (saveButton) {
       saveFoodFromForm();
+      return;
+    }
+
+    const choiceOption = target.closest(".choice-options button");
+    if (choiceOption) {
+      setChoiceValue(choiceOption.closest(".choice-options"), choiceOption.dataset.value || choiceOption.textContent.trim());
       return;
     }
 
@@ -1497,8 +1512,6 @@
     enableRuntimeMode();
     applyTheme();
     watchSystemTheme();
-    const purchaseInput = document.querySelector(".phone-add [aria-label='购买时间']");
-    if (purchaseInput) purchaseInput.type = "date";
 
     renderAll();
     resetAddForm();

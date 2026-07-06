@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FoodTime 食物期限管理原型</title>
-    <link rel="stylesheet" href="styles.css?v=20260706-clear" />
+    <link rel="stylesheet" href="styles.css?v=20260706-input" />
   </head>
   <body>
     <main class="board" aria-label="FoodTime static app prototype">
@@ -133,7 +133,9 @@
         <header class="sub-header">
           <button class="back-button" aria-label="返回"></button>
           <h1>添加食物</h1>
-          <span></span>
+          <button class="confirm-add-button" type="button" aria-label="保存食物">
+            <img src="icons/check.svg" alt="" />
+          </button>
         </header>
 
         <section class="photo-area">
@@ -160,7 +162,7 @@
           </label>
           <label>
             购买时间
-            <input type="date" value="2026-07-05" aria-label="购买时间" />
+            <input type="text" value="2026-07-05" inputmode="numeric" aria-label="购买时间" />
           </label>
           <fieldset>
             <legend>数量</legend>
@@ -169,14 +171,15 @@
                 <input class="quantity-input" value="1" inputmode="decimal" aria-label="数量" />
               </label>
               <label>
-                <select aria-label="数量单位">
-                  <option selected>斤</option>
-                  <option>个</option>
-                  <option>袋</option>
-                  <option>盒</option>
-                  <option>瓶</option>
-                  <option>包</option>
-                </select>
+                <input type="hidden" value="斤" aria-label="数量单位" />
+                <div class="choice-options unit-options" aria-label="数量单位选项">
+                  <button type="button" class="active" data-value="斤">斤</button>
+                  <button type="button" data-value="个">个</button>
+                  <button type="button" data-value="袋">袋</button>
+                  <button type="button" data-value="盒">盒</button>
+                  <button type="button" data-value="瓶">瓶</button>
+                  <button type="button" data-value="包">包</button>
+                </div>
               </label>
             </div>
           </fieldset>
@@ -194,18 +197,17 @@
                 <input class="reminder-input" value="3" inputmode="decimal" aria-label="提醒数值" />
               </label>
               <label>
-                <select aria-label="提醒单位">
-                  <option>分钟</option>
-                  <option>小时</option>
-                  <option selected>天</option>
-                  <option>月</option>
-                </select>
+                <input type="hidden" value="天" aria-label="提醒单位" />
+                <div class="choice-options reminder-unit-options" aria-label="提醒单位选项">
+                  <button type="button" data-value="分钟">分钟</button>
+                  <button type="button" data-value="小时">小时</button>
+                  <button type="button" class="active" data-value="天">天</button>
+                  <button type="button" data-value="月">月</button>
+                </div>
               </label>
             </div>
           </fieldset>
         </form>
-
-        <button class="primary-action">保存</button>
       </section>
 
       <section class="phone phone-stats is-paused" aria-label="统计界面">
@@ -557,6 +559,6 @@
         </section>
       </section>
     </main>
-    <script src="app.js?v=20260706-clear"></script>
+    <script src="app.js?v=20260706-input"></script>
   </body>
 </html>
