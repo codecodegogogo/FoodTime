@@ -662,10 +662,10 @@
         min-height: 780px;
         margin-top: 42px;
         place-items: center;
-        border: 2px solid #f0eadf;
-        border-radius: 44px;
-        background: rgba(255, 255, 255, 0.92);
-        box-shadow: 0 18px 42px rgba(54, 71, 62, 0.045);
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
       }
 
       .empty-inner {
@@ -679,26 +679,26 @@
         width: 128px;
         height: 128px;
         place-items: center;
-        border: 6px solid #27353a;
-        border-radius: 38px;
-        background: #fff7d7;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
       }
 
       .empty-icon img {
-        width: 70px;
-        height: 70px;
+        width: 98px;
+        height: 98px;
       }
 
       .empty-inner h2 {
         margin: 0;
-        font-size: 33px;
+        font-size: 38px;
         font-weight: 900;
       }
 
       .empty-inner p {
         margin: 0;
         color: var(--muted);
-        font-size: 25px;
+        font-size: 28px;
         font-weight: 700;
       }
 
@@ -748,6 +748,7 @@
         display: block;
         width: 44px;
         height: 32px;
+        transform: scale(1.3);
         border: 4px solid #fff;
         border-radius: 9px;
       }
@@ -1068,7 +1069,7 @@
         <header class="topbar"><h1 class="brand">FoodTime</h1><div class="icon-circle"><img src="icons/add.svg" alt="" /></div></header>
         <section class="hero"><div><p>今天先吃</p><strong>所有东西都已经吃完了</strong></div><div class="fridge-art"><span class="food-dot dot-a"></span><span class="food-dot dot-b"></span><span class="food-dot dot-c"></span></div></section>
         <nav class="segmented"><span>全部</span><span>冰箱</span><span class="active">常温</span></nav>
-        <section class="empty-panel"><div class="empty-inner"><div class="empty-icon"><img src="icons/room.svg" alt="" /></div><h2>这里还没有食物</h2><p>添加后会在这里显示</p></div></section>
+        <section class="empty-panel"><div class="empty-inner"><div class="empty-icon"><img src="icons/empty-plate.svg" alt="" /></div><h2>这里还没有食物</h2><p>添加后会在这里显示</p></div></section>
       </main>
       <footer class="tabbar"><span class="active"><img src="icons/nav-home-radish.svg" alt="" />首页</span><span><img src="icons/nav-profile-active.svg" alt="" />我的</span></footer>
     </section>
