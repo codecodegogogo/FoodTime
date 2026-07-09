@@ -437,7 +437,7 @@
   }
 
   function reminderUnit(value) {
-    return ["分钟", "小时", "天", "月"].includes(value) ? value : "天";
+    return ["分钟", "小时", "天", "星期", "月"].includes(value) ? value : "天";
   }
 
   function reminderMinutes(value, unit) {
@@ -445,6 +445,7 @@
     const normalizedUnit = reminderUnit(unit);
     if (normalizedUnit === "分钟") return amount;
     if (normalizedUnit === "小时") return amount * 60;
+    if (normalizedUnit === "星期") return amount * 7 * 24 * 60;
     if (normalizedUnit === "月") return amount * 30 * 24 * 60;
     return amount * 24 * 60;
   }
@@ -817,8 +818,68 @@
     });
   }
 
+  function setReminderUnit(value) {
+    const add = screenElement("add");
+    const safeValue = reminderUnit(value);
+    const input = add?.querySelector("[aria-label='提醒单位']");
+    const label = add?.querySelector(".reminder-unit-picker-label");
+    if (input) input.value = safeValue;
+    if (label) label.textContent = safeValue;
+    add?.querySelectorAll(".reminder-unit-option-grid button").forEach((button) => {
+      button.classList.toggle("active", button.dataset.value === safeValue);
+    });
+  }
+
+  function normalizedFolderName(value) {
+    return String(value || "").trim() || "默认";
+  }
+
+  function existingFolders() {
+    const folders = ["默认"];
+    loadFoods().forEach((food) => {
+      const folder = normalizedFolderName(food.folder);
+      if (!folders.some((item) => item.toLocaleLowerCase() === folder.toLocaleLowerCase())) {
+        folders.push(folder);
+      }
+    });
+    return folders;
+  }
+
+  function resolveFolderName(value) {
+    const folder = normalizedFolderName(value);
+    return existingFolders().find((item) => item.toLocaleLowerCase() === folder.toLocaleLowerCase()) || folder;
+  }
+
+  function setFolderValue(value) {
+    const input = screenElement("add")?.querySelector("[aria-label='存放文件夹']");
+    if (input) input.value = resolveFolderName(value);
+  }
+
+  function renderFolderOptions() {
+    const grid = screenElement("add")?.querySelector(".folder-option-grid");
+    if (!grid) return;
+    const current = normalizedFolderName(formValue(".phone-add [aria-label='存放文件夹']"));
+    grid.innerHTML = existingFolders()
+      .map((folder) => `<button type="button" data-value="${escapeHtml(folder)}" class="${folder.toLocaleLowerCase() === current.toLocaleLowerCase() ? "active" : ""}">${escapeHtml(folder)}</button>`)
+      .join("");
+  }
+
   function closeUnitModal() {
     const modal = screenElement("add")?.querySelector(".unit-modal");
+    if (!modal) return;
+    modal.classList.add("is-hidden");
+    modal.setAttribute("aria-hidden", "true");
+  }
+
+  function closeReminderUnitModal() {
+    const modal = screenElement("add")?.querySelector(".reminder-unit-modal");
+    if (!modal) return;
+    modal.classList.add("is-hidden");
+    modal.setAttribute("aria-hidden", "true");
+  }
+
+  function closeFolderModal() {
+    const modal = screenElement("add")?.querySelector(".folder-modal");
     if (!modal) return;
     modal.classList.add("is-hidden");
     modal.setAttribute("aria-hidden", "true");
@@ -827,7 +888,29 @@
   function openUnitModal() {
     const modal = screenElement("add")?.querySelector(".unit-modal");
     if (!modal) return;
+    closeReminderUnitModal();
+    closeFolderModal();
     setQuantityUnit(formValue(".phone-add [aria-label='数量单位']") || "斤");
+    modal.classList.remove("is-hidden");
+    modal.setAttribute("aria-hidden", "false");
+  }
+
+  function openReminderUnitModal() {
+    const modal = screenElement("add")?.querySelector(".reminder-unit-modal");
+    if (!modal) return;
+    closeUnitModal();
+    closeFolderModal();
+    setReminderUnit(formValue(".phone-add [aria-label='提醒单位']") || "天");
+    modal.classList.remove("is-hidden");
+    modal.setAttribute("aria-hidden", "false");
+  }
+
+  function openFolderModal() {
+    const modal = screenElement("add")?.querySelector(".folder-modal");
+    if (!modal) return;
+    closeUnitModal();
+    closeReminderUnitModal();
+    renderFolderOptions();
     modal.classList.remove("is-hidden");
     modal.setAttribute("aria-hidden", "false");
   }
@@ -861,7 +944,8 @@
   function setPhotoButtonLabel(area, label) {
     const button = area?.querySelector(".photo-area > button");
     if (!button) return;
-    button.innerHTML = `<img class="button-icon" src="icon/相机.svg" alt="" /><span>${escapeHtml(label)}</span>`;
+    button.setAttribute("aria-label", label || "拍照");
+    button.innerHTML = `<img class="button-icon" src="icon/相机.svg" alt="" />`;
   }
 
   function setAddFormMode(isEditing) {
@@ -1086,7 +1170,7 @@
     add.querySelector("[aria-label='数量']").value = "1";
     setQuantityUnit("斤");
     add.querySelector("[aria-label='提醒数值']").value = "3";
-    add.querySelector("[aria-label='提醒单位']").value = "天";
+    setReminderUnit("天");
     add.querySelector("[aria-label='存放文件夹']").value = "默认";
     add.querySelectorAll(".storage-chips button").forEach((button, index) => {
       button.classList.toggle("active", index === 0);
@@ -1105,8 +1189,8 @@
     add.querySelector("[aria-label='数量']").value = food.quantity || "1";
     setQuantityUnit(food.unit || "个");
     add.querySelector("[aria-label='提醒数值']").value = food.remindValue || food.remindDays || "3";
-    add.querySelector("[aria-label='提醒单位']").value = food.remindUnit || "天";
-    add.querySelector("[aria-label='存放文件夹']").value = food.folder || "默认";
+    setReminderUnit(food.remindUnit || "天");
+    setFolderValue(food.folder || "默认");
     add.querySelectorAll(".storage-chips button").forEach((button) => {
       button.classList.toggle("active", button.textContent.trim() === (food.storage || "冰箱"));
     });
@@ -1120,7 +1204,7 @@
     const quantity = formValue(".phone-add [aria-label='数量']") || "1";
     const unit = formValue(".phone-add [aria-label='数量单位']") || "个";
     const storage = selectedOption(".phone-add .storage-chips .active") || "冰箱";
-    const folder = formValue(".phone-add [aria-label='存放文件夹']") || "默认";
+    const folder = resolveFolderName(formValue(".phone-add [aria-label='存放文件夹']"));
     const remindValue = reminderAmount(formValue(".phone-add [aria-label='提醒数值']"));
     const remindUnit = reminderUnit(formValue(".phone-add [aria-label='提醒单位']"));
     const remindDays = reminderDaysCompat(remindValue, remindUnit);
@@ -1508,9 +1592,44 @@
       return;
     }
 
+    const reminderUnitPicker = target.closest(".reminder-unit-picker-button");
+    if (reminderUnitPicker) {
+      openReminderUnitModal();
+      return;
+    }
+
+    const reminderUnitOption = target.closest(".reminder-unit-option-grid button");
+    if (reminderUnitOption) {
+      setReminderUnit(reminderUnitOption.dataset.value || reminderUnitOption.textContent.trim());
+      closeReminderUnitModal();
+      return;
+    }
+
+    const folderMore = target.closest(".folder-more-button");
+    if (folderMore) {
+      openFolderModal();
+      return;
+    }
+
+    const folderOption = target.closest(".folder-option-grid button");
+    if (folderOption) {
+      setFolderValue(folderOption.dataset.value || folderOption.textContent.trim());
+      closeFolderModal();
+      return;
+    }
+
     const unitModalClose = target.closest(".unit-modal-close");
-    if (unitModalClose || target.classList?.contains("unit-modal")) {
+    if (unitModalClose) {
       closeUnitModal();
+      closeReminderUnitModal();
+      closeFolderModal();
+      return;
+    }
+
+    if (target.classList?.contains("unit-modal") || target.classList?.contains("reminder-unit-modal") || target.classList?.contains("folder-modal")) {
+      closeUnitModal();
+      closeReminderUnitModal();
+      closeFolderModal();
       return;
     }
 

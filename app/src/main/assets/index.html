@@ -153,7 +153,7 @@
             <span class="egg"></span>
           </div>
           <input class="camera-input" type="file" accept="image/*" capture="environment" aria-label="拍摄食物照片" hidden />
-          <button><img class="button-icon" src="icon/相机.svg" alt="" /><span>拍照</span></button>
+          <button aria-label="拍照"><img class="button-icon" src="icon/相机.svg" alt="" /></button>
         </section>
 
         <form class="form-panel add-form-panel">
@@ -200,7 +200,9 @@
               <div class="field-control split-control">
                 <input class="reminder-input" value="3" inputmode="decimal" aria-label="提醒数值" />
                 <input type="hidden" value="天" aria-label="提醒单位" />
-                <span class="unit-static-label">天</span>
+                <button class="reminder-unit-picker-button" type="button" aria-label="选择提醒单位">
+                  <span class="reminder-unit-picker-label">天</span>
+                </button>
               </div>
             </label>
 
@@ -232,6 +234,36 @@
               <button type="button" data-value="瓶">瓶</button>
               <button type="button" data-value="包">包</button>
             </div>
+          </div>
+        </section>
+
+        <section class="reminder-unit-modal is-hidden" aria-label="选择提醒单位" aria-hidden="true">
+          <div class="unit-dialog" role="dialog" aria-modal="true" aria-labelledby="reminder-unit-dialog-title">
+            <header>
+              <h2 id="reminder-unit-dialog-title">选择提醒单位</h2>
+              <button class="unit-modal-close" type="button" aria-label="关闭提醒单位选择">
+                <img src="icon/错误.svg" alt="" />
+              </button>
+            </header>
+            <div class="unit-option-grid reminder-unit-option-grid">
+              <button type="button" data-value="分钟">分钟</button>
+              <button type="button" data-value="小时">小时</button>
+              <button type="button" data-value="天">天</button>
+              <button type="button" data-value="星期">星期</button>
+              <button type="button" data-value="月">月</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="folder-modal is-hidden" aria-label="选择存放文件夹" aria-hidden="true">
+          <div class="unit-dialog" role="dialog" aria-modal="true" aria-labelledby="folder-dialog-title">
+            <header>
+              <h2 id="folder-dialog-title">选择存放文件夹</h2>
+              <button class="unit-modal-close" type="button" aria-label="关闭文件夹选择">
+                <img src="icon/错误.svg" alt="" />
+              </button>
+            </header>
+            <div class="unit-option-grid folder-option-grid"></div>
           </div>
         </section>
       </section>

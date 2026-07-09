@@ -88,6 +88,7 @@ button {
 .photo-area > button,
 .field-icon-button,
 .unit-picker-button,
+.reminder-unit-picker-button,
 .unit-modal-close,
 .unit-option-grid button {
   cursor: pointer;
@@ -790,39 +791,34 @@ button {
 .photo-area {
   width: min(248px, calc(100% - 88px));
   margin: 18px auto 20px;
-  padding: 28px 18px 26px;
-  border: 2px dashed #bfd7c6;
+  padding: 24px 18px 18px;
+  border: 0;
   border-radius: 24px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.72), transparent 58%),
-    #f9fbf2;
+  background: transparent;
   text-align: center;
 }
 
 .photo-area button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  min-width: 128px;
-  min-height: 40px;
-  margin-top: 20px;
-  border-radius: 14px;
-  color: #ffffff;
-  background: var(--ink);
+  display: grid;
+  width: 52px;
+  height: 52px;
+  margin: 14px auto 0;
+  place-items: center;
+  border-radius: 0;
+  color: var(--ink);
+  background: transparent;
   font-weight: 900;
 }
 
 .button-icon {
   display: block;
-  width: 21px;
-  height: 21px;
+  width: 38px;
+  height: 38px;
   object-fit: contain;
 }
 
 .photo-area.is-captured {
-  border-color: var(--mint-dark);
-  background: #eef8ef;
+  background: transparent;
 }
 
 .photo-area.is-captured .plate-illustration {
@@ -837,7 +833,7 @@ button {
 }
 
 .photo-area.is-captured button {
-  background: var(--mint-dark);
+  background: transparent;
 }
 
 .photo-area.is-icon-preview:not(.is-captured) .plate-illustration {
@@ -1118,7 +1114,8 @@ button {
 }
 
 .field-icon-button,
-.unit-picker-button {
+.unit-picker-button,
+.reminder-unit-picker-button {
   display: grid;
   height: 100%;
   min-height: 44px;
@@ -1150,17 +1147,9 @@ button {
 }
 
 .unit-picker-button,
-.unit-static-label {
+.reminder-unit-picker-button {
   color: #174d3d;
   font-size: 15px;
-}
-
-.unit-static-label {
-  display: grid;
-  height: 100%;
-  min-height: 44px;
-  place-items: center;
-  font-weight: 900;
 }
 
 .storage-field .storage-chips {
@@ -1174,7 +1163,9 @@ button {
   border-radius: 14px;
 }
 
-.unit-modal {
+.unit-modal,
+.reminder-unit-modal,
+.folder-modal {
   position: absolute;
   inset: 0;
   z-index: 8;
@@ -1184,7 +1175,9 @@ button {
   background: rgba(36, 48, 52, 0.28);
 }
 
-.unit-modal.is-hidden {
+.unit-modal.is-hidden,
+.reminder-unit-modal.is-hidden,
+.folder-modal.is-hidden {
   display: none;
 }
 
@@ -2365,13 +2358,17 @@ html.theme-system-dark .tabbar .active {
 }
 
 html.theme-dark .primary-action,
-html.theme-system-dark .primary-action,
+html.theme-system-dark .primary-action {
+  color: #07110e;
+  background-color: #78d6a8;
+}
+
 html.theme-dark .photo-area > button,
 html.theme-system-dark .photo-area > button,
 html.theme-dark .photo-area.is-captured button,
 html.theme-system-dark .photo-area.is-captured button {
-  color: #07110e;
-  background-color: #78d6a8;
+  color: var(--ink);
+  background-color: transparent;
 }
 
 html.theme-dark .phone-add > .primary-action,
@@ -2552,6 +2549,12 @@ html.theme-system-dark .sync-now-button.is-syncing {
   html.theme-system .photo-area.is-captured button {
     color: #07110e;
     background-color: #78d6a8;
+  }
+
+  html.theme-system .photo-area > button,
+  html.theme-system .photo-area.is-captured button {
+    color: var(--ink);
+    background-color: transparent;
   }
 
   html.theme-system .phone-add > .primary-action {
