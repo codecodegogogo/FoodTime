@@ -72,6 +72,7 @@ button {
 .settings-button,
 .row-action,
 .sheet-close,
+.sheet-edit-action,
 .sheet-actions button,
 .segmented button,
 .storage-chips button,
@@ -638,9 +639,9 @@ button {
   bottom: 0;
   left: 0;
   z-index: 2;
-  padding: 10px 20px 20px;
-  border-radius: 28px 28px 0 0;
-  background: rgba(255, 255, 255, 0.98);
+  padding: 20px 20px 34px;
+  border-radius: 30px 30px 0 0;
+  background: #ffffff;
   box-shadow: 0 -18px 48px rgba(36, 48, 52, 0.18);
 }
 
@@ -648,7 +649,7 @@ button {
   display: block;
   width: 46px;
   height: 5px;
-  margin: 0 auto 14px;
+  margin: 0 auto 28px;
   border-radius: 999px;
   background: #d8ddd7;
 }
@@ -658,7 +659,7 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  margin-bottom: 14px;
+  margin-bottom: 28px;
 }
 
 .action-sheet p {
@@ -670,23 +671,41 @@ button {
 
 .action-sheet h2 {
   margin: 0;
-  font-size: 20px;
+  color: #102a36;
+  font-size: 22px;
+  font-weight: 900;
 }
 
 .sheet-title-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .sheet-title-row span {
   flex: 0 0 auto;
-  padding: 8px 10px;
+  padding: 9px 14px;
   border-radius: 999px;
   color: #9d382e;
   background: #ffe2dd;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 900;
+}
+
+.sheet-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sheet-edit-action {
+  display: grid;
+  width: 54px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid #e5ded3;
+  border-radius: 14px;
+  background: #fffdf8;
 }
 
 .sheet-close {
@@ -696,59 +715,56 @@ button {
   width: 40px;
   height: 40px;
   place-items: center;
-  border-radius: 0;
-  background: transparent;
+  border-radius: 50%;
+  background: #f4f1eb;
 }
 
 .close-icon {
   display: block;
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   background: url("icon/错误.svg") center / contain no-repeat;
 }
 
 .sheet-actions {
   display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
 }
 
 .sheet-actions button {
   display: grid;
-  grid-template-columns: 42px 1fr;
-  column-gap: 12px;
-  align-items: center;
-  min-height: 62px;
-  padding: 10px 12px;
-  border: 0;
-  border-radius: 0;
+  align-content: center;
+  justify-items: center;
+  gap: 10px;
+  min-height: 90px;
+  padding: 12px 8px;
+  border: 1px solid #e8dfd0;
+  border-radius: 16px;
   color: var(--ink);
-  background: transparent;
-  text-align: left;
+  background: #fffdf8;
+  text-align: center;
 }
 
 .sheet-actions strong {
   display: block;
   font-size: 15px;
-}
-
-.sheet-actions small {
-  display: block;
-  grid-column: 2;
-  margin-top: 4px;
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 800;
+  font-weight: 900;
 }
 
 .sheet-icon {
-  grid-row: span 2;
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
   border: 0;
   border-radius: 0;
   background-position: center;
   background-repeat: no-repeat;
-  background-size: 34px 34px;
+  background-size: contain;
+}
+
+.sheet-edit-action .sheet-icon {
+  width: 24px;
+  height: 24px;
 }
 
 .sheet-icon.eaten {

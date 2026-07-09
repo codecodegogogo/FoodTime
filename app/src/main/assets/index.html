@@ -94,36 +94,32 @@
           <span class="sheet-handle"></span>
           <header>
             <div>
-              <p>正在处理</p>
               <div class="sheet-title-row">
                 <h2>鲜牛奶</h2>
                 <span>计算中</span>
               </div>
             </div>
-            <button class="sheet-close" aria-label="关闭操作面板">
-              <span class="close-icon"></span>
-            </button>
+            <div class="sheet-top-actions">
+              <button class="sheet-edit-action" type="button" data-sheet-action="edit" aria-label="编辑食物">
+                <span class="sheet-icon edit"></span>
+              </button>
+              <button class="sheet-close" aria-label="关闭操作面板">
+                <span class="close-icon"></span>
+              </button>
+            </div>
           </header>
           <div class="sheet-actions">
-            <button class="sheet-edit-action" type="button" data-sheet-action="edit">
-              <span class="sheet-icon edit"></span>
-              <strong>再次编辑</strong>
-              <small>修改名称、数量和提醒</small>
-            </button>
             <button type="button" data-sheet-action="eaten">
               <span class="sheet-icon eaten"></span>
               <strong>已吃完</strong>
-              <small>从冰箱列表移除</small>
             </button>
             <button type="button" data-sheet-action="spoiled">
               <span class="sheet-icon spoiled"></span>
               <strong>坏掉了</strong>
-              <small>记录浪费原因</small>
             </button>
             <button type="button" data-sheet-action="delay">
               <span class="sheet-icon delay"></span>
               <strong>延期</strong>
-              <small>再提醒我 1 天</small>
             </button>
           </div>
         </section>

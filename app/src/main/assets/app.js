@@ -1565,7 +1565,7 @@
       return;
     }
 
-    const sheetAction = target.closest(".sheet-actions button");
+    const sheetAction = target.closest(".action-sheet [data-sheet-action]");
     if (sheetAction) {
       const action = sheetAction.dataset.sheetAction;
       if (action === "edit") editSelectedFood();
