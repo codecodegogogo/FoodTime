@@ -1268,16 +1268,26 @@
     showScreen("history", { replace: true });
   }
 
+  function openHistoryClearModal() {
+    const modal = screenElement("history")?.querySelector(".history-clear-modal");
+    if (!modal) return;
+    modal.classList.remove("is-hidden");
+    modal.setAttribute("aria-hidden", "false");
+  }
+
+  function closeHistoryClearModal() {
+    const modal = screenElement("history")?.querySelector(".history-clear-modal");
+    if (!modal) return;
+    modal.classList.add("is-hidden");
+    modal.setAttribute("aria-hidden", "true");
+  }
+
   function clearAllFoodData() {
     const count = loadFoods().length;
     if (!count) {
       updateSyncStatus("本地没有需要清除的食物数据");
       return;
     }
-
-    const confirmed = typeof window.confirm !== "function"
-      || window.confirm("确认清除本地和云端的全部食物数据？同步后云端也会被清空。");
-    if (!confirmed) return;
 
     localStorage.setItem(CLEAR_ALL_AT_KEY, nowIso());
     selectedFoodId = null;
@@ -1667,6 +1677,19 @@
 
     const clearHistoryAction = target.closest(".history-clear-action");
     if (clearHistoryAction) {
+      openHistoryClearModal();
+      return;
+    }
+
+    const clearCancelAction = target.closest(".confirm-cancel-action");
+    if (clearCancelAction || target.classList?.contains("history-clear-modal")) {
+      closeHistoryClearModal();
+      return;
+    }
+
+    const clearDeleteAction = target.closest(".confirm-delete-action");
+    if (clearDeleteAction) {
+      closeHistoryClearModal();
       clearAllFoodData();
       return;
     }

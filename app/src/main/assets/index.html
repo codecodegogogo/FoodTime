@@ -459,17 +459,15 @@
         <header class="sub-header">
           <button class="back-button" aria-label="返回"></button>
           <h1>历史食物记录</h1>
-          <span></span>
+          <button class="history-clear-action history-clear-icon-action" type="button" aria-label="清除本地和云端数据">
+            <img src="icon/删除.svg" alt="" />
+          </button>
         </header>
 
         <nav class="history-filters" aria-label="历史记录筛选">
           <button class="active">已吃完</button>
           <button>已坏掉</button>
         </nav>
-
-        <section class="history-tools">
-          <button class="history-clear-action" type="button">清除本地和云端数据</button>
-        </section>
 
         <section class="history-list" aria-label="过往食物列表">
           <article>
@@ -488,6 +486,20 @@
             </div>
             <button class="restore-action" type="button">还原</button>
           </article>
+        </section>
+
+        <section class="confirm-modal history-clear-modal is-hidden" aria-label="确认删除数据" aria-hidden="true">
+          <div class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="history-clear-title">
+            <div class="confirm-icon">
+              <img src="icon/删除.svg" alt="" />
+            </div>
+            <h2 id="history-clear-title">是否删除全部数据？</h2>
+            <p>本地食物记录会被清空，同步后云端数据也会被清空。</p>
+            <div class="confirm-actions">
+              <button class="confirm-cancel-action" type="button">取消</button>
+              <button class="confirm-delete-action" type="button">删除</button>
+            </div>
+          </div>
         </section>
       </section>
 

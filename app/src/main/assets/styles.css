@@ -81,6 +81,7 @@ button {
 .tabbar span,
 .stats-grid article,
 .history-filters button,
+.history-clear-action,
 .sync-entry,
 .sync-now-button,
 .photo-area > button,
@@ -703,7 +704,7 @@ button {
   display: block;
   width: 30px;
   height: 30px;
-  background: url("icons/close.svg") center / contain no-repeat;
+  background: url("icon/错误.svg") center / contain no-repeat;
 }
 
 .sheet-actions {
@@ -752,22 +753,22 @@ button {
 
 .sheet-icon.eaten {
   background-color: transparent;
-  background-image: url("icons/action-done.svg");
+  background-image: url("icon/吃完.svg");
 }
 
 .sheet-icon.edit {
   background-color: transparent;
-  background-image: url("icons/settings.svg");
+  background-image: url("icon/编辑.svg");
 }
 
 .sheet-icon.spoiled {
   background-color: transparent;
-  background-image: url("icons/action-bad.svg");
+  background-image: url("icon/删除.svg");
 }
 
 .sheet-icon.delay {
   background-color: transparent;
-  background-image: url("icons/action-delay.svg");
+  background-image: url("icon/时间.svg");
 }
 
 .photo-area {
@@ -1946,20 +1947,97 @@ legend {
   grid-template-columns: repeat(2, 1fr);
 }
 
-.history-tools {
-  display: flex;
-  justify-content: flex-end;
-  margin: -8px 20px 14px;
+.history-clear-action {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 0;
+  background: transparent;
 }
 
-.history-clear-action {
-  min-height: 36px;
-  padding: 0;
-  border: 0;
-  color: #a43d34;
-  background: transparent;
+.history-clear-action img {
+  display: block;
+  width: 27px;
+  height: 27px;
+  object-fit: contain;
+}
+
+.confirm-modal {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(36, 48, 52, 0.28);
+  backdrop-filter: blur(8px);
+}
+
+.confirm-modal.is-hidden {
+  display: none;
+}
+
+.confirm-dialog {
+  width: 100%;
+  max-width: 314px;
+  padding: 26px 22px 20px;
+  border-radius: 26px;
+  background: #ffffff;
+  box-shadow: 0 28px 80px rgba(39, 57, 50, 0.24);
+  text-align: center;
+}
+
+.confirm-icon {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 14px;
+  place-items: center;
+  border-radius: 20px;
+  background: #f8dedb;
+}
+
+.confirm-icon img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
+
+.confirm-dialog h2 {
+  margin: 0 0 9px;
+  font-size: 20px;
+}
+
+.confirm-dialog p {
+  margin: 0;
+  color: var(--muted);
   font-size: 13px;
+  line-height: 1.55;
+  font-weight: 800;
+}
+
+.confirm-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.confirm-actions button {
+  min-height: 44px;
+  border-radius: 14px;
   font-weight: 900;
+}
+
+.confirm-cancel-action {
+  color: var(--muted);
+  background: #f0eee6;
+}
+
+.confirm-delete-action {
+  color: #ffffff;
+  background: #a43d34;
 }
 
 .history-list {
