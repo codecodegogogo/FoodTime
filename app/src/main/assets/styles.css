@@ -383,7 +383,7 @@ button {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 10px;
+  margin-top: 0;
 }
 
 .home-folder-options button {
@@ -1157,7 +1157,11 @@ button {
   font-weight: 900;
 }
 
-.add-form-panel > .form-field > input:not([type="hidden"]) {
+.native-date-input {
+  display: none !important;
+}
+
+.add-form-panel > .form-field > input:not([type="hidden"]):not([hidden]) {
   display: block;
   width: 100%;
   padding: 0 14px;
@@ -1872,7 +1876,7 @@ legend {
 }
 
 .setting-dot {
-  --setting-icon: url("icons/settings.svg");
+  --setting-icon: url("icons/settings-provided.svg");
   --setting-icon-filter: none;
   flex: 0 0 auto;
   display: grid;
@@ -1894,17 +1898,17 @@ legend {
 }
 
 .cloud-dot {
-  --setting-icon: url("icons/sync.svg");
+  --setting-icon: url("icons/sync-cloud-provided.svg");
   --setting-icon-filter: none;
 }
 
 .theme-dot {
-  --setting-icon: url("icons/settings.svg");
+  --setting-icon: url("icons/settings-provided.svg");
   --setting-icon-filter: none;
 }
 
 .notice-dot {
-  --setting-icon: url("icons/action-delay.svg");
+  --setting-icon: url("icon/时间.svg");
   --setting-icon-filter: none;
 }
 
@@ -2264,17 +2268,17 @@ html.theme-system-dark .settings-hint {
 
 html.theme-dark .setting-dot,
 html.theme-system-dark .setting-dot {
-  --setting-icon-filter: brightness(0) saturate(100%) invert(82%) sepia(22%) saturate(884%) hue-rotate(91deg) brightness(92%) contrast(84%);
+  --setting-icon-filter: none;
 }
 
 html.theme-dark .theme-dot,
 html.theme-system-dark .theme-dot {
-  --setting-icon-filter: brightness(0) saturate(100%) invert(79%) sepia(22%) saturate(730%) hue-rotate(183deg) brightness(104%) contrast(101%);
+  --setting-icon-filter: none;
 }
 
 html.theme-dark .notice-dot,
 html.theme-system-dark .notice-dot {
-  --setting-icon-filter: brightness(0) saturate(100%) invert(78%) sepia(31%) saturate(743%) hue-rotate(322deg) brightness(103%) contrast(101%);
+  --setting-icon-filter: none;
 }
 
 html.theme-dark .row-chevron,
@@ -2504,15 +2508,15 @@ html.theme-system-dark .sync-now-button.is-syncing {
   }
 
   html.theme-system .setting-dot {
-    --setting-icon-filter: brightness(0) saturate(100%) invert(82%) sepia(22%) saturate(884%) hue-rotate(91deg) brightness(92%) contrast(84%);
+    --setting-icon-filter: none;
   }
 
   html.theme-system .theme-dot {
-    --setting-icon-filter: brightness(0) saturate(100%) invert(79%) sepia(22%) saturate(730%) hue-rotate(183deg) brightness(104%) contrast(101%);
+    --setting-icon-filter: none;
   }
 
   html.theme-system .notice-dot {
-    --setting-icon-filter: brightness(0) saturate(100%) invert(78%) sepia(31%) saturate(743%) hue-rotate(322deg) brightness(103%) contrast(101%);
+    --setting-icon-filter: none;
   }
 
   html.theme-system .row-chevron {

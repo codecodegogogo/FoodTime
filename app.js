@@ -606,15 +606,9 @@
     const folders = foldersForStorage(currentHomeFilter);
     if (!folders.includes(currentHomeFolder)) currentHomeFolder = "全部";
 
-    const toggle = filter.querySelector(".home-folder-toggle");
     const options = filter.querySelector(".home-folder-options");
-    if (toggle) {
-      toggle.classList.toggle("active", homeFolderExpanded || currentHomeFolder !== "全部");
-      toggle.setAttribute("aria-expanded", homeFolderExpanded ? "true" : "false");
-      toggle.textContent = currentHomeFolder === "全部" ? "文件夹" : currentHomeFolder;
-    }
     if (options) {
-      options.hidden = !homeFolderExpanded;
+      options.hidden = false;
       options.innerHTML = folders
         .map((folder) => `<button type="button" data-folder="${escapeHtml(folder)}" class="${folder === currentHomeFolder ? "active" : ""}">${escapeHtml(folder)}</button>`)
         .join("");
@@ -1635,7 +1629,7 @@
       return;
     }
 
-    const unitOption = target.closest(".unit-option-grid button");
+    const unitOption = target.closest(".unit-modal .unit-option-grid button");
     if (unitOption) {
       setQuantityUnit(unitOption.dataset.value || unitOption.textContent.trim());
       closeUnitModal();
@@ -1762,13 +1756,6 @@
       currentHomeFilter = homeFilter.textContent.trim();
       currentHomeFolder = "全部";
       homeFolderExpanded = false;
-      renderHomeScreens();
-      return;
-    }
-
-    const homeFolderToggle = target.closest(".home-folder-toggle");
-    if (homeFolderToggle) {
-      homeFolderExpanded = !homeFolderExpanded;
       renderHomeScreens();
       return;
     }
