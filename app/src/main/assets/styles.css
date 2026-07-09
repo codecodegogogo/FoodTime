@@ -75,6 +75,8 @@ button {
 .sheet-edit-action,
 .sheet-actions button,
 .segmented button,
+.home-folder-toggle,
+.home-folder-options button,
 .storage-chips button,
 .stepper button,
 .primary-action,
@@ -348,6 +350,53 @@ button {
 
 .segmented .active,
 .chips .active {
+  color: #ffffff;
+  background: var(--mint-dark);
+}
+
+.home-folder-filter {
+  margin: -6px 20px 16px;
+}
+
+.home-folder-filter.is-hidden {
+  display: none;
+}
+
+.home-folder-toggle {
+  min-height: 34px;
+  padding: 0 14px;
+  border: 1px solid #ded8cd;
+  border-radius: 999px;
+  color: #376c58;
+  background: #fffdf8;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.home-folder-toggle.active {
+  color: #ffffff;
+  border-color: transparent;
+  background: var(--mint-dark);
+}
+
+.home-folder-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.home-folder-options button {
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  color: var(--muted);
+  background: #eee9df;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.home-folder-options button.active {
   color: #ffffff;
   background: var(--mint-dark);
 }
@@ -823,8 +872,8 @@ button {
 
 .photo-area.is-captured .plate-illustration {
   overflow: hidden;
-  border: 2px solid #26353a;
-  border-radius: 22px;
+  border: 1px solid #d2d0c8;
+  border-radius: 18px;
   background: var(--captured-photo, #eef8ef) center / cover no-repeat;
 }
 
@@ -837,10 +886,10 @@ button {
 }
 
 .photo-area.is-icon-preview:not(.is-captured) .plate-illustration {
-  overflow: visible;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
+  overflow: hidden;
+  border: 1px solid #d2d0c8;
+  border-radius: 18px;
+  background: #fffdf8;
 }
 
 .photo-area.is-icon-preview:not(.is-captured) .plate-illustration::before {
@@ -866,9 +915,12 @@ button {
 
 .plate-illustration {
   position: relative;
-  width: 180px;
-  height: 132px;
+  width: 136px;
+  height: 136px;
   margin: 0 auto;
+  border: 1px solid #d2d0c8;
+  border-radius: 18px;
+  background: #fffdf8;
 }
 
 .photo-shelf {
@@ -1105,6 +1157,14 @@ button {
   font-weight: 900;
 }
 
+.add-form-panel > .form-field > input:not([type="hidden"]) {
+  display: block;
+  width: 100%;
+  padding: 0 14px;
+  border: 1px solid #e2ded4;
+  background: #fffdf8;
+}
+
 .field-control-action {
   grid-template-columns: minmax(0, 1fr) 60px;
 }
@@ -1130,6 +1190,11 @@ button {
   width: 24px;
   height: 24px;
   object-fit: contain;
+}
+
+.date-picker-button img {
+  width: 28px;
+  height: 28px;
 }
 
 .folder-more-button img {
@@ -2232,6 +2297,8 @@ html.theme-dark .inline-number-field,
 html.theme-system-dark .inline-number-field,
 html.theme-dark .segmented,
 html.theme-system-dark .segmented,
+html.theme-dark .home-folder-toggle,
+html.theme-system-dark .home-folder-toggle,
 html.theme-dark .history-filters,
 html.theme-system-dark .history-filters,
 html.theme-dark .tabbar,
@@ -2323,6 +2390,8 @@ html.theme-system-dark .sync-now-button.is-syncing {
 
 html.theme-dark .segmented button,
 html.theme-system-dark .segmented button,
+html.theme-dark .home-folder-options button,
+html.theme-system-dark .home-folder-options button,
 html.theme-dark .chips button,
 html.theme-system-dark .chips button,
 html.theme-dark .choice-options button,
@@ -2337,6 +2406,10 @@ html.theme-system-dark .tabbar span {
 
 html.theme-dark .segmented .active,
 html.theme-system-dark .segmented .active,
+html.theme-dark .home-folder-toggle.active,
+html.theme-system-dark .home-folder-toggle.active,
+html.theme-dark .home-folder-options button.active,
+html.theme-system-dark .home-folder-options button.active,
 html.theme-dark .chips .active,
 html.theme-system-dark .chips .active,
 html.theme-dark .choice-options .active,

@@ -117,6 +117,8 @@
   let currentScreen = "home";
   let routeStack = ["home"];
   let currentHomeFilter = "全部";
+  let currentHomeFolder = "全部";
+  let homeFolderExpanded = false;
   let currentHistoryFilter = "已吃完";
   let selectedFoodId = null;
   let editingFoodId = null;
@@ -531,10 +533,12 @@
     return `<div class="food-thumb icon-thumb ${type}"><img src="${icon}" alt="" /></div>`;
   }
 
-  function activeFoods(filter = currentHomeFilter) {
+  function activeFoods(filter = currentHomeFilter, folder = currentHomeFolder) {
     return loadFoods().filter((food) => {
       if (food.status !== "active") return false;
-      return filter === "全部" || food.storage === filter;
+      if (filter !== "全部" && food.storage !== filter) return false;
+      if (filter !== "全部" && folder !== "全部" && normalizedFolderName(food.folder) !== folder) return false;
+      return true;
     });
   }
 
@@ -542,7 +546,7 @@
     const list = screen.querySelector(".food-list");
     if (!list) return;
 
-    const foods = activeFoods(filter);
+    const foods = activeFoods(filter, currentHomeFolder);
     list.classList.toggle("is-empty", !foods.length);
     if (!foods.length) {
       list.innerHTML = `
@@ -578,6 +582,45 @@
       .join("");
   }
 
+  function foldersForStorage(storage) {
+    const folders = ["全部"];
+    loadFoods().forEach((food) => {
+      if (food.status !== "active" || food.storage !== storage) return;
+      const folder = normalizedFolderName(food.folder);
+      if (!folders.some((item) => item.toLocaleLowerCase() === folder.toLocaleLowerCase())) {
+        folders.push(folder);
+      }
+    });
+    return folders;
+  }
+
+  function renderHomeFolderFilter(screen) {
+    const filter = screen.querySelector(".home-folder-filter");
+    if (!filter) return;
+
+    const visible = currentHomeFilter !== "全部";
+    filter.classList.toggle("is-hidden", !visible);
+    filter.setAttribute("aria-hidden", visible ? "false" : "true");
+    if (!visible) return;
+
+    const folders = foldersForStorage(currentHomeFilter);
+    if (!folders.includes(currentHomeFolder)) currentHomeFolder = "全部";
+
+    const toggle = filter.querySelector(".home-folder-toggle");
+    const options = filter.querySelector(".home-folder-options");
+    if (toggle) {
+      toggle.classList.toggle("active", homeFolderExpanded || currentHomeFolder !== "全部");
+      toggle.setAttribute("aria-expanded", homeFolderExpanded ? "true" : "false");
+      toggle.textContent = currentHomeFolder === "全部" ? "文件夹" : currentHomeFolder;
+    }
+    if (options) {
+      options.hidden = !homeFolderExpanded;
+      options.innerHTML = folders
+        .map((folder) => `<button type="button" data-folder="${escapeHtml(folder)}" class="${folder === currentHomeFolder ? "active" : ""}">${escapeHtml(folder)}</button>`)
+        .join("");
+    }
+  }
+
   function renderHomeScreens() {
     ["home", "homeSheet"].forEach((name) => {
       const screen = screenElement(name);
@@ -586,10 +629,11 @@
       buttons.forEach((button) => {
         button.classList.toggle("active", button.textContent.trim() === currentHomeFilter);
       });
+      renderHomeFolderFilter(screen);
       renderHomeList(screen, currentHomeFilter);
     });
 
-    const visibleFoods = activeFoods(currentHomeFilter);
+    const visibleFoods = activeFoods(currentHomeFilter, currentHomeFolder);
     document.querySelectorAll(".hero-copy strong").forEach((item) => {
       item.textContent = visibleFoods.length ? `${visibleFoods.length} 件食物正在储存` : "所有东西都已经吃完了";
     });
@@ -1240,6 +1284,8 @@
       food.updatedAt = nowIso();
       saveFoods(foods);
       currentHomeFilter = "全部";
+      currentHomeFolder = "全部";
+      homeFolderExpanded = false;
       editingFoodId = null;
       resetAddForm();
       showScreen("home", { reset: true });
@@ -1269,6 +1315,8 @@
 
     saveFoods(foods);
     currentHomeFilter = "全部";
+    currentHomeFolder = "全部";
+    homeFolderExpanded = false;
     resetAddForm();
     showScreen("home", { reset: true });
   }
@@ -1376,6 +1424,8 @@
     localStorage.setItem(CLEAR_ALL_AT_KEY, nowIso());
     selectedFoodId = null;
     currentHomeFilter = "全部";
+    currentHomeFolder = "全部";
+    homeFolderExpanded = false;
     currentHistoryFilter = "已吃完";
     saveFoods([], { skipSync: true });
     renderAll();
@@ -1710,6 +1760,22 @@
     const homeFilter = target.closest(".phone-home .segmented button");
     if (homeFilter) {
       currentHomeFilter = homeFilter.textContent.trim();
+      currentHomeFolder = "全部";
+      homeFolderExpanded = false;
+      renderHomeScreens();
+      return;
+    }
+
+    const homeFolderToggle = target.closest(".home-folder-toggle");
+    if (homeFolderToggle) {
+      homeFolderExpanded = !homeFolderExpanded;
+      renderHomeScreens();
+      return;
+    }
+
+    const homeFolderOption = target.closest(".home-folder-options button");
+    if (homeFolderOption) {
+      currentHomeFolder = homeFolderOption.dataset.folder || homeFolderOption.textContent.trim() || "全部";
       renderHomeScreens();
       return;
     }
