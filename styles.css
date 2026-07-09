@@ -1922,10 +1922,10 @@ legend {
 
 .row-chevron {
   --chevron-filter: none;
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   margin-left: auto;
-  background: url("icons/chevron-right.svg") center / contain no-repeat;
+  background: url("icons/enter-provided.svg") center / contain no-repeat;
   filter: var(--chevron-filter);
 }
 
@@ -2280,7 +2280,7 @@ html.theme-system-dark .notice-dot {
 
 html.theme-dark .row-chevron,
 html.theme-system-dark .row-chevron {
-  --chevron-filter: brightness(0) saturate(100%) invert(78%) sepia(11%) saturate(366%) hue-rotate(101deg) brightness(94%) contrast(88%);
+  --chevron-filter: none;
 }
 
 html.theme-dark .history-clear-action,
@@ -2517,7 +2517,7 @@ html.theme-system-dark .sync-now-button.is-syncing {
   }
 
   html.theme-system .row-chevron {
-    --chevron-filter: brightness(0) saturate(100%) invert(78%) sepia(11%) saturate(366%) hue-rotate(101deg) brightness(94%) contrast(88%);
+    --chevron-filter: none;
   }
 
   html.theme-system .history-clear-action {

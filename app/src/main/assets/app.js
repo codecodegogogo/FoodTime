@@ -551,7 +551,7 @@
     if (!foods.length) {
       list.innerHTML = `
         <article class="empty-row food-empty">
-          <img class="empty-plate-icon" src="icons/empty-plate.svg" alt="" />
+          <img class="empty-plate-icon" src="icons/meal-provided.svg" alt="" />
           <span>这里还没有食物</span>
         </article>
       `;
