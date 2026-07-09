@@ -427,6 +427,11 @@
       .replace(/'/g, "&#39;");
   }
 
+  function shortFoodName(value) {
+    const chars = Array.from(String(value || ""));
+    return chars.length > 6 ? `${chars.slice(0, 6).join("")}...` : chars.join("");
+  }
+
   function daysStored(food) {
     const date = new Date(`${food.purchaseDate}T00:00:00`);
     if (Number.isNaN(date.getTime())) return 0;
@@ -562,11 +567,12 @@
       .map((food) => {
         const reminder = remindInfo(food);
         const amount = `${food.quantity || 1}${food.unit || ""}`;
+        const displayName = shortFoodName(food.name);
         return `
           <article class="food-row ${reminder.className}" data-food-id="${escapeHtml(food.id)}">
             ${thumbMarkup(food)}
             <div class="food-info">
-              <h2>${escapeHtml(food.name)}</h2>
+              <h2 title="${escapeHtml(food.name)}">${escapeHtml(displayName)}</h2>
               <p>
                 <span class="food-date-line">${escapeHtml(formatDate(food.purchaseDate))}购买</span>
                 <span class="food-detail-line">${escapeHtml(food.storage)} · ${escapeHtml(amount)}</span>
@@ -846,7 +852,7 @@
 
   function setQuantityUnit(value) {
     const add = screenElement("add");
-    const safeValue = value || "斤";
+    const safeValue = value || "";
     const input = add?.querySelector("[aria-label='数量单位']");
     const label = add?.querySelector(".unit-picker-label");
     if (input) input.value = safeValue;
@@ -858,7 +864,7 @@
 
   function setReminderUnit(value) {
     const add = screenElement("add");
-    const safeValue = reminderUnit(value);
+    const safeValue = value ? reminderUnit(value) : "";
     const input = add?.querySelector("[aria-label='提醒单位']");
     const label = add?.querySelector(".reminder-unit-picker-label");
     if (input) input.value = safeValue;
@@ -1001,7 +1007,16 @@
     const area = add?.querySelector(".photo-area");
     if (!area) return;
 
-    const name = formValue(".phone-add [aria-label='食物名称']") || "食物";
+    const name = formValue(".phone-add [aria-label='食物名称']");
+    if (!name) {
+      area.classList.remove("is-icon-preview");
+      area.style.removeProperty("--preview-icon");
+      delete area.dataset.previewLabel;
+      const illustration = area.querySelector(".plate-illustration");
+      if (illustration) delete illustration.dataset.previewLabel;
+      return;
+    }
+
     const visual = foodIconDefForName(name);
     area.classList.add("is-icon-preview");
     area.style.setProperty("--preview-icon", `url("${visual.file}")`);
@@ -1031,6 +1046,13 @@
     area.classList.remove("is-icon-preview");
     area.style.setProperty("--captured-photo", `url("${capturedPhoto}")`);
     setPhotoButtonLabel(area, "更换照片");
+  }
+
+  function clearPurchaseDateValue() {
+    const visibleInput = screenElement("add")?.querySelector("[aria-label='购买时间']");
+    const nativeInput = screenElement("add")?.querySelector(".native-date-input");
+    if (visibleInput) visibleInput.value = "";
+    if (nativeInput) nativeInput.value = "";
   }
 
   function loadThemeSettings() {
@@ -1203,15 +1225,15 @@
     if (!add) return;
     editingFoodId = null;
     setAddFormMode(false);
-    add.querySelector("[aria-label='食物名称']").value = "草莓";
-    setPurchaseDateValue(today.toISOString().slice(0, 10));
-    add.querySelector("[aria-label='数量']").value = "1";
-    setQuantityUnit("斤");
-    add.querySelector("[aria-label='提醒数值']").value = "3";
-    setReminderUnit("天");
-    add.querySelector("[aria-label='存放文件夹']").value = "默认";
+    add.querySelector("[aria-label='食物名称']").value = "";
+    clearPurchaseDateValue();
+    add.querySelector("[aria-label='数量']").value = "";
+    setQuantityUnit("");
+    add.querySelector("[aria-label='提醒数值']").value = "";
+    setReminderUnit("");
+    add.querySelector("[aria-label='存放文件夹']").value = "";
     add.querySelectorAll(".storage-chips button").forEach((button, index) => {
-      button.classList.toggle("active", index === 0);
+      button.classList.remove("active");
     });
     clearCapturedPhoto(add.querySelector(".photo-area"));
   }
@@ -1344,7 +1366,11 @@
 
     const sheet = screenElement("homeSheet")?.querySelector(".action-sheet");
     if (sheet) {
-      sheet.querySelector("h2").textContent = food.name;
+      const title = sheet.querySelector("h2");
+      if (title) {
+        title.textContent = shortFoodName(food.name);
+        title.setAttribute("title", food.name || "");
+      }
       sheet.querySelector(".sheet-title-row span").textContent = remindInfo(food).label;
     }
 

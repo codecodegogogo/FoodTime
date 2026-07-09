@@ -167,13 +167,13 @@
         <form class="form-panel add-form-panel">
           <label class="form-field form-field-full">
             <span>食物名称</span>
-            <input value="草莓" aria-label="食物名称" />
+            <input value="" aria-label="食物名称" />
           </label>
 
           <label class="form-field form-field-full">
             <span>购买时间</span>
             <div class="field-control field-control-action">
-              <input type="text" value="2026-07-05" inputmode="numeric" aria-label="购买时间" readonly />
+              <input type="text" value="" inputmode="numeric" aria-label="购买时间" readonly />
               <button class="field-icon-button date-picker-button" type="button" aria-label="选择购买时间">
                 <img src="icon/时间.svg" alt="" />
               </button>
@@ -185,10 +185,10 @@
             <label class="form-field quantity-field">
               <span>数量</span>
               <div class="field-control split-control">
-                <input class="quantity-input" value="1" inputmode="decimal" aria-label="数量" />
-                <input type="hidden" value="斤" aria-label="数量单位" />
+                <input class="quantity-input" value="" inputmode="decimal" aria-label="数量" />
+                <input type="hidden" value="" aria-label="数量单位" />
                 <button class="unit-picker-button" type="button" aria-label="选择数量单位">
-                  <span class="unit-picker-label">斤</span>
+                  <span class="unit-picker-label"></span>
                 </button>
               </div>
             </label>
@@ -196,7 +196,7 @@
             <fieldset class="storage-field">
               <legend>存放位置</legend>
               <div class="chips storage-chips">
-              <button type="button" class="active">冰箱</button>
+              <button type="button">冰箱</button>
               <button type="button">常温</button>
               </div>
             </fieldset>
@@ -206,10 +206,10 @@
             <label class="form-field reminder-field">
               <span>提醒时间</span>
               <div class="field-control split-control">
-                <input class="reminder-input" value="3" inputmode="decimal" aria-label="提醒数值" />
-                <input type="hidden" value="天" aria-label="提醒单位" />
+                <input class="reminder-input" value="" inputmode="decimal" aria-label="提醒数值" />
+                <input type="hidden" value="" aria-label="提醒单位" />
                 <button class="reminder-unit-picker-button" type="button" aria-label="选择提醒单位">
-                  <span class="reminder-unit-picker-label">天</span>
+                  <span class="reminder-unit-picker-label"></span>
                 </button>
               </div>
             </label>
@@ -217,7 +217,7 @@
             <label class="form-field folder-field">
               <span>存放文件夹</span>
               <div class="field-control field-control-action">
-                <input value="默认" aria-label="存放文件夹" />
+                <input value="" aria-label="存放文件夹" />
                 <button class="field-icon-button folder-more-button" type="button" aria-label="更多存放文件夹">
                   <img src="icon/更多.svg" alt="" />
                 </button>
@@ -378,7 +378,6 @@
               <h2>同步设置</h2>
               <p>默认坚果云，也支持其他 WebDAV 服务</p>
             </div>
-            <span class="row-chevron"></span>
           </button>
           <button class="setting-row theme-settings-button" type="button">
             <div class="setting-dot theme-dot"></div>
@@ -386,7 +385,6 @@
               <h2>夜间模式</h2>
               <p class="theme-summary-text">跟随系统</p>
             </div>
-            <span class="row-chevron"></span>
           </button>
           <button class="setting-row notification-settings-button" type="button">
             <div class="setting-dot notice-dot"></div>
@@ -394,7 +392,6 @@
               <h2>提醒通知</h2>
               <p class="notification-summary-text">每天 09:00，紧急提醒 3 天</p>
             </div>
-            <span class="row-chevron"></span>
           </button>
         </section>
       </section>

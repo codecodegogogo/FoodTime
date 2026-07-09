@@ -1920,15 +1920,6 @@ legend {
   line-height: 1.55;
 }
 
-.row-chevron {
-  --chevron-filter: none;
-  width: 24px;
-  height: 24px;
-  margin-left: auto;
-  background: url("icons/enter-provided.svg") center / contain no-repeat;
-  filter: var(--chevron-filter);
-}
-
 .sync-panel {
   padding: 18px;
 }
@@ -2278,11 +2269,6 @@ html.theme-system-dark .notice-dot {
   --setting-icon-filter: none;
 }
 
-html.theme-dark .row-chevron,
-html.theme-system-dark .row-chevron {
-  --chevron-filter: none;
-}
-
 html.theme-dark .history-clear-action,
 html.theme-system-dark .history-clear-action {
   color: #ffb0a7;
@@ -2516,10 +2502,6 @@ html.theme-system-dark .sync-now-button.is-syncing {
     --setting-icon-filter: none;
   }
 
-  html.theme-system .row-chevron {
-    --chevron-filter: none;
-  }
-
   html.theme-system .history-clear-action {
     color: #ffb0a7;
   }
@@ -2729,4 +2711,64 @@ html.app-runtime .phone.is-active {
 
 html.app-runtime .phone::before {
   display: none;
+}
+
+html.app-runtime .action-sheet,
+html.app-runtime .unit-modal,
+html.app-runtime .reminder-unit-modal,
+html.app-runtime .folder-modal,
+html.app-runtime .confirm-modal {
+  position: fixed;
+}
+
+html.app-runtime .action-sheet {
+  z-index: 20;
+  max-height: calc(100dvh - 18px);
+  overflow-y: auto;
+  padding-bottom: calc(34px + env(safe-area-inset-bottom));
+}
+
+html.app-runtime .unit-modal,
+html.app-runtime .reminder-unit-modal,
+html.app-runtime .folder-modal,
+html.app-runtime .confirm-modal {
+  z-index: 30;
+}
+
+html.app-runtime .unit-modal,
+html.app-runtime .reminder-unit-modal,
+html.app-runtime .folder-modal {
+  align-items: end;
+  padding-bottom: calc(20px + env(safe-area-inset-bottom));
+}
+
+@media (max-width: 450px) {
+  .action-sheet,
+  .unit-modal,
+  .reminder-unit-modal,
+  .folder-modal,
+  .confirm-modal {
+    position: fixed;
+  }
+
+  .action-sheet {
+    z-index: 20;
+    max-height: calc(100dvh - 18px);
+    overflow-y: auto;
+    padding-bottom: calc(34px + env(safe-area-inset-bottom));
+  }
+
+  .unit-modal,
+  .reminder-unit-modal,
+  .folder-modal,
+  .confirm-modal {
+    z-index: 30;
+  }
+
+  .unit-modal,
+  .reminder-unit-modal,
+  .folder-modal {
+    align-items: end;
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+  }
 }
