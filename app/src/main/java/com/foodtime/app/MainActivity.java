@@ -3,6 +3,7 @@ package com.foodtime.app;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.Manifest;
+import android.app.DatePickerDialog;
 import android.content.res.Configuration;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -29,6 +30,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -112,6 +114,50 @@ public class MainActivity extends Activity {
             int nightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
             return nightMode == Configuration.UI_MODE_NIGHT_YES ? "dark" : "light";
         }
+
+        @JavascriptInterface
+        public void showDatePicker(String currentDate) {
+            runOnUiThread(() -> openDatePicker(currentDate));
+        }
+    }
+
+    private void openDatePicker(String currentDate) {
+        Calendar calendar = Calendar.getInstance();
+        try {
+            Date parsed = new SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(currentDate);
+            if (parsed != null) {
+                calendar.setTime(parsed);
+            }
+        } catch (Exception ignored) {
+        }
+
+        DatePickerDialog dialog = new DatePickerDialog(
+                this,
+                (view, year, month, dayOfMonth) -> {
+                    String selectedDate = String.format(
+                            Locale.US,
+                            "%04d-%02d-%02d",
+                            year,
+                            month + 1,
+                            dayOfMonth);
+                    emitDatePickerResult(selectedDate);
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH));
+        dialog.show();
+    }
+
+    private void emitDatePickerResult(String selectedDate) {
+        if (webView == null) {
+            return;
+        }
+
+        runOnUiThread(() -> webView.evaluateJavascript(
+                "window.FoodTimeApp&&window.FoodTimeApp.onNativePurchaseDateSelected&&window.FoodTimeApp.onNativePurchaseDateSelected("
+                        + JSONObject.quote(selectedDate)
+                        + ")",
+                null));
     }
 
     private void requestNotificationPermissionIfNeeded() {

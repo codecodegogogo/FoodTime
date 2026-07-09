@@ -105,17 +105,22 @@
             </button>
           </header>
           <div class="sheet-actions">
-            <button>
+            <button class="sheet-edit-action" type="button" data-sheet-action="edit">
+              <span class="sheet-icon edit"></span>
+              <strong>再次编辑</strong>
+              <small>修改名称、数量和提醒</small>
+            </button>
+            <button type="button" data-sheet-action="eaten">
               <span class="sheet-icon eaten"></span>
               <strong>已吃完</strong>
               <small>从冰箱列表移除</small>
             </button>
-            <button>
+            <button type="button" data-sheet-action="spoiled">
               <span class="sheet-icon spoiled"></span>
               <strong>坏掉了</strong>
               <small>记录浪费原因</small>
             </button>
-            <button>
+            <button type="button" data-sheet-action="delay">
               <span class="sheet-icon delay"></span>
               <strong>延期</strong>
               <small>再提醒我 1 天</small>
@@ -130,11 +135,11 @@
       </section>
 
       <section class="phone phone-add" aria-label="添加食物界面">
-        <header class="sub-header">
+        <header class="sub-header add-header">
           <button class="back-button" aria-label="返回"></button>
           <h1>添加食物</h1>
           <button class="confirm-add-button" type="button" aria-label="保存食物">
-            <img src="icons/check.svg" alt="" />
+            <img src="icon/正确.svg" alt="" />
           </button>
         </header>
 
@@ -152,62 +157,87 @@
             <span class="egg"></span>
           </div>
           <input class="camera-input" type="file" accept="image/*" capture="environment" aria-label="拍摄食物照片" hidden />
-          <button><img class="button-icon" src="icons/camera.svg" alt="" /><span>拍照</span></button>
+          <button><img class="button-icon" src="icon/相机.svg" alt="" /><span>拍照</span></button>
         </section>
 
-        <form class="form-panel">
-          <label>
-            食物名称
+        <form class="form-panel add-form-panel">
+          <label class="form-field form-field-full">
+            <span>食物名称</span>
             <input value="草莓" aria-label="食物名称" />
           </label>
-          <label>
-            购买时间
-            <input type="text" value="2026-07-05" inputmode="numeric" aria-label="购买时间" />
-          </label>
-          <fieldset>
-            <legend>数量</legend>
-            <div class="quantity-grid">
-              <label>
-                <input class="quantity-input" value="1" inputmode="decimal" aria-label="数量" />
-              </label>
-              <label>
-                <input type="hidden" value="斤" aria-label="数量单位" />
-                <div class="choice-options unit-options" aria-label="数量单位选项">
-                  <button type="button" class="active" data-value="斤">斤</button>
-                  <button type="button" data-value="个">个</button>
-                  <button type="button" data-value="袋">袋</button>
-                  <button type="button" data-value="盒">盒</button>
-                  <button type="button" data-value="瓶">瓶</button>
-                  <button type="button" data-value="包">包</button>
-                </div>
-              </label>
+
+          <label class="form-field form-field-full">
+            <span>购买时间</span>
+            <div class="field-control field-control-action">
+              <input type="text" value="2026-07-05" inputmode="numeric" aria-label="购买时间" readonly />
+              <button class="field-icon-button date-picker-button" type="button" aria-label="选择购买时间">
+                <img src="icon/时间.svg" alt="" />
+              </button>
             </div>
-          </fieldset>
-          <fieldset>
-            <legend>存放位置</legend>
-            <div class="chips storage-chips">
+            <input class="native-date-input" type="date" aria-label="原生购买时间选择" hidden />
+          </label>
+
+          <div class="form-row">
+            <label class="form-field quantity-field">
+              <span>数量</span>
+              <div class="field-control split-control">
+                <input class="quantity-input" value="1" inputmode="decimal" aria-label="数量" />
+                <input type="hidden" value="斤" aria-label="数量单位" />
+                <button class="unit-picker-button" type="button" aria-label="选择数量单位">
+                  <span class="unit-picker-label">斤</span>
+                </button>
+              </div>
+            </label>
+
+            <fieldset class="storage-field">
+              <legend>存放位置</legend>
+              <div class="chips storage-chips">
               <button type="button" class="active">冰箱</button>
               <button type="button">常温</button>
-            </div>
-          </fieldset>
-          <fieldset>
-            <legend>提醒时间</legend>
-            <div class="quantity-grid reminder-grid">
-              <label>
+              </div>
+            </fieldset>
+          </div>
+
+          <div class="form-row">
+            <label class="form-field reminder-field">
+              <span>提醒时间</span>
+              <div class="field-control split-control">
                 <input class="reminder-input" value="3" inputmode="decimal" aria-label="提醒数值" />
-              </label>
-              <label>
                 <input type="hidden" value="天" aria-label="提醒单位" />
-                <div class="choice-options reminder-unit-options" aria-label="提醒单位选项">
-                  <button type="button" data-value="分钟">分钟</button>
-                  <button type="button" data-value="小时">小时</button>
-                  <button type="button" class="active" data-value="天">天</button>
-                  <button type="button" data-value="月">月</button>
-                </div>
-              </label>
-            </div>
-          </fieldset>
+                <span class="unit-static-label">天</span>
+              </div>
+            </label>
+
+            <label class="form-field folder-field">
+              <span>存放文件夹</span>
+              <div class="field-control field-control-action">
+                <input value="默认" aria-label="存放文件夹" />
+                <button class="field-icon-button folder-more-button" type="button" aria-label="更多存放文件夹">
+                  <img src="icon/更多.svg" alt="" />
+                </button>
+              </div>
+            </label>
+          </div>
         </form>
+
+        <section class="unit-modal is-hidden" aria-label="选择数量单位" aria-hidden="true">
+          <div class="unit-dialog" role="dialog" aria-modal="true" aria-labelledby="unit-dialog-title">
+            <header>
+              <h2 id="unit-dialog-title">选择单位</h2>
+              <button class="unit-modal-close" type="button" aria-label="关闭单位选择">
+                <img src="icon/错误.svg" alt="" />
+              </button>
+            </header>
+            <div class="unit-option-grid">
+              <button type="button" data-value="斤">斤</button>
+              <button type="button" data-value="个">个</button>
+              <button type="button" data-value="袋">袋</button>
+              <button type="button" data-value="盒">盒</button>
+              <button type="button" data-value="瓶">瓶</button>
+              <button type="button" data-value="包">包</button>
+            </div>
+          </div>
+        </section>
       </section>
 
       <section class="phone phone-stats is-paused" aria-label="统计界面">

@@ -119,6 +119,7 @@
   let currentHomeFilter = "全部";
   let currentHistoryFilter = "已吃完";
   let selectedFoodId = null;
+  let editingFoodId = null;
   let capturedPhoto = "";
   let syncTimer = 0;
   let syncInFlight = false;
@@ -561,7 +562,10 @@
             ${thumbMarkup(food)}
             <div class="food-info">
               <h2>${escapeHtml(food.name)}</h2>
-              <p>${escapeHtml(formatDate(food.purchaseDate))}购买 · ${escapeHtml(food.storage)} · ${escapeHtml(amount)}</p>
+              <p>
+                <span class="food-date-line">${escapeHtml(formatDate(food.purchaseDate))}购买</span>
+                <span class="food-detail-line">${escapeHtml(food.storage)} · ${escapeHtml(amount)}</span>
+              </p>
             </div>
             <div class="food-actions">
               <div class="food-state">${escapeHtml(reminder.label)}</div>
@@ -801,10 +805,72 @@
     });
   }
 
+  function setQuantityUnit(value) {
+    const add = screenElement("add");
+    const safeValue = value || "斤";
+    const input = add?.querySelector("[aria-label='数量单位']");
+    const label = add?.querySelector(".unit-picker-label");
+    if (input) input.value = safeValue;
+    if (label) label.textContent = safeValue;
+    add?.querySelectorAll(".unit-option-grid button").forEach((button) => {
+      button.classList.toggle("active", button.dataset.value === safeValue);
+    });
+  }
+
+  function closeUnitModal() {
+    const modal = screenElement("add")?.querySelector(".unit-modal");
+    if (!modal) return;
+    modal.classList.add("is-hidden");
+    modal.setAttribute("aria-hidden", "true");
+  }
+
+  function openUnitModal() {
+    const modal = screenElement("add")?.querySelector(".unit-modal");
+    if (!modal) return;
+    setQuantityUnit(formValue(".phone-add [aria-label='数量单位']") || "斤");
+    modal.classList.remove("is-hidden");
+    modal.setAttribute("aria-hidden", "false");
+  }
+
+  function setPurchaseDateValue(value) {
+    const normalized = /^\d{4}-\d{2}-\d{2}$/.test(value || "") ? value : today.toISOString().slice(0, 10);
+    const visibleInput = screenElement("add")?.querySelector("[aria-label='购买时间']");
+    const nativeInput = screenElement("add")?.querySelector(".native-date-input");
+    if (visibleInput) visibleInput.value = normalized;
+    if (nativeInput) nativeInput.value = normalized;
+  }
+
+  function requestPurchaseDate() {
+    const currentDate = formValue(".phone-add [aria-label='购买时间']") || today.toISOString().slice(0, 10);
+    if (typeof window.FoodTimeNative?.showDatePicker === "function") {
+      window.FoodTimeNative.showDatePicker(currentDate);
+      return;
+    }
+
+    const nativeInput = screenElement("add")?.querySelector(".native-date-input");
+    if (!nativeInput) return;
+    nativeInput.value = currentDate;
+    if (typeof nativeInput.showPicker === "function") {
+      nativeInput.showPicker();
+    } else {
+      nativeInput.click();
+      nativeInput.focus();
+    }
+  }
+
   function setPhotoButtonLabel(area, label) {
     const button = area?.querySelector(".photo-area > button");
     if (!button) return;
-    button.innerHTML = `<img class="button-icon" src="icons/camera.svg" alt="" /><span>${escapeHtml(label)}</span>`;
+    button.innerHTML = `<img class="button-icon" src="icon/相机.svg" alt="" /><span>${escapeHtml(label)}</span>`;
+  }
+
+  function setAddFormMode(isEditing) {
+    const add = screenElement("add");
+    if (!add) return;
+    const title = add.querySelector(".sub-header h1");
+    const saveButton = add.querySelector(".confirm-add-button");
+    if (title) title.textContent = isEditing ? "编辑食物" : "添加食物";
+    if (saveButton) saveButton.setAttribute("aria-label", isEditing ? "更新食物" : "保存食物");
   }
 
   function updatePhotoPreviewFromName() {
@@ -828,6 +894,21 @@
     area?.style.removeProperty("--captured-photo");
     setPhotoButtonLabel(area, "拍照");
     updatePhotoPreviewFromName();
+  }
+
+  function setCapturedPhoto(area, photo) {
+    capturedPhoto = photo || "";
+    if (!area) return;
+
+    if (!capturedPhoto) {
+      clearCapturedPhoto(area);
+      return;
+    }
+
+    area.classList.add("is-captured");
+    area.classList.remove("is-icon-preview");
+    area.style.setProperty("--captured-photo", `url("${capturedPhoto}")`);
+    setPhotoButtonLabel(area, "更换照片");
   }
 
   function loadThemeSettings() {
@@ -998,16 +1079,39 @@
   function resetAddForm() {
     const add = screenElement("add");
     if (!add) return;
+    editingFoodId = null;
+    setAddFormMode(false);
     add.querySelector("[aria-label='食物名称']").value = "草莓";
-    add.querySelector("[aria-label='购买时间']").value = today.toISOString().slice(0, 10);
+    setPurchaseDateValue(today.toISOString().slice(0, 10));
     add.querySelector("[aria-label='数量']").value = "1";
-    setChoiceValue(add.querySelector(".unit-options"), "斤");
+    setQuantityUnit("斤");
     add.querySelector("[aria-label='提醒数值']").value = "3";
-    setChoiceValue(add.querySelector(".reminder-unit-options"), "天");
+    add.querySelector("[aria-label='提醒单位']").value = "天";
+    add.querySelector("[aria-label='存放文件夹']").value = "默认";
     add.querySelectorAll(".storage-chips button").forEach((button, index) => {
       button.classList.toggle("active", index === 0);
     });
     clearCapturedPhoto(add.querySelector(".photo-area"));
+  }
+
+  function fillAddForm(food) {
+    const add = screenElement("add");
+    if (!add || !food) return;
+
+    editingFoodId = food.id;
+    setAddFormMode(true);
+    add.querySelector("[aria-label='食物名称']").value = food.name || "";
+    setPurchaseDateValue(food.purchaseDate || today.toISOString().slice(0, 10));
+    add.querySelector("[aria-label='数量']").value = food.quantity || "1";
+    setQuantityUnit(food.unit || "个");
+    add.querySelector("[aria-label='提醒数值']").value = food.remindValue || food.remindDays || "3";
+    add.querySelector("[aria-label='提醒单位']").value = food.remindUnit || "天";
+    add.querySelector("[aria-label='存放文件夹']").value = food.folder || "默认";
+    add.querySelectorAll(".storage-chips button").forEach((button) => {
+      button.classList.toggle("active", button.textContent.trim() === (food.storage || "冰箱"));
+    });
+    setCapturedPhoto(add.querySelector(".photo-area"), food.photo || "");
+    updatePhotoPreviewFromName();
   }
 
   function saveFoodFromForm() {
@@ -1016,6 +1120,7 @@
     const quantity = formValue(".phone-add [aria-label='数量']") || "1";
     const unit = formValue(".phone-add [aria-label='数量单位']") || "个";
     const storage = selectedOption(".phone-add .storage-chips .active") || "冰箱";
+    const folder = formValue(".phone-add [aria-label='存放文件夹']") || "默认";
     const remindValue = reminderAmount(formValue(".phone-add [aria-label='提醒数值']"));
     const remindUnit = reminderUnit(formValue(".phone-add [aria-label='提醒单位']"));
     const remindDays = reminderDaysCompat(remindValue, remindUnit);
@@ -1023,11 +1128,46 @@
     const foods = loadFoods();
     const visual = foodIconDefForName(name);
 
+    if (editingFoodId) {
+      const food = foods.find((item) => item.id === editingFoodId);
+      if (!food) {
+        editingFoodId = null;
+        resetAddForm();
+        showScreen("home", { reset: true });
+        return;
+      }
+
+      const samePurchaseDate = food.purchaseDate === purchaseDate;
+      food.name = name;
+      food.purchaseDate = purchaseDate;
+      food.storage = storage;
+      food.folder = folder;
+      food.quantity = quantity;
+      food.unit = unit;
+      food.purchaseAt = samePurchaseDate
+        ? food.purchaseAt || purchaseAt
+        : purchaseAt;
+      food.remindValue = remindValue;
+      food.remindUnit = remindUnit;
+      food.remindDays = remindDays;
+      food.type = visual.type;
+      food.icon = visual.file;
+      food.photo = capturedPhoto;
+      food.updatedAt = nowIso();
+      saveFoods(foods);
+      currentHomeFilter = "全部";
+      editingFoodId = null;
+      resetAddForm();
+      showScreen("home", { reset: true });
+      return;
+    }
+
     foods.unshift({
       id: `food-${Date.now()}`,
       name,
       purchaseDate,
       storage,
+      folder,
       quantity,
       unit,
       purchaseAt,
@@ -1047,6 +1187,16 @@
     currentHomeFilter = "全部";
     resetAddForm();
     showScreen("home", { reset: true });
+  }
+
+  function editSelectedFood() {
+    if (!selectedFoodId) return;
+    const food = loadFoods().find((item) => item.id === selectedFoodId);
+    if (!food) return;
+
+    fillAddForm(food);
+    selectedFoodId = null;
+    showScreen("add", { replace: true });
   }
 
   function updateReminderDays(button) {
@@ -1335,6 +1485,37 @@
       return;
     }
 
+    const unitPicker = target.closest(".unit-picker-button");
+    if (unitPicker) {
+      openUnitModal();
+      return;
+    }
+
+    const unitOption = target.closest(".unit-option-grid button");
+    if (unitOption) {
+      setQuantityUnit(unitOption.dataset.value || unitOption.textContent.trim());
+      closeUnitModal();
+      return;
+    }
+
+    const unitModalClose = target.closest(".unit-modal-close");
+    if (unitModalClose || target.classList?.contains("unit-modal")) {
+      closeUnitModal();
+      return;
+    }
+
+    const datePicker = target.closest(".date-picker-button, .phone-add [aria-label='购买时间']");
+    if (datePicker) {
+      requestPurchaseDate();
+      return;
+    }
+
+    const nativeDateInput = target.closest(".native-date-input");
+    if (nativeDateInput) {
+      setPurchaseDateValue(nativeDateInput.value);
+      return;
+    }
+
     const choiceOption = target.closest(".choice-options button");
     if (choiceOption) {
       setChoiceValue(choiceOption.closest(".choice-options"), choiceOption.dataset.value || choiceOption.textContent.trim());
@@ -1376,10 +1557,11 @@
 
     const sheetAction = target.closest(".sheet-actions button");
     if (sheetAction) {
-      const index = itemIndex(sheetAction, "button");
-      if (index === 0) markSelectedFood("eaten");
-      if (index === 1) markSelectedFood("spoiled");
-      if (index === 2) delaySelectedFood();
+      const action = sheetAction.dataset.sheetAction;
+      if (action === "edit") editSelectedFood();
+      if (action === "eaten") markSelectedFood("eaten");
+      if (action === "spoiled") markSelectedFood("spoiled");
+      if (action === "delay") delaySelectedFood();
       return;
     }
 
@@ -1499,6 +1681,12 @@
     const input = event.target.closest(".camera-input");
     if (input) {
       handlePhotoFile(input.files && input.files[0]);
+      return;
+    }
+
+    const dateInput = event.target.closest(".native-date-input");
+    if (dateInput) {
+      setPurchaseDateValue(dateInput.value);
     }
   }
 
@@ -1532,6 +1720,7 @@
 
   window.FoodTimeApp = {
     onNativeSyncResult,
+    onNativePurchaseDateSelected: setPurchaseDateValue,
     refreshTheme: applyTheme,
     back: goBack,
     canGoBack() {

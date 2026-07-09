@@ -1,0 +1,1149 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=921, initial-scale=1" />
+    <title>FoodTime redesign stills</title>
+    <style>
+      :root {
+        --bg: #fbf7ee;
+        --paper: #fffefa;
+        --surface: #ffffff;
+        --surface-soft: #f6f4ec;
+        --mint-50: #eff8f1;
+        --mint-100: #dff1e5;
+        --mint-200: #cae6d6;
+        --green: #4f9675;
+        --green-dark: #2f624f;
+        --ink: #243136;
+        --muted: #71807c;
+        --line: #e7e1d5;
+        --danger: #a9524d;
+        --danger-bg: #f8dedb;
+        --safe-bg: #ddf2e7;
+        --safe: #2b755b;
+        --warm: #f6ce74;
+        --shadow-soft: 0 22px 60px rgba(54, 71, 62, 0.08);
+        --shadow-nav: 0 18px 48px rgba(54, 71, 62, 0.16);
+        font-family:
+          "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", Arial,
+          sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: #eee8dc;
+      }
+
+      body {
+        display: grid;
+        place-items: start center;
+      }
+
+      .screen {
+        position: relative;
+        width: 921px;
+        height: 2048px;
+        overflow: hidden;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 88% 9%, rgba(213, 238, 219, 0.72), transparent 240px),
+          linear-gradient(180deg, #fcf8ef 0%, #faf6ed 100%);
+      }
+
+      body.single .screen {
+        display: none;
+      }
+
+      body.single .screen.active-screen {
+        display: block;
+      }
+
+      .status {
+        position: absolute;
+        top: 35px;
+        left: 57px;
+        right: 57px;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: #090909;
+        font-size: 33px;
+        font-weight: 600;
+        letter-spacing: 0;
+      }
+
+      .status-icons {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 30px;
+        font-weight: 800;
+      }
+
+      .signal {
+        display: flex;
+        align-items: end;
+        gap: 5px;
+        height: 30px;
+      }
+
+      .signal span {
+        display: block;
+        width: 8px;
+        border-radius: 9px;
+        background: #050505;
+      }
+
+      .signal span:nth-child(1) { height: 11px; }
+      .signal span:nth-child(2) { height: 17px; }
+      .signal span:nth-child(3) { height: 24px; }
+      .signal span:nth-child(4) { height: 30px; }
+
+      .battery {
+        min-width: 56px;
+        height: 31px;
+        padding: 1px 7px;
+        border-radius: 10px;
+        color: #fff;
+        background: #0a0a0a;
+        font-size: 25px;
+        line-height: 31px;
+        text-align: center;
+      }
+
+      .page {
+        position: relative;
+        z-index: 1;
+        padding: 137px 47px 0;
+      }
+
+      .topbar,
+      .subbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 96px;
+      }
+
+      .brand {
+        margin: 0;
+        color: var(--green);
+        font-size: 66px;
+        font-weight: 900;
+        line-height: 1;
+        letter-spacing: 0;
+      }
+
+      .subbar {
+        justify-content: center;
+      }
+
+      .subbar h1 {
+        margin: 0;
+        font-size: 43px;
+        font-weight: 850;
+        letter-spacing: 0;
+      }
+
+      .subbar .back,
+      .subbar .check,
+      .subbar .spacer {
+        position: absolute;
+        top: 148px;
+        width: 72px;
+        height: 72px;
+      }
+
+      .subbar .back { left: 52px; }
+      .subbar .check { right: 53px; }
+      .subbar .spacer { right: 53px; }
+
+      [data-screen="05-add"] .subbar .back img,
+      [data-screen="05-add"] .subbar .check img {
+        width: 58px;
+        height: 58px;
+      }
+
+      .icon-circle {
+        display: grid;
+        width: 64px;
+        height: 64px;
+        place-items: center;
+        border: 3px solid rgba(36, 49, 54, 0.14);
+        border-radius: 24px;
+        background: #e9f5ed;
+        box-shadow: 0 10px 24px rgba(47, 98, 79, 0.12);
+      }
+
+      .icon-circle img,
+      .icon-btn img,
+      .back img,
+      .check img {
+        width: 36px;
+        height: 36px;
+        object-fit: contain;
+      }
+
+      .icon-btn {
+        display: grid;
+        width: 64px;
+        height: 64px;
+        place-items: center;
+        border-radius: 22px;
+        background: rgba(255, 255, 255, 0.62);
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: 1fr 214px;
+        gap: 28px;
+        align-items: center;
+        min-height: 383px;
+        margin-top: 52px;
+        padding: 47px 46px;
+        border: 2px solid var(--mint-200);
+        border-radius: 48px;
+        background:
+          linear-gradient(140deg, rgba(255, 255, 255, 0.9), rgba(237, 248, 240, 0.94)),
+          var(--mint-50);
+        box-shadow: var(--shadow-soft);
+      }
+
+      .hero p,
+      .label {
+        margin: 0 0 24px;
+        color: var(--muted);
+        font-size: 30px;
+        font-weight: 760;
+        line-height: 1.2;
+      }
+
+      .hero strong {
+        display: block;
+        max-width: 430px;
+        font-size: 43px;
+        font-weight: 900;
+        line-height: 1.22;
+        letter-spacing: 0;
+      }
+
+      .hero .mini {
+        display: flex;
+        gap: 14px;
+        margin-top: 28px;
+      }
+
+      .mini span {
+        padding: 12px 18px;
+        border-radius: 999px;
+        color: var(--green-dark);
+        background: #e5f2e8;
+        font-size: 23px;
+        font-weight: 800;
+      }
+
+      .fridge-art {
+        position: relative;
+        width: 180px;
+        height: 255px;
+        border: 8px solid #27353a;
+        border-radius: 48px;
+        background: #fff;
+        box-shadow: inset 0 -86px #dcefe4;
+      }
+
+      .fridge-art::before {
+        content: "";
+        position: absolute;
+        top: 103px;
+        left: 0;
+        width: 100%;
+        border-top: 8px solid #27353a;
+      }
+
+      .fridge-art::after {
+        content: "";
+        position: absolute;
+        top: 42px;
+        right: 27px;
+        width: 16px;
+        height: 71px;
+        border-radius: 999px;
+        background: #27353a;
+      }
+
+      .food-dot {
+        position: absolute;
+        border: 7px solid #27353a;
+      }
+
+      .dot-a {
+        left: 31px;
+        bottom: 36px;
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: #ef7f70;
+      }
+
+      .dot-b {
+        right: 25px;
+        bottom: 37px;
+        width: 50px;
+        height: 66px;
+        border-radius: 17px;
+        background: #f6cf6d;
+      }
+
+      .dot-c {
+        left: 84px;
+        bottom: 103px;
+        width: 57px;
+        height: 39px;
+        transform: rotate(-19deg);
+        border-radius: 50%;
+        background: #75b988;
+      }
+
+      .segmented {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        height: 108px;
+        margin-top: 42px;
+        padding: 10px;
+        border-radius: 35px;
+        background: #e9e3d8;
+      }
+
+      .segmented.two {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .segmented span {
+        display: grid;
+        place-items: center;
+        border-radius: 27px;
+        color: #64716e;
+        font-size: 30px;
+        font-weight: 860;
+      }
+
+      .segmented .active {
+        color: #fff;
+        background: var(--green);
+        box-shadow: 0 12px 24px rgba(79, 150, 117, 0.18);
+      }
+
+      .list {
+        margin-top: 54px;
+      }
+
+      .food-row {
+        display: grid;
+        grid-template-columns: 112px 1fr auto;
+        gap: 24px;
+        align-items: center;
+        min-height: 176px;
+        padding: 20px 2px;
+        border-bottom: 2px solid rgba(223, 218, 207, 0.75);
+      }
+
+      .food-row:last-child {
+        border-bottom: 0;
+      }
+
+      .thumb {
+        display: grid;
+        width: 92px;
+        height: 92px;
+        place-items: center;
+        border-radius: 30px;
+        background: rgba(255, 255, 255, 0.58);
+      }
+
+      .thumb img {
+        width: 86px;
+        height: 86px;
+        object-fit: contain;
+      }
+
+      .food-info h2 {
+        margin: 0 0 16px;
+        font-size: 35px;
+        font-weight: 900;
+      }
+
+      .food-info p {
+        margin: 0;
+        max-width: 290px;
+        color: var(--muted);
+        font-size: 29px;
+        font-weight: 520;
+        line-height: 1.35;
+      }
+
+      .row-right {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+      }
+
+      .chip {
+        display: inline-grid;
+        min-width: 144px;
+        min-height: 68px;
+        place-items: center;
+        padding: 0 25px;
+        border-radius: 999px;
+        font-size: 26px;
+        font-weight: 880;
+        white-space: nowrap;
+      }
+
+      .chip.danger {
+        color: var(--danger);
+        background: var(--danger-bg);
+      }
+
+      .chip.safe {
+        color: var(--safe);
+        background: var(--safe-bg);
+      }
+
+      .text-action {
+        color: var(--ink);
+        font-size: 27px;
+        font-weight: 860;
+      }
+
+      .tabbar {
+        position: absolute;
+        left: 124px;
+        right: 124px;
+        bottom: 70px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        height: 128px;
+        padding: 12px;
+        border-radius: 64px;
+        background: rgba(255, 255, 255, 0.93);
+        box-shadow: var(--shadow-nav);
+      }
+
+      .tabbar span {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        border-radius: 52px;
+        color: #6a7673;
+        font-size: 29px;
+        font-weight: 850;
+      }
+
+      .tabbar .active {
+        color: var(--green-dark);
+        background: #eff7f1;
+      }
+
+      .tabbar img {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+      }
+
+      .service-card {
+        display: grid;
+        grid-template-columns: 1fr 96px;
+        align-items: center;
+        min-height: 189px;
+        margin-top: 52px;
+        padding: 35px 42px;
+        border-radius: 42px;
+        background:
+          linear-gradient(115deg, #ffffff 0%, #f0f8ee 100%);
+        box-shadow: var(--shadow-soft);
+      }
+
+      .service-card h2,
+      .stat-card h2,
+      .setting-row h2 {
+        margin: 0 0 14px;
+        font-size: 35px;
+        font-weight: 900;
+      }
+
+      .service-card p,
+      .setting-row p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 26px;
+        font-weight: 720;
+      }
+
+      .sync-icon {
+        display: grid;
+        width: 86px;
+        height: 86px;
+        place-items: center;
+        border-radius: 30px;
+        background: #e7f5ea;
+      }
+
+      .sync-icon img {
+        width: 55px;
+        height: 55px;
+      }
+
+      .stat-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+        margin-top: 35px;
+      }
+
+      .stat-card {
+        min-height: 250px;
+        padding: 38px;
+        border: 2px solid #f0eadf;
+        border-radius: 39px;
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: 0 18px 42px rgba(54, 71, 62, 0.055);
+      }
+
+      .stat-card.wide {
+        grid-column: 1 / -1;
+        min-height: 226px;
+      }
+
+      .stat-card strong {
+        display: block;
+        margin: 14px 0 6px;
+        font-size: 72px;
+        line-height: 1;
+      }
+
+      .stat-card span {
+        color: var(--muted);
+        font-size: 27px;
+        font-weight: 720;
+      }
+
+      .sheet-screen::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        background: linear-gradient(180deg, rgba(251, 247, 238, 0.02), rgba(251, 247, 238, 0.42));
+      }
+
+      .action-sheet {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 3;
+        min-height: 520px;
+        padding: 28px 47px 58px;
+        border-radius: 54px 54px 0 0;
+        background: rgba(255, 255, 255, 0.97);
+        box-shadow: 0 -30px 70px rgba(54, 71, 62, 0.18);
+      }
+
+      .handle {
+        display: block;
+        width: 110px;
+        height: 11px;
+        margin: 0 auto 40px;
+        border-radius: 999px;
+        background: #ddded8;
+      }
+
+      .sheet-head {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 18px;
+        align-items: center;
+      }
+
+      .sheet-title {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+      }
+
+      .sheet-title h2 {
+        margin: 0;
+        font-size: 45px;
+        font-weight: 900;
+      }
+
+      .sheet-head-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .sheet-mini-button {
+        display: grid;
+        min-width: 104px;
+        height: 68px;
+        place-items: center;
+        border: 2px solid #e7e3db;
+        border-radius: 24px;
+        color: var(--green-dark);
+        background: #fffdf8;
+        font-size: 25px;
+        font-weight: 900;
+      }
+
+      .close {
+        display: grid;
+        width: 68px;
+        height: 68px;
+        place-items: center;
+        border-radius: 24px;
+        background: #f7f5ef;
+      }
+
+      .close img {
+        width: 44px;
+        height: 44px;
+      }
+
+      .sheet-actions {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+        margin-top: 50px;
+      }
+
+      .sheet-action {
+        display: grid;
+        gap: 18px;
+        align-items: center;
+        justify-items: center;
+        min-height: 166px;
+        padding: 20px 10px;
+        border: 2px solid #efe8dc;
+        border-radius: 30px;
+        background: #fffdf8;
+        text-align: center;
+      }
+
+      .sheet-action img {
+        width: 70px;
+        height: 70px;
+        object-fit: contain;
+      }
+
+      .sheet-action strong {
+        display: block;
+        margin: 0;
+        font-size: 29px;
+        font-weight: 900;
+      }
+
+      .sheet-action small {
+        display: none;
+      }
+
+      .empty-panel {
+        display: grid;
+        min-height: 780px;
+        margin-top: 42px;
+        place-items: center;
+        border: 2px solid #f0eadf;
+        border-radius: 44px;
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: 0 18px 42px rgba(54, 71, 62, 0.045);
+      }
+
+      .empty-inner {
+        display: grid;
+        justify-items: center;
+        gap: 24px;
+      }
+
+      .empty-icon {
+        display: grid;
+        width: 128px;
+        height: 128px;
+        place-items: center;
+        border: 6px solid #27353a;
+        border-radius: 38px;
+        background: #fff7d7;
+      }
+
+      .empty-icon img {
+        width: 70px;
+        height: 70px;
+      }
+
+      .empty-inner h2 {
+        margin: 0;
+        font-size: 33px;
+        font-weight: 900;
+      }
+
+      .empty-inner p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 25px;
+        font-weight: 700;
+      }
+
+      .photo-card {
+        display: grid;
+        justify-items: center;
+        width: 380px;
+        height: 380px;
+        margin: 34px auto 0;
+        padding: 38px 34px 34px;
+        border: 4px dashed #c8ded1;
+        border-radius: 47px;
+        background:
+          linear-gradient(180deg, rgba(255,255,255,0.68), rgba(247,250,244,0.82));
+      }
+
+      .photo-card .food-big {
+        width: 148px;
+        height: 148px;
+        object-fit: contain;
+        filter: drop-shadow(0 20px 20px rgba(41, 57, 49, 0.1));
+      }
+
+      .camera-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        min-width: 252px;
+        height: 76px;
+        margin-top: 42px;
+        border-radius: 27px;
+        color: #fff;
+        background: #243136;
+        font-size: 29px;
+        font-weight: 900;
+      }
+
+      .camera-btn img {
+        width: 42px;
+        height: 42px;
+        filter: brightness(0) invert(1);
+      }
+
+      .camera-symbol {
+        position: relative;
+        display: block;
+        width: 44px;
+        height: 32px;
+        border: 4px solid #fff;
+        border-radius: 9px;
+      }
+
+      .camera-symbol::before {
+        content: "";
+        position: absolute;
+        top: -10px;
+        left: 9px;
+        width: 18px;
+        height: 8px;
+        border-radius: 7px 7px 0 0;
+        background: #fff;
+      }
+
+      .camera-symbol::after {
+        content: "";
+        position: absolute;
+        top: 7px;
+        left: 14px;
+        width: 9px;
+        height: 9px;
+        border: 4px solid #fff;
+        border-radius: 50%;
+      }
+
+      .form-card {
+        margin-top: 30px;
+        padding: 34px 40px 36px;
+        border-radius: 43px;
+        background: rgba(255, 255, 255, 0.96);
+        box-shadow: 0 18px 46px rgba(54, 71, 62, 0.06);
+      }
+
+      .field {
+        margin-bottom: 23px;
+      }
+
+      .field-title {
+        display: block;
+        margin-bottom: 12px;
+        color: var(--muted);
+        font-size: 25px;
+        font-weight: 850;
+      }
+
+      .input {
+        display: flex;
+        align-items: center;
+        min-height: 86px;
+        padding: 0 29px;
+        border: 2px solid #e7e3db;
+        border-radius: 27px;
+        background: #fffdf8;
+        font-size: 29px;
+        font-weight: 800;
+      }
+
+      .input.with-addon,
+      .select-input {
+        justify-content: space-between;
+        gap: 18px;
+        padding-right: 0;
+      }
+
+      .input-addon {
+        display: inline-flex;
+        flex: 0 0 auto;
+        align-self: stretch;
+        align-items: center;
+        justify-content: center;
+        min-width: 120px;
+        border-left: 3px dashed #ddd7cc;
+        color: var(--green-dark);
+        font-size: 25px;
+        font-weight: 900;
+      }
+
+      .date-symbol {
+        position: relative;
+        flex: 0 0 auto;
+        width: 35px;
+        height: 35px;
+        border: 4px solid var(--green-dark);
+        border-radius: 50%;
+      }
+
+      .date-symbol::before,
+      .date-symbol::after {
+        content: "";
+        position: absolute;
+        left: 16px;
+        top: 8px;
+        width: 4px;
+        border-radius: 999px;
+        background: var(--green-dark);
+        transform-origin: bottom center;
+      }
+
+      .date-symbol::before {
+        height: 12px;
+      }
+
+      .date-symbol::after {
+        height: 10px;
+        transform: rotate(52deg);
+      }
+
+      .reminder-symbol {
+        position: relative;
+        width: 36px;
+        height: 38px;
+      }
+
+      .reminder-symbol::before {
+        content: "";
+        position: absolute;
+        left: 6px;
+        top: 5px;
+        width: 24px;
+        height: 25px;
+        border: 4px solid var(--green-dark);
+        border-bottom-width: 5px;
+        border-radius: 15px 15px 11px 11px;
+      }
+
+      .reminder-symbol::after {
+        content: "";
+        position: absolute;
+        left: 13px;
+        bottom: 0;
+        width: 10px;
+        height: 6px;
+        border-radius: 0 0 999px 999px;
+        background: var(--green-dark);
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1.18fr;
+        gap: 22px;
+        align-items: start;
+      }
+
+      .half-field {
+        width: calc((100% - 22px) / 2.18);
+      }
+
+      .pill-btn {
+        display: grid;
+        min-height: 72px;
+        place-items: center;
+        border-radius: 22px;
+        color: #687471;
+        background: #eeeae1;
+        font-size: 25px;
+        font-weight: 850;
+      }
+
+      .pill-btn.active {
+        color: #fff;
+        background: var(--green);
+        box-shadow: 0 14px 28px rgba(79, 150, 117, 0.18);
+      }
+
+      .storage-stack {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+
+      .storage-stack .pill-btn {
+        min-height: 64px;
+        border-radius: 21px;
+        font-size: 24px;
+      }
+
+      .setting-card {
+        margin-top: 76px;
+      }
+
+      .setting-row {
+        display: grid;
+        grid-template-columns: 96px 1fr 52px;
+        gap: 25px;
+        align-items: center;
+        min-height: 190px;
+        border-bottom: 2px solid rgba(223, 218, 207, 0.78);
+      }
+
+      .setting-row:last-child {
+        border-bottom: 0;
+      }
+
+      .setting-icon {
+        display: grid;
+        width: 74px;
+        height: 74px;
+        place-items: center;
+        border-radius: 27px;
+        background: #fffefa;
+      }
+
+      .setting-icon img {
+        width: 58px;
+        height: 58px;
+        object-fit: contain;
+      }
+
+      .chev {
+        width: 40px;
+        height: 40px;
+        opacity: 0.65;
+      }
+
+      .record-card {
+        margin-top: 42px;
+        overflow: hidden;
+        border: 2px solid #ede7dc;
+        border-radius: 43px;
+        background: rgba(255, 255, 255, 0.94);
+        box-shadow: 0 18px 42px rgba(54, 71, 62, 0.045);
+      }
+
+      .record-card .food-row {
+        margin: 0 38px;
+        grid-template-columns: 112px 1fr auto;
+      }
+
+      .screen-title-page .page {
+        padding-top: 137px;
+      }
+
+      .simple-empty {
+        min-height: 205px;
+        margin-top: 42px;
+      }
+
+      .danger-link {
+        margin-top: 36px;
+        text-align: right;
+        color: #9b4b46;
+        font-size: 27px;
+        font-weight: 880;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="screen" data-screen="01-home">
+      <div class="status"><span>17:22</span><div class="status-icons"><div class="signal"><span></span><span></span><span></span><span></span></div><span>4G</span><span class="battery">65</span></div></div>
+      <main class="page">
+        <header class="topbar">
+          <h1 class="brand">FoodTime</h1>
+          <div class="icon-circle"><img src="icons/add.svg" alt="" /></div>
+        </header>
+        <section class="hero">
+          <div>
+            <p>今天先吃</p>
+            <strong>2 件食物正在储存</strong>
+            <div class="mini"><span>过期 1</span><span>快到期 1</span></div>
+          </div>
+          <div class="fridge-art"><span class="food-dot dot-a"></span><span class="food-dot dot-b"></span><span class="food-dot dot-c"></span></div>
+        </section>
+        <nav class="segmented"><span class="active">全部</span><span>冰箱</span><span>常温</span></nav>
+        <section class="list">
+          <article class="food-row"><div class="thumb"><img src="icons/food-pork.svg" alt="" /></div><div class="food-info"><h2>猪肉</h2><p>6 月 1 日购买 · 冰箱 · 5个</p></div><div class="row-right"><span class="chip danger">已过期 32 天</span><span class="text-action">处理</span></div></article>
+          <article class="food-row"><div class="thumb"><img src="icons/food-potato.svg" alt="" /></div><div class="food-info"><h2>土豆粉</h2><p>7 月 8 日购买 · 冰箱 · 1袋</p></div><div class="row-right"><span class="chip safe">3 天后到期</span><span class="text-action">处理</span></div></article>
+        </section>
+      </main>
+      <footer class="tabbar"><span class="active"><img src="icons/nav-home-radish.svg" alt="" />首页</span><span><img src="icons/nav-profile-active.svg" alt="" />我的</span></footer>
+    </section>
+
+    <section class="screen" data-screen="02-profile">
+      <div class="status"><span>17:22</span><div class="status-icons"><div class="signal"><span></span><span></span><span></span><span></span></div><span>4G</span><span class="battery">65</span></div></div>
+      <main class="page">
+        <header class="topbar">
+          <h1 class="brand">FoodTime</h1>
+          <div class="icon-btn"><img src="icons/settings.svg" alt="" /></div>
+        </header>
+        <section class="service-card">
+          <div><h2>当前服务：坚果云 WebDAV</h2><p>同步时间：今天 17:20</p></div>
+          <div class="sync-icon"><img src="icons/sync-cloud-provided.svg" alt="" /></div>
+        </section>
+        <section class="stat-grid">
+          <article class="stat-card"><h2>冰箱中</h2><strong>2</strong><span>件食物</span></article>
+          <article class="stat-card"><h2>常温中</h2><strong>0</strong><span>件食物</span></article>
+          <article class="stat-card wide"><h2>历史食物记录</h2><strong>0</strong><span>条记录</span></article>
+        </section>
+      </main>
+      <footer class="tabbar"><span><img src="icons/nav-home-radish.svg" alt="" />首页</span><span class="active"><img src="icons/nav-profile-active.svg" alt="" />我的</span></footer>
+    </section>
+
+    <section class="screen sheet-screen" data-screen="03-sheet">
+      <div class="status"><span>17:22</span><div class="status-icons"><div class="signal"><span></span><span></span><span></span><span></span></div><span>4G</span><span class="battery">65</span></div></div>
+      <main class="page">
+        <header class="topbar"><h1 class="brand">FoodTime</h1><div class="icon-circle"><img src="icons/add.svg" alt="" /></div></header>
+        <section class="hero"><div><p>今天先吃</p><strong>2 件食物正在储存</strong></div><div class="fridge-art"><span class="food-dot dot-a"></span><span class="food-dot dot-b"></span><span class="food-dot dot-c"></span></div></section>
+        <nav class="segmented"><span class="active">全部</span><span>冰箱</span><span>常温</span></nav>
+        <section class="list">
+          <article class="food-row"><div class="thumb"><img src="icons/food-pork.svg" alt="" /></div><div class="food-info"><h2>猪肉</h2><p>6 月 1 日购买 · 冰箱 · 5个</p></div><div class="row-right"><span class="chip danger">已过期 32 天</span><span class="text-action">处理</span></div></article>
+          <article class="food-row"><div class="thumb"><img src="icons/food-potato.svg" alt="" /></div><div class="food-info"><h2>土豆粉</h2><p>7 月 8 日购买 · 冰箱 · 1袋</p></div><div class="row-right"><span class="chip safe">3 天后到期</span><span class="text-action">处理</span></div></article>
+        </section>
+      </main>
+      <section class="action-sheet">
+        <span class="handle"></span>
+        <header class="sheet-head"><div class="sheet-title"><h2>猪肉</h2><span class="chip danger">已过期 32 天</span></div><div class="sheet-head-actions"><div class="sheet-mini-button">?</div><div class="close"><img src="icons/close.svg" alt="" /></div></div></header>
+        <div class="sheet-actions">
+          <div class="sheet-action"><img src="icons/action-done.svg" alt="" /><div><strong>已吃完</strong><small>从冰箱列表移除</small></div></div>
+          <div class="sheet-action"><img src="icons/action-bad.svg" alt="" /><div><strong>坏掉了</strong><small>记录浪费原因</small></div></div>
+          <div class="sheet-action"><img src="icons/action-delay.svg" alt="" /><div><strong>延期</strong><small>再提醒我 1 天</small></div></div>
+        </div>
+      </section>
+    </section>
+
+    <section class="screen" data-screen="04-home-empty">
+      <div class="status"><span>17:22</span><div class="status-icons"><div class="signal"><span></span><span></span><span></span><span></span></div><span>4G</span><span class="battery">65</span></div></div>
+      <main class="page">
+        <header class="topbar"><h1 class="brand">FoodTime</h1><div class="icon-circle"><img src="icons/add.svg" alt="" /></div></header>
+        <section class="hero"><div><p>今天先吃</p><strong>所有东西都已经吃完了</strong></div><div class="fridge-art"><span class="food-dot dot-a"></span><span class="food-dot dot-b"></span><span class="food-dot dot-c"></span></div></section>
+        <nav class="segmented"><span>全部</span><span>冰箱</span><span class="active">常温</span></nav>
+        <section class="empty-panel"><div class="empty-inner"><div class="empty-icon"><img src="icons/room.svg" alt="" /></div><h2>这里还没有食物</h2><p>添加后会在这里显示</p></div></section>
+      </main>
+      <footer class="tabbar"><span class="active"><img src="icons/nav-home-radish.svg" alt="" />首页</span><span><img src="icons/nav-profile-active.svg" alt="" />我的</span></footer>
+    </section>
+
+    <section class="screen" data-screen="05-add">
+      <div class="status"><span>17:23</span><div class="status-icons"><div class="signal"><span></span><span></span><span></span><span></span></div><span>4G</span><span class="battery">65</span></div></div>
+      <main class="page">
+        <header class="subbar"><div class="back"><img src="icons/back.svg" alt="" /></div><h1>添加食物</h1><div class="check"><img src="icons/check.svg" alt="" /></div></header>
+        <section class="photo-card"><img class="food-big" src="icons/food-strawberry.svg" alt="" /><div class="camera-btn"><span class="camera-symbol"></span>拍照</div></section>
+        <section class="form-card">
+          <div class="field"><span class="field-title">食物名称</span><div class="input">草莓</div></div>
+          <div class="field"><span class="field-title">购买时间</span><div class="input with-addon"><span>2026-07-08</span><span class="input-addon"><span class="date-symbol"></span></span></div></div>
+          <div class="form-row">
+            <div class="field"><span class="field-title">数量</span><div class="input select-input"><span>1</span><span class="input-addon">斤</span></div></div>
+            <div class="field"><span class="field-title">存放位置</span><div class="storage-stack"><span class="pill-btn active">冰箱</span><span class="pill-btn">常温</span></div></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><span class="field-title">提醒时间</span><div class="input select-input"><span>3</span><span class="input-addon">天</span></div></div>
+            <div class="field"><span class="field-title">存放文件夹</span><div class="input with-addon"><span>默认</span><span class="input-addon"><span class="reminder-symbol"></span></span></div></div>
+          </div>
+        </section>
+      </main>
+    </section>
+
+    <section class="screen" data-screen="06-settings">
+      <div class="status"><span>17:23</span><div class="status-icons"><div class="signal"><span></span><span></span><span></span><span></span></div><span>4G</span><span class="battery">65</span></div></div>
+      <main class="page">
+        <header class="subbar"><div class="back"><img src="icons/back.svg" alt="" /></div><h1 class="brand" style="font-size:62px">FoodTime</h1><span class="spacer"></span></header>
+        <section class="setting-card">
+          <article class="setting-row"><div class="setting-icon"><img src="icons/sync-cloud-provided.svg" alt="" /></div><div><h2>同步设置</h2><p>默认坚果云，也支持其他 WebDAV 服务</p></div><img class="chev" src="icons/chevron-right.svg" alt="" /></article>
+          <article class="setting-row"><div class="setting-icon"><img src="icons/settings.svg" alt="" /></div><div><h2>夜间模式</h2><p>跟随系统</p></div><img class="chev" src="icons/chevron-right.svg" alt="" /></article>
+          <article class="setting-row"><div class="setting-icon"><img src="icons/action-delay.svg" alt="" /></div><div><h2>提醒通知</h2><p>每天 00:54，紧急提醒 3 天</p></div><img class="chev" src="icons/chevron-right.svg" alt="" /></article>
+        </section>
+      </main>
+    </section>
+
+    <section class="screen screen-title-page" data-screen="07-fridge">
+      <div class="status"><span>17:23</span><div class="status-icons"><div class="signal"><span></span><span></span><span></span><span></span></div><span>4G</span><span class="battery">65</span></div></div>
+      <main class="page">
+        <header class="subbar"><div class="back"><img src="icons/back.svg" alt="" /></div><h1>冰箱食物</h1><span class="spacer"></span></header>
+        <nav class="segmented"><span class="active">全部</span><span>快提醒</span><span>安全</span></nav>
+        <section class="record-card">
+          <article class="food-row"><div class="thumb"><img src="icons/food-pork.svg" alt="" /></div><div class="food-info"><h2>猪肉</h2><p>冰箱中，已存 38 天</p></div><span class="chip danger">需处理</span></article>
+          <article class="food-row"><div class="thumb"><img src="icons/food-potato.svg" alt="" /></div><div class="food-info"><h2>土豆粉</h2><p>冰箱中，已存 1 天</p></div><span class="chip safe">安全</span></article>
+        </section>
+      </main>
+    </section>
+
+    <section class="screen screen-title-page" data-screen="08-room-empty">
+      <div class="status"><span>17:23</span><div class="status-icons"><div class="signal"><span></span><span></span><span></span><span></span></div><span>4G</span><span class="battery">65</span></div></div>
+      <main class="page">
+        <header class="subbar"><div class="back"><img src="icons/back.svg" alt="" /></div><h1>常温食物</h1><span class="spacer"></span></header>
+        <nav class="segmented"><span class="active">全部</span><span>快提醒</span><span>安全</span></nav>
+        <section class="empty-panel simple-empty"><div class="empty-inner"><h2>暂无记录</h2><p>常温食物会显示在这里</p></div></section>
+      </main>
+    </section>
+
+    <section class="screen screen-title-page" data-screen="09-history-empty">
+      <div class="status"><span>17:23</span><div class="status-icons"><div class="signal"><span></span><span></span><span></span><span></span></div><span>4G</span><span class="battery">65</span></div></div>
+      <main class="page">
+        <header class="subbar"><div class="back"><img src="icons/back.svg" alt="" /></div><h1>历史食物记录</h1><span class="spacer"></span></header>
+        <nav class="segmented two"><span class="active">已吃完</span><span>已坏掉</span></nav>
+        <div class="danger-link">清除本地和云端数据</div>
+        <section class="empty-panel simple-empty"><div class="empty-inner"><h2>暂无记录</h2><p>处理过的食物会在这里归档</p></div></section>
+      </main>
+    </section>
+
+    <script>
+      const params = new URLSearchParams(location.search);
+      const id = params.get("screen");
+      if (id) {
+        document.body.classList.add("single");
+        const target = document.querySelector(`[data-screen="${id}"]`);
+        if (target) target.classList.add("active-screen");
+      }
+    </script>
+  </body>
+</html>
