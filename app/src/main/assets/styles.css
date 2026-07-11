@@ -91,6 +91,7 @@ button {
 .field-icon-button,
 .unit-picker-button,
 .reminder-unit-picker-button,
+.theme-inline-options button,
 .unit-modal-close,
 .unit-option-grid button {
   cursor: pointer;
@@ -1881,7 +1882,7 @@ legend {
   text-align: left;
 }
 
-.settings-menu .setting-row > div:not(.setting-dot) {
+.settings-menu .setting-copy {
   flex: 1 1 auto;
   min-width: 0;
   text-align: left;
@@ -1891,6 +1892,32 @@ legend {
 .settings-menu .setting-row p {
   width: 100%;
   text-align: left;
+}
+
+.theme-inline-options {
+  display: grid;
+  flex: 0 0 auto;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+  padding: 4px;
+  border-radius: 14px;
+  background: var(--line);
+}
+
+.theme-inline-options button {
+  min-width: 44px;
+  min-height: 34px;
+  padding: 0 8px;
+  border-radius: 10px;
+  color: var(--muted);
+  background: transparent;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.theme-inline-options button.active {
+  color: #ffffff;
+  background: var(--mint-dark);
 }
 
 .setting-dot {

@@ -1067,7 +1067,7 @@
   }
 
   function themeModeLabel(mode) {
-    if (mode === "dark") return "夜间";
+    if (mode === "dark") return "深色";
     if (mode === "light") return "浅色";
     return "跟随系统";
   }
@@ -1106,9 +1106,23 @@
   }
 
   function renderThemeSummary(settings = loadThemeSettings()) {
+    const effectiveMode = settings.mode === "system" ? systemThemeMode() : settings.mode;
     document.querySelectorAll(".theme-summary-text").forEach((item) => {
-      item.textContent = themeModeLabel(settings.mode);
+      item.textContent = themeModeLabel(effectiveMode);
     });
+    document.querySelectorAll(".theme-inline-options button").forEach((button) => {
+      const active = button.dataset.themeMode === effectiveMode;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", active ? "true" : "false");
+    });
+  }
+
+  function saveThemeMode(mode) {
+    const safeMode = ["light", "dark"].includes(mode) ? mode : "light";
+    const settings = { mode: safeMode, updatedAt: nowIso() };
+    localStorage.setItem(THEME_SETTINGS_KEY, JSON.stringify(settings));
+    applyTheme(settings);
+    renderThemeSummary(settings);
   }
 
   function fillThemeSettingsForm() {
@@ -1818,10 +1832,9 @@
       return;
     }
 
-    const themeSettingsButton = target.closest(".theme-settings-button");
-    if (themeSettingsButton) {
-      fillThemeSettingsForm();
-      showScreen("themeSettings");
+    const inlineThemeOption = target.closest(".theme-inline-options button");
+    if (inlineThemeOption) {
+      saveThemeMode(inlineThemeOption.dataset.themeMode || "light");
       return;
     }
 

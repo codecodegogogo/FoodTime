@@ -945,6 +945,35 @@
         text-align: left;
       }
 
+      .setting-row.theme-row {
+        grid-template-columns: 96px minmax(0, 1fr) auto;
+      }
+
+      .theme-inline-preview {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        padding: 6px;
+        border-radius: 18px;
+        background: #e8e2d6;
+      }
+
+      .theme-inline-preview span {
+        display: grid;
+        min-width: 70px;
+        min-height: 48px;
+        place-items: center;
+        border-radius: 13px;
+        color: var(--muted);
+        font-size: 20px;
+        font-weight: 900;
+      }
+
+      .theme-inline-preview .active {
+        color: #fff;
+        background: var(--green);
+      }
+
       .setting-row:last-child {
         border-bottom: 0;
       }
@@ -1106,7 +1135,7 @@
         <header class="subbar"><div class="back"><img src="icons/back.svg" alt="" /></div><h1 class="brand" style="font-size:62px">FoodTime</h1><span class="spacer"></span></header>
         <section class="setting-card">
           <article class="setting-row"><div class="setting-icon"><img src="icons/sync-cloud-provided.svg" alt="" /></div><div><h2>同步设置</h2><p>默认坚果云，也支持其他 WebDAV 服务</p></div></article>
-          <article class="setting-row"><div class="setting-icon"><img src="icons/settings-provided.svg" alt="" /></div><div><h2>夜间模式</h2><p>跟随系统</p></div></article>
+          <article class="setting-row theme-row"><div class="setting-icon"><img src="icons/settings-provided.svg" alt="" /></div><div><h2>夜间模式</h2><p>浅色</p></div><div class="theme-inline-preview"><span class="active">浅色</span><span>深色</span></div></article>
           <article class="setting-row"><div class="setting-icon"><img src="icon/时间.svg" alt="" /></div><div><h2>提醒通知</h2><p>每天 00:54，紧急提醒 3 天</p></div></article>
         </section>
       </main>

@@ -374,21 +374,25 @@
         <section class="setting-list settings-menu" aria-label="设置列表">
           <button class="setting-row sync-settings-button" type="button">
             <div class="setting-dot cloud-dot"></div>
-            <div>
+            <div class="setting-copy">
               <h2>同步设置</h2>
               <p>默认坚果云，也支持其他 WebDAV 服务</p>
             </div>
           </button>
-          <button class="setting-row theme-settings-button" type="button">
+          <div class="setting-row theme-settings-row">
             <div class="setting-dot theme-dot"></div>
-            <div>
+            <div class="setting-copy">
               <h2>夜间模式</h2>
-              <p class="theme-summary-text">跟随系统</p>
+              <p class="theme-summary-text">浅色</p>
             </div>
-          </button>
+            <div class="theme-inline-options" aria-label="显示模式">
+              <button type="button" data-theme-mode="light">浅色</button>
+              <button type="button" data-theme-mode="dark">深色</button>
+            </div>
+          </div>
           <button class="setting-row notification-settings-button" type="button">
             <div class="setting-dot notice-dot"></div>
-            <div>
+            <div class="setting-copy">
               <h2>提醒通知</h2>
               <p class="notification-summary-text">每天 09:00，紧急提醒 3 天</p>
             </div>
