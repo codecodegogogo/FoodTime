@@ -458,7 +458,7 @@
 
   function shortFoodName(value) {
     const chars = Array.from(String(value || ""));
-    return chars.length > 6 ? `${chars.slice(0, 6).join("")}...` : chars.join("");
+    return chars.length > 5 ? `${chars.slice(0, 5).join("")}...` : chars.join("");
   }
 
   function daysStored(food) {
@@ -709,7 +709,7 @@
           <article data-food-id="${escapeHtml(food.id)}">
             ${thumbMarkup(food)}
             <div>
-              <h2>${escapeHtml(food.name)}</h2>
+              <h2 title="${escapeHtml(food.name)}">${escapeHtml(shortFoodName(food.name))}</h2>
               <p>${escapeHtml(recordDescription(food))}</p>
             </div>
             ${action}

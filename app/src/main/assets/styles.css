@@ -4,8 +4,8 @@
   --line: #dfe8df;
   --paper: #fbf8ef;
   --surface: #ffffff;
-  --mint: #96e8ba;
-  --mint-dark: #96e8ba;
+  --mint: #68c990;
+  --mint-dark: #68c990;
   --leaf: #57a773;
   --coral: #f07867;
   --yellow: #f8c85f;
@@ -24,8 +24,8 @@ html.theme-system-dark {
   --line: #31443d;
   --paper: #101917;
   --surface: #182521;
-  --mint: #96e8ba;
-  --mint-dark: #96e8ba;
+  --mint: #68c990;
+  --mint-dark: #68c990;
   --shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
 }
 
@@ -36,8 +36,8 @@ html.theme-system-dark {
     --line: #31443d;
     --paper: #101917;
     --surface: #182521;
-    --mint: #96e8ba;
-    --mint-dark: #96e8ba;
+    --mint: #68c990;
+    --mint-dark: #68c990;
     --shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
   }
 }
@@ -790,17 +790,18 @@ button:active,
   display: grid;
   flex: 0 0 auto;
   width: 40px;
-  height: 40px;
+  height: 38px;
   place-items: center;
-  border-radius: 50%;
-  background: #f4f1eb;
+  border: 1px solid #e5ded3;
+  border-radius: 12px;
+  background: #fffdf8;
 }
 
 .close-icon {
   display: block;
-  width: 28px;
-  height: 28px;
-  background: url("icon/错误.svg") center / contain no-repeat;
+  width: 20px;
+  height: 20px;
+  background: url("icons/close.svg") center / contain no-repeat;
 }
 
 .sheet-actions {
@@ -856,12 +857,12 @@ button:active,
 
 .sheet-icon.spoiled {
   background-color: transparent;
-  background-image: url("icon/删除.svg");
+  background-image: url("icon/坏掉.svg");
 }
 
 .sheet-icon.delay {
   background-color: transparent;
-  background-image: url("icon/时间.svg");
+  background-image: url("icon/延期.svg");
 }
 
 .photo-area {
@@ -1231,7 +1232,7 @@ button:active,
 .folder-more-button img {
   width: 22px;
   height: 22px;
-  filter: brightness(0) saturate(100%) invert(32%) sepia(22%) saturate(1163%) hue-rotate(112deg) brightness(86%) contrast(84%);
+  filter: none;
 }
 
 .split-control {
@@ -1301,12 +1302,14 @@ button:active,
   width: 36px;
   height: 36px;
   place-items: center;
-  background: transparent;
+  border: 1px solid #e5ded3;
+  border-radius: 10px;
+  background: #fffdf8;
 }
 
 .unit-modal-close img {
-  width: 26px;
-  height: 26px;
+  width: 18px;
+  height: 18px;
 }
 
 .unit-option-grid {
@@ -1447,15 +1450,15 @@ legend {
 
 .chips button.active,
 .theme-options button.active {
-  border-color: #96e8ba;
+  border-color: #68c990;
   color: #103e26;
   background: var(--mint-dark);
-  box-shadow: 0 8px 18px rgba(150, 232, 186, 0.22);
+  box-shadow: 0 8px 18px rgba(104, 201, 144, 0.22);
 }
 
 .quantity-input:focus,
 .reminder-input:focus {
-  border-color: #96e8ba;
+  border-color: #68c990;
   background-color: #eef8ef;
 }
 
@@ -1549,7 +1552,7 @@ legend {
 
 .stepper button:active,
 .mini-stepper button:active {
-  color: #ffffff;
+  color: #103e26;
   background: var(--mint-dark);
 }
 
@@ -2500,14 +2503,14 @@ html.theme-dark .theme-options button.active,
 html.theme-system-dark .theme-options button.active,
 html.theme-dark .history-filters .active,
 html.theme-system-dark .history-filters .active {
-  border-color: #96e8ba;
+  border-color: #68c990;
   color: #07110e;
-  background-color: #96e8ba;
+  background-color: #68c990;
 }
 
 html.theme-dark .tabbar .active,
 html.theme-system-dark .tabbar .active {
-  color: #96e8ba;
+  color: #68c990;
   background-color: transparent;
   box-shadow: none;
 }
@@ -2515,7 +2518,7 @@ html.theme-system-dark .tabbar .active {
 html.theme-dark .primary-action,
 html.theme-system-dark .primary-action {
   color: #07110e;
-  background-color: #96e8ba;
+  background-color: #68c990;
 }
 
 html.theme-dark .photo-area > button,
@@ -2529,7 +2532,7 @@ html.theme-system-dark .photo-area.is-captured button {
 html.theme-dark .phone-add > .primary-action,
 html.theme-system-dark .phone-add > .primary-action {
   border-color: transparent;
-  background: #96e8ba;
+  background: #68c990;
   box-shadow: none;
 }
 
@@ -2538,7 +2541,7 @@ html.theme-system-dark .stepper button:active,
 html.theme-dark .mini-stepper button:active,
 html.theme-system-dark .mini-stepper button:active {
   color: #07110e;
-  background-color: #96e8ba;
+  background-color: #68c990;
 }
 
 html.theme-dark .sync-now-button.is-syncing,
@@ -2684,13 +2687,13 @@ html.theme-system-dark .sync-now-button.is-syncing {
   html.theme-system .choice-options .active,
   html.theme-system .theme-options button.active,
   html.theme-system .history-filters .active {
-    border-color: #96e8ba;
+    border-color: #68c990;
     color: #07110e;
-    background-color: #96e8ba;
+    background-color: #68c990;
   }
 
   html.theme-system .tabbar .active {
-    color: #96e8ba;
+    color: #68c990;
     background-color: transparent;
     box-shadow: none;
   }
@@ -2699,7 +2702,7 @@ html.theme-system-dark .sync-now-button.is-syncing {
   html.theme-system .photo-area > button,
   html.theme-system .photo-area.is-captured button {
     color: #07110e;
-    background-color: #96e8ba;
+    background-color: #68c990;
   }
 
   html.theme-system .photo-area > button,
@@ -2710,14 +2713,14 @@ html.theme-system-dark .sync-now-button.is-syncing {
 
   html.theme-system .phone-add > .primary-action {
     border-color: transparent;
-    background: #96e8ba;
+    background: #68c990;
     box-shadow: none;
   }
 
   html.theme-system .stepper button:active,
   html.theme-system .mini-stepper button:active {
     color: #07110e;
-    background-color: #96e8ba;
+    background-color: #68c990;
   }
 
   html.theme-system .sync-now-button.is-syncing {

@@ -311,7 +311,7 @@ final class FoodTimeNotificationScheduler {
         if (foods.isEmpty()) {
             return "FoodTime 今日提醒";
         }
-        String name = foods.get(0).name;
+        String name = displayName(foods.get(0).name);
         return foods.size() > 1 ? name + "等即将过期" : name + "即将过期";
     }
 
@@ -319,8 +319,17 @@ final class FoodTimeNotificationScheduler {
         if (foods.isEmpty()) {
             return "今天没有即将过期的食物";
         }
-        String name = foods.get(0).name;
+        String name = displayName(foods.get(0).name);
         return foods.size() > 1 ? name + "等即将过期，请尽快处理。" : name + "即将过期，请尽快处理。";
+    }
+
+    private static String displayName(String value) {
+        String name = value == null ? "" : value;
+        if (name.codePointCount(0, name.length()) <= 5) {
+            return name;
+        }
+        int endIndex = name.offsetByCodePoints(0, 5);
+        return name.substring(0, endIndex) + "...";
     }
 
     private static int intervalForLevel(int level) {
