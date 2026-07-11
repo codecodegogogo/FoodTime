@@ -13,7 +13,7 @@
   const PHOTO_THUMB_MIN_SIDE = 96;
   const PHOTO_THUMB_QUALITY = 0.24;
   const PHOTO_SYNC_MAX_CHARS = 28000;
-  const FALLBACK_APP_VERSION = "0.1.0";
+  const FALLBACK_APP_VERSION = "v1";
   const UPDATE_API_URL = "https://api.github.com/repos/codecodegogogo/FoodTime/releases/latest";
   const RELEASES_URL = "https://github.com/codecodegogogo/FoodTime/releases";
   let pendingReleaseUrl = RELEASES_URL;
@@ -71,7 +71,7 @@
     { type: "chicken", file: "icons/food-pork.svg", keywords: ["五花肉", "猪肉", "里脊", "肉馅"] },
     { type: "chicken", file: "icons/food-beef.svg", keywords: ["牛排", "肥牛", "牛肉"] },
     { type: "chicken", file: "icons/food-ribs.svg", keywords: ["排骨", "肋排", "小排"] },
-    { type: "berry", file: "icons/food-greens.svg", keywords: ["上海青", "小青菜", "青菜", "油菜", "菜心"] },
+    { type: "berry", file: "icons/food-greens.svg", keywords: ["上海青", "小青菜", "青菜", "油菜", "菜心", "豆芽"] },
     { type: "chicken", file: "icons/food-chicken-cut.svg", keywords: ["鸡胸肉", "鸡胸", "鸡肉"] },
     { type: "chicken", file: "icons/food-hotpot.svg", keywords: ["火锅", "涮锅"] },
     { type: "chicken", file: "icons/food-soup.svg", keywords: ["排骨汤", "骨头汤", "紫菜汤", "鸡汤", "汤"] },
@@ -81,7 +81,7 @@
     { type: "milk", file: "icons/food-mustard.svg", keywords: ["芥末酱", "芥末"] },
     { type: "bread", file: "icons/food-hamburger.svg", keywords: ["汉堡包", "汉堡"] },
     { type: "bread", file: "icons/food-croissant.svg", keywords: ["牛角面包", "牛角包", "可颂"] },
-    { type: "berry", file: "icons/food-peas.svg", keywords: ["豌豆", "青豆"] },
+    { type: "berry", file: "icons/food-peas.svg", keywords: ["豌豆", "青豆", "胡豆", "蚕豆"] },
     { type: "bread", file: "icons/food-sushi.svg", keywords: ["寿司"] },
     { type: "bread", file: "icons/food-donut.svg", keywords: ["甜甜圈"] },
     { type: "berry", file: "icons/food-eggplant.svg", keywords: ["茄子"] },
@@ -112,7 +112,7 @@
     { type: "berry", file: "icons/food-potato.svg", keywords: ["土豆", "马铃薯"] },
     { type: "berry", file: "icons/food-carrot.svg", keywords: ["胡萝卜"] },
     { type: "berry", file: "icons/food-corn.svg", keywords: ["玉米"] },
-    { type: "berry", file: "icons/food-broccoli.svg", keywords: ["西兰花"] },
+    { type: "berry", file: "icons/food-broccoli.svg", keywords: ["西兰花", "菜花", "花菜"] },
     { type: "berry", file: "icons/food-onion.svg", keywords: ["洋葱"] },
     { type: "berry", file: "icons/food-mushroom.svg", keywords: ["蘑菇", "香菇", "菌菇"] },
     { type: "berry", file: "icons/food-pumpkin.svg", keywords: ["南瓜"] },
@@ -705,7 +705,8 @@
   }
 
   function foodIconSrc(food) {
-    if (food.icon) return food.icon;
+    if (food.icon === DEFAULT_ADD_ICON && food.type === "meal") return food.icon;
+    if (food.icon && !String(food.icon).startsWith("icons/food-")) return food.icon;
     const namedIcon = foodIconDefForName(food.name);
     if (namedIcon?.file) return namedIcon.file;
     const type = food.type || classifyFood(food.name);

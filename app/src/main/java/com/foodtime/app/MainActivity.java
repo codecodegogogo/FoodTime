@@ -144,9 +144,9 @@ public class MainActivity extends Activity {
             String versionName = getPackageManager()
                     .getPackageInfo(getPackageName(), 0)
                     .versionName;
-            return versionName == null || versionName.trim().isEmpty() ? "0.1.0" : versionName;
+            return versionName == null || versionName.trim().isEmpty() ? "v1" : versionName;
         } catch (PackageManager.NameNotFoundException ignored) {
-            return "0.1.0";
+            return "v1";
         }
     }
 

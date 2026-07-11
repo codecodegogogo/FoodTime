@@ -494,20 +494,29 @@ button:active,
 }
 
 .icon-thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
+  contain: layout paint;
+  isolation: isolate;
   background-color: transparent;
   background-image: none !important;
 }
 
 .icon-thumb img {
-  position: absolute;
-  inset: 3px;
+  position: static !important;
+  inset: auto !important;
   display: block;
-  width: 44px;
-  height: 44px;
-  margin: auto;
+  flex: 0 0 44px;
+  width: 44px !important;
+  height: 44px !important;
+  max-width: 44px;
+  max-height: 44px;
+  margin: 0 !important;
   object-fit: contain;
   object-position: center;
+  transform: none !important;
 }
 
 .icon-thumb span {

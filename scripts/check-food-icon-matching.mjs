@@ -3,7 +3,7 @@ import vm from "node:vm";
 
 const source = fs.readFileSync("app.js", "utf8").replace(
   "window.FoodTimeApp = {",
-  "window.__foodIconDefForName = foodIconDefForName; window.FoodTimeApp = {",
+  "window.__foodIconDefForName = foodIconDefForName; window.__foodIconSrc = foodIconSrc; window.FoodTimeApp = {",
 );
 
 const context = {
@@ -45,6 +45,11 @@ const cases = new Map([
   ["排骨汤", "icons/food-soup.svg"],
   ["娃娃菜", "icons/food-cabbage.svg"],
   ["哈密瓜", "icons/food-melon.svg"],
+  ["茄皇方便面", "icons/food-noodle.svg"],
+  ["各种面粉", "icons/food-bread.svg"],
+  ["豆芽", "icons/food-greens.svg"],
+  ["菜花", "icons/food-broccoli.svg"],
+  ["胡豆", "icons/food-peas.svg"],
 ]);
 
 for (const [name, expected] of cases) {
@@ -53,3 +58,13 @@ for (const [name, expected] of cases) {
   if (!fs.existsSync(actual)) throw new Error(`${name}: missing file ${actual}`);
   console.log(`${name} -> ${actual}`);
 }
+
+const correctedLegacyIcon = context.window.__foodIconSrc({
+  name: "各种面粉",
+  type: "bread",
+  icon: "icons/food-noodle.svg",
+});
+if (correctedLegacyIcon !== "icons/food-bread.svg") {
+  throw new Error(`legacy icon was not corrected: ${correctedLegacyIcon}`);
+}
+console.log(`历史错误图标 -> ${correctedLegacyIcon}`);
