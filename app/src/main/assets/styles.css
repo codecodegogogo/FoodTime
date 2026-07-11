@@ -559,9 +559,17 @@ button:active,
   background-image: url("icons/food-milk.svg");
 }
 
+.food-type-milk {
+  background-color: transparent;
+}
+
 .berry {
   background-color: transparent;
   background-image: url("icons/food-berry.svg");
+}
+
+.food-type-berry {
+  background-color: transparent;
 }
 
 .chicken {
@@ -569,10 +577,20 @@ button:active,
   background-image: url("icons/food-meat.svg");
 }
 
+.food-type-chicken {
+  background-color: transparent;
+}
+
 .bread-thumb,
 .food-thumb.bread {
   background-color: transparent;
   background-image: url("icons/food-bread.svg");
+}
+
+.food-type-bread,
+.food-type-meal {
+  position: relative;
+  background-color: transparent;
 }
 
 .food-info {

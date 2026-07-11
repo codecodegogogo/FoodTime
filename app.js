@@ -13,7 +13,7 @@
   const PHOTO_THUMB_MIN_SIDE = 96;
   const PHOTO_THUMB_QUALITY = 0.24;
   const PHOTO_SYNC_MAX_CHARS = 28000;
-  const FOOD_ICON_ASSET_VERSION = "20260711-food-fix-v6";
+  const FOOD_ICON_ASSET_VERSION = "20260711-type-class-v7";
   const FALLBACK_APP_VERSION = "v1";
   const UPDATE_API_URL = "https://api.github.com/repos/codecodegogogo/FoodTime/releases/latest";
   const RELEASES_URL = "https://github.com/codecodegogogo/FoodTime/releases";
@@ -61,9 +61,6 @@
   ];
 
   const FOOD_ICON_ALIASES = [
-    { type: "bread", file: "icons/food-oatmeal-safe.svg", keywords: ["燕麦片", "燕麦", "麦片"] },
-    { type: "bread", file: "icons/food-flour-safe.svg", keywords: ["低筋面粉", "中筋面粉", "高筋面粉", "各种面粉", "面粉", "淀粉"] },
-    { type: "bread", file: "icons/food-pancake-safe.svg", keywords: ["葱油饼", "手抓饼", "煎饼", "烙饼", "饼"] },
     { type: "bread", file: "icons/food-dumpling.svg", keywords: ["饺子皮", "饺子", "水饺", "蒸饺", "锅贴"] },
     { type: "bread", file: "icons/food-bun.svg", keywords: ["包子", "肉包", "菜包", "小笼包", "灌汤包", "馒头"] },
     { type: "bread", file: "icons/food-rice.svg", keywords: ["米饭", "白米饭", "大米饭", "剩饭"] },
@@ -735,12 +732,13 @@
     }
 
     const type = escapeHtml(food.type || classifyFood(food.name));
+    const typeClass = `food-type-${type}`;
     const iconSource = foodIconSrc(food);
     const icon = escapeHtml(versionedFoodIcon(iconSource));
     if (String(iconSource).startsWith("icons/")) {
-      return `<div class="food-thumb icon-thumb ${type}" style="--food-icon: url('${icon}')"></div>`;
+      return `<div class="food-thumb icon-thumb ${typeClass}" style="--food-icon: url('${icon}')"></div>`;
     }
-    return `<div class="food-thumb icon-thumb ${type}"><img src="${icon}" alt="" /></div>`;
+    return `<div class="food-thumb icon-thumb ${typeClass}"><img src="${icon}" alt="" /></div>`;
   }
 
   function activeFoods(filter = currentHomeFilter, folder = currentHomeFolder) {
