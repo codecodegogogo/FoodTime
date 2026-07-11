@@ -501,7 +501,10 @@ button:active,
   contain: layout paint;
   isolation: isolate;
   background-color: transparent;
-  background-image: none !important;
+  background-image: var(--food-icon, none) !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: 44px 44px !important;
 }
 
 .icon-thumb img {

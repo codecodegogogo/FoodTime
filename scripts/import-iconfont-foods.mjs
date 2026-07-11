@@ -55,7 +55,7 @@ async function fetchJson(url, options) {
 function cleanSvg(showSvg) {
   const viewBox = showSvg.match(/viewBox="([^"]+)"/)?.[1] || "0 0 1024 1024";
   const inner = showSvg.replace(/^<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "");
-  return `<svg width="200" height="200" viewBox="${viewBox}" version="1.1" xmlns="http://www.w3.org/2000/svg">${inner}</svg>\n`;
+  return `<svg overflow="hidden" viewBox="${viewBox}" version="1.1" xmlns="http://www.w3.org/2000/svg">${inner}</svg>\n`;
 }
 
 function writeIcon(file, svg) {

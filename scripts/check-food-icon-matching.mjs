@@ -3,7 +3,7 @@ import vm from "node:vm";
 
 const source = fs.readFileSync("app.js", "utf8").replace(
   "window.FoodTimeApp = {",
-  "window.__foodIconDefForName = foodIconDefForName; window.__foodIconSrc = foodIconSrc; window.FoodTimeApp = {",
+  "window.__foodIconDefForName = foodIconDefForName; window.__foodIconSrc = foodIconSrc; window.__thumbMarkup = thumbMarkup; window.FoodTimeApp = {",
 );
 
 const context = {
@@ -68,3 +68,10 @@ if (correctedLegacyIcon !== "icons/food-bread.svg") {
   throw new Error(`legacy icon was not corrected: ${correctedLegacyIcon}`);
 }
 console.log(`历史错误图标 -> ${correctedLegacyIcon}`);
+
+const noodleMarkup = context.window.__thumbMarkup({ name: "茄皇方便面", type: "bread", icon: "icons/food-noodle.svg" });
+if (noodleMarkup.includes("<img")) throw new Error(`bundled SVG still uses an img element: ${noodleMarkup}`);
+if (!noodleMarkup.includes("--food-icon") || !noodleMarkup.includes("20260711-svg-v4")) {
+  throw new Error(`bundled SVG background is not versioned: ${noodleMarkup}`);
+}
+console.log("内置 SVG 使用固定背景格渲染。");

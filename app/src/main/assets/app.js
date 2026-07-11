@@ -6,6 +6,7 @@
   const THEME_SETTINGS_KEY = "foodtime.themeSettings.v1";
   const NOTIFICATION_SETTINGS_KEY = "foodtime.notificationSettings.v1";
   const FOLDER_STORAGE_KEY = "foodtime.folders.v1";
+  const FOLDER_CHANGES_KEY = "foodtime.folderChanges.v1";
   const DEFAULT_ADD_ICON = "icons/meal-provided.svg";
   const FIXED_DAILY_REMINDER_TIMES = ["09:00", "15:00", "20:00"];
   const ONE_DAY = 24 * 60 * 60 * 1000;
@@ -13,6 +14,7 @@
   const PHOTO_THUMB_MIN_SIDE = 96;
   const PHOTO_THUMB_QUALITY = 0.24;
   const PHOTO_SYNC_MAX_CHARS = 28000;
+  const FOOD_ICON_ASSET_VERSION = "20260711-svg-v4";
   const FALLBACK_APP_VERSION = "v1";
   const UPDATE_API_URL = "https://api.github.com/repos/codecodegogogo/FoodTime/releases/latest";
   const RELEASES_URL = "https://github.com/codecodegogogo/FoodTime/releases";
@@ -434,6 +436,7 @@
       clearedAt: localStorage.getItem(CLEAR_ALL_AT_KEY) || "",
       foods: loadFoods().map(foodForSync),
       folders: existingFolders(),
+      folderChanges: loadFolderChanges(),
     };
   }
 
@@ -456,15 +459,16 @@
   }
 
   function parseRemotePayload(body) {
-    if (!body) return { foods: [], folders: [], clearedAt: "" };
+    if (!body) return { foods: [], folders: [], folderChanges: [], clearedAt: "" };
     const parsed = JSON.parse(body);
     if (Array.isArray(parsed)) {
-      return { foods: normalizeFoods(parsed), folders: [], clearedAt: "" };
+      return { foods: normalizeFoods(parsed), folders: [], folderChanges: [], clearedAt: "" };
     }
 
     return {
       foods: normalizeFoods(parsed.foods),
       folders: normalizeFolderList(parsed.folders),
+      folderChanges: normalizeFolderChanges(parsed.folderChanges),
       clearedAt: parsed.clearedAt || "",
     };
   }
@@ -546,7 +550,12 @@
     if (!result.missing && result.body) {
       try {
         const remotePayload = parseRemotePayload(result.body);
-        const merged = mergeRemotePayload(loadFoods(), remotePayload);
+        saveFolderChanges(mergeFolderChanges(loadFolderChanges(), remotePayload.folderChanges));
+        const merged = mergeRemotePayload(loadFoods(), remotePayload).map((food) => (
+          folderIsDeleted(normalizedFolderName(food.folder))
+            ? { ...food, folder: "默认" }
+            : food
+        ));
         saveFoods(merged, { skipSync: true });
         saveFolderNames([...existingFolders(), ...remotePayload.folders], { skipSync: true });
         renderAll();
@@ -713,13 +722,22 @@
     return FOOD_ICON_DEFS.find((item) => item.type === type)?.file || FOOD_ICON_DEFS[3].file;
   }
 
+  function versionedFoodIcon(file) {
+    const source = String(file || "");
+    return source.startsWith("icons/food-") ? `${source}?v=${FOOD_ICON_ASSET_VERSION}` : source;
+  }
+
   function thumbMarkup(food) {
     if (food.photo) {
       return `<div class="food-thumb photo-thumb"><img src="${escapeHtml(food.photo)}" alt="${escapeHtml(food.name)}" /></div>`;
     }
 
     const type = escapeHtml(food.type || classifyFood(food.name));
-    const icon = escapeHtml(foodIconSrc(food));
+    const iconSource = foodIconSrc(food);
+    const icon = escapeHtml(versionedFoodIcon(iconSource));
+    if (String(iconSource).startsWith("icons/")) {
+      return `<div class="food-thumb icon-thumb ${type}" style="--food-icon: url('${icon}')"></div>`;
+    }
     return `<div class="food-thumb icon-thumb ${type}"><img src="${icon}" alt="" /></div>`;
   }
 
@@ -1080,6 +1098,52 @@
     return folders;
   }
 
+  function normalizeFolderChanges(values) {
+    const byName = new Map();
+    (Array.isArray(values) ? values : []).forEach((value) => {
+      const name = folderNameValue(value?.name);
+      const updatedAt = String(value?.updatedAt || "");
+      if (!name || name === "默认" || !updatedAt) return;
+      const key = name.toLocaleLowerCase();
+      const current = byName.get(key);
+      if (!current || (Date.parse(updatedAt) || 0) >= (Date.parse(current.updatedAt) || 0)) {
+        byName.set(key, { name, deleted: Boolean(value.deleted), updatedAt });
+      }
+    });
+    return Array.from(byName.values());
+  }
+
+  function loadFolderChanges() {
+    try {
+      return normalizeFolderChanges(JSON.parse(localStorage.getItem(FOLDER_CHANGES_KEY) || "[]"));
+    } catch (error) {
+      localStorage.removeItem(FOLDER_CHANGES_KEY);
+      return [];
+    }
+  }
+
+  function saveFolderChanges(changes) {
+    localStorage.setItem(FOLDER_CHANGES_KEY, JSON.stringify(normalizeFolderChanges(changes).slice(-100)));
+  }
+
+  function mergeFolderChanges(localChanges, remoteChanges) {
+    return normalizeFolderChanges([...localChanges, ...remoteChanges]);
+  }
+
+  function folderIsDeleted(name, changes = loadFolderChanges()) {
+    const key = folderNameValue(name).toLocaleLowerCase();
+    return Boolean(changes.find((change) => change.name.toLocaleLowerCase() === key)?.deleted);
+  }
+
+  function setFolderState(name, deleted) {
+    const folder = folderNameValue(name);
+    if (!folder || folder === "默认") return;
+    const key = folder.toLocaleLowerCase();
+    const changes = loadFolderChanges().filter((change) => change.name.toLocaleLowerCase() !== key);
+    changes.push({ name: folder, deleted: Boolean(deleted), updatedAt: nowIso() });
+    saveFolderChanges(changes);
+  }
+
   function existingFolders() {
     let storedFolders = [];
     try {
@@ -1088,9 +1152,11 @@
       localStorage.removeItem(FOLDER_STORAGE_KEY);
     }
 
-    const folders = normalizeFolderList(["默认", ...storedFolders]);
+    const changes = loadFolderChanges();
+    const folders = normalizeFolderList(["默认", ...storedFolders]).filter((folder) => !folderIsDeleted(folder, changes));
     loadFoods().forEach((food) => {
       const folder = normalizedFolderName(food.folder);
+      if (folderIsDeleted(folder, changes)) return;
       if (!folders.some((item) => item.toLocaleLowerCase() === folder.toLocaleLowerCase())) {
         folders.push(folder);
       }
@@ -1099,7 +1165,8 @@
   }
 
   function saveFolderNames(folders, options = {}) {
-    const normalized = normalizeFolderList(["默认", ...folders]);
+    const changes = loadFolderChanges();
+    const normalized = normalizeFolderList(["默认", ...folders]).filter((folder) => !folderIsDeleted(folder, changes));
     localStorage.setItem(FOLDER_STORAGE_KEY, JSON.stringify(normalized));
     if (!options.skipSync) scheduleSync();
     renderFolderManagement();
@@ -1163,6 +1230,7 @@
       input.select();
       return;
     }
+    setFolderState(folder, false);
     saveFolderNames([...existingFolders(), folder]);
     input.value = "";
   }
@@ -1200,8 +1268,11 @@
     ));
     const folders = existingFolders().map((folder) => folder === original ? nextName : folder);
     if (currentHomeFolder === original) currentHomeFolder = nextName;
+    setFolderState(original, true);
+    setFolderState(nextName, false);
     saveFolderNames(folders, { skipSync: true });
-    saveFoods(foods);
+    saveFoods(foods, { skipSync: true });
+    scheduleSync({ immediate: true });
     renderAll();
   }
 
@@ -1217,8 +1288,10 @@
     ));
     const folders = existingFolders().filter((item) => item !== folder);
     if (currentHomeFolder === folder) currentHomeFolder = "全部";
+    setFolderState(folder, true);
     saveFolderNames(folders, { skipSync: true });
-    saveFoods(foods);
+    saveFoods(foods, { skipSync: true });
+    scheduleSync({ immediate: true });
     renderAll();
   }
 
@@ -1333,7 +1406,7 @@
 
     const visual = foodIconDefForName(name);
     area.classList.add("is-icon-preview");
-    area.style.setProperty("--preview-icon", `url("${visual.file}")`);
+    area.style.setProperty("--preview-icon", `url("${versionedFoodIcon(visual.file)}")`);
     area.dataset.previewLabel = name.slice(0, 3);
     const illustration = area.querySelector(".plate-illustration");
     if (illustration) illustration.dataset.previewLabel = name.slice(0, 3);
