@@ -494,14 +494,20 @@ button:active,
 }
 
 .icon-thumb {
+  overflow: hidden;
   background-color: transparent;
   background-image: none !important;
 }
 
 .icon-thumb img {
+  position: absolute;
+  inset: 3px;
+  display: block;
   width: 44px;
   height: 44px;
+  margin: auto;
   object-fit: contain;
+  object-position: center;
 }
 
 .icon-thumb span {
@@ -1262,7 +1268,8 @@ button:active,
 
 .unit-modal,
 .reminder-unit-modal,
-.folder-modal {
+.folder-modal,
+.update-modal {
   position: absolute;
   inset: 0;
   z-index: 8;
@@ -1274,7 +1281,8 @@ button:active,
 
 .unit-modal.is-hidden,
 .reminder-unit-modal.is-hidden,
-.folder-modal.is-hidden {
+.folder-modal.is-hidden,
+.update-modal.is-hidden {
   display: none;
 }
 
@@ -1327,6 +1335,46 @@ button:active,
 }
 
 .unit-option-grid button.active {
+  color: #103e26;
+  background: var(--mint-dark);
+}
+
+.update-dialog header {
+  align-items: flex-start;
+}
+
+.update-dialog header > div {
+  min-width: 0;
+  padding-right: 8px;
+}
+
+.update-dialog-message {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+  font-weight: 800;
+}
+
+.update-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.update-actions button {
+  min-height: 46px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.update-later-action {
+  color: var(--muted);
+  background: var(--line);
+}
+
+.update-download-action {
   color: #103e26;
   background: var(--mint-dark);
 }
@@ -2013,6 +2061,23 @@ legend {
 .folder-dot {
   --setting-icon: url("icon/更多.svg");
   --setting-icon-filter: none;
+}
+
+.update-dot {
+  --setting-icon: url("icons/update-check.svg");
+  --setting-icon-filter: none;
+}
+
+.setting-meta {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.update-check-button:disabled {
+  opacity: 0.72;
 }
 
 .folder-manager-panel {
@@ -2929,6 +2994,7 @@ html.app-runtime .action-sheet,
 html.app-runtime .unit-modal,
 html.app-runtime .reminder-unit-modal,
 html.app-runtime .folder-modal,
+html.app-runtime .update-modal,
 html.app-runtime .confirm-modal {
   position: fixed;
 }
@@ -2943,13 +3009,15 @@ html.app-runtime .action-sheet {
 html.app-runtime .unit-modal,
 html.app-runtime .reminder-unit-modal,
 html.app-runtime .folder-modal,
+html.app-runtime .update-modal,
 html.app-runtime .confirm-modal {
   z-index: 45;
 }
 
 html.app-runtime .unit-modal,
 html.app-runtime .reminder-unit-modal,
-html.app-runtime .folder-modal {
+html.app-runtime .folder-modal,
+html.app-runtime .update-modal {
   align-items: end;
   padding-bottom: calc(20px + env(safe-area-inset-bottom));
 }
@@ -2990,6 +3058,7 @@ html.app-runtime .folder-modal {
   .unit-modal,
   .reminder-unit-modal,
   .folder-modal,
+  .update-modal,
   .confirm-modal {
     position: fixed;
   }
@@ -3004,13 +3073,15 @@ html.app-runtime .folder-modal {
   .unit-modal,
   .reminder-unit-modal,
   .folder-modal,
+  .update-modal,
   .confirm-modal {
     z-index: 45;
   }
 
   .unit-modal,
   .reminder-unit-modal,
-  .folder-modal {
+  .folder-modal,
+  .update-modal {
     align-items: end;
     padding-bottom: calc(20px + env(safe-area-inset-bottom));
   }

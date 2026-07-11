@@ -126,6 +126,38 @@ public class MainActivity extends Activity {
         public void haptic(String type) {
             runOnUiThread(() -> performHapticFeedback(type));
         }
+
+        @JavascriptInterface
+        public String appVersion() {
+            return BuildConfig.VERSION_NAME;
+        }
+
+        @JavascriptInterface
+        public void openExternal(String url) {
+            runOnUiThread(() -> openExternalUrl(url));
+        }
+    }
+
+    private void openExternalUrl(String url) {
+        if (url == null || url.trim().isEmpty()) {
+            return;
+        }
+
+        Uri uri = Uri.parse(url.trim());
+        String host = uri.getHost();
+        String path = uri.getPath();
+        if (!"https".equalsIgnoreCase(uri.getScheme())
+                || !"github.com".equalsIgnoreCase(host)
+                || path == null
+                || !path.startsWith("/codecodegogogo/FoodTime/releases")) {
+            return;
+        }
+
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, uri));
+        } catch (Exception ignored) {
+            // The update prompt remains optional if no browser is available.
+        }
     }
 
     private void performHapticFeedback(String type) {

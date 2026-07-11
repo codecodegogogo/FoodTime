@@ -13,6 +13,10 @@
   const PHOTO_THUMB_MIN_SIDE = 96;
   const PHOTO_THUMB_QUALITY = 0.24;
   const PHOTO_SYNC_MAX_CHARS = 28000;
+  const FALLBACK_APP_VERSION = "0.1.0";
+  const UPDATE_API_URL = "https://api.github.com/repos/codecodegogogo/FoodTime/releases/latest";
+  const RELEASES_URL = "https://github.com/codecodegogogo/FoodTime/releases";
+  let pendingReleaseUrl = RELEASES_URL;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -56,6 +60,34 @@
   ];
 
   const FOOD_ICON_ALIASES = [
+    { type: "bread", file: "icons/food-dumpling.svg", keywords: ["饺子皮", "饺子", "水饺", "蒸饺", "锅贴"] },
+    { type: "bread", file: "icons/food-bun.svg", keywords: ["包子", "肉包", "菜包", "小笼包", "灌汤包", "馒头"] },
+    { type: "bread", file: "icons/food-rice.svg", keywords: ["米饭", "白米饭", "大米饭", "剩饭"] },
+    { type: "bread", file: "icons/food-noodle.svg", keywords: ["牛肉面", "鸡蛋面", "汤面", "炒面", "面条", "挂面", "拉面", "方便面", "泡面", "米线", "粉丝", "粉条"] },
+    { type: "bread", file: "icons/food-tofu.svg", keywords: ["鱼豆腐", "豆腐", "豆干", "香干", "千张", "豆皮"] },
+    { type: "chicken", file: "icons/food-fish.svg", keywords: ["鱼肉", "鲫鱼", "鲈鱼", "草鱼", "带鱼", "鱼"] },
+    { type: "chicken", file: "icons/food-shrimp.svg", keywords: ["基围虾", "虾仁", "大虾", "虾"] },
+    { type: "berry", file: "icons/food-cabbage.svg", keywords: ["大白菜", "娃娃菜", "白菜"] },
+    { type: "chicken", file: "icons/food-pork.svg", keywords: ["五花肉", "猪肉", "里脊", "肉馅"] },
+    { type: "chicken", file: "icons/food-beef.svg", keywords: ["牛排", "肥牛", "牛肉"] },
+    { type: "chicken", file: "icons/food-ribs.svg", keywords: ["排骨", "肋排", "小排"] },
+    { type: "berry", file: "icons/food-greens.svg", keywords: ["上海青", "小青菜", "青菜", "油菜", "菜心"] },
+    { type: "chicken", file: "icons/food-chicken-cut.svg", keywords: ["鸡胸肉", "鸡胸", "鸡肉"] },
+    { type: "chicken", file: "icons/food-hotpot.svg", keywords: ["火锅", "涮锅"] },
+    { type: "chicken", file: "icons/food-soup.svg", keywords: ["排骨汤", "骨头汤", "紫菜汤", "鸡汤", "汤"] },
+    { type: "bread", file: "icons/food-fried-rice.svg", keywords: ["扬州炒饭", "蛋炒饭", "炒饭"] },
+    { type: "chicken", file: "icons/food-tomato-egg.svg", keywords: ["西红柿炒鸡蛋", "番茄炒蛋"] },
+    { type: "milk", file: "icons/food-pudding.svg", keywords: ["布丁", "果冻"] },
+    { type: "milk", file: "icons/food-mustard.svg", keywords: ["芥末酱", "芥末"] },
+    { type: "bread", file: "icons/food-hamburger.svg", keywords: ["汉堡包", "汉堡"] },
+    { type: "bread", file: "icons/food-croissant.svg", keywords: ["牛角面包", "牛角包", "可颂"] },
+    { type: "berry", file: "icons/food-peas.svg", keywords: ["豌豆", "青豆"] },
+    { type: "bread", file: "icons/food-sushi.svg", keywords: ["寿司"] },
+    { type: "bread", file: "icons/food-donut.svg", keywords: ["甜甜圈"] },
+    { type: "berry", file: "icons/food-eggplant.svg", keywords: ["茄子"] },
+    { type: "bread", file: "icons/food-cookie.svg", keywords: ["曲奇饼干", "曲奇"] },
+    { type: "bread", file: "icons/food-cupcake.svg", keywords: ["纸杯蛋糕", "杯子蛋糕"] },
+    { type: "berry", file: "icons/food-melon.svg", keywords: ["哈密瓜", "香瓜", "甜瓜"] },
     { type: "berry", file: "icons/food-strawberry.svg", keywords: ["草莓"] },
     { type: "berry", file: "icons/food-apple.svg", keywords: ["苹果", "青苹果"] },
     { type: "berry", file: "icons/food-banana.svg", keywords: ["香蕉"] },
@@ -216,6 +248,109 @@
 
   function nativeNotificationsAvailable() {
     return Boolean(window.FoodTimeNative && typeof window.FoodTimeNative.updateNotificationPlan === "function");
+  }
+
+  function currentAppVersion() {
+    try {
+      const version = window.FoodTimeNative?.appVersion?.();
+      if (version) return String(version);
+    } catch (error) {
+      // Browser previews use the bundled fallback version.
+    }
+    return FALLBACK_APP_VERSION;
+  }
+
+  function versionParts(value) {
+    const parts = String(value || "").match(/\d+/g) || [];
+    return [0, 1, 2].map((index) => Number.parseInt(parts[index], 10) || 0);
+  }
+
+  function isNewerVersion(latest, current) {
+    const latestParts = versionParts(latest);
+    const currentParts = versionParts(current);
+    for (let index = 0; index < latestParts.length; index += 1) {
+      if (latestParts[index] !== currentParts[index]) return latestParts[index] > currentParts[index];
+    }
+    return false;
+  }
+
+  function renderCurrentVersion() {
+    document.querySelectorAll(".update-version-text").forEach((item) => {
+      item.textContent = `当前 ${currentAppVersion()}`;
+    });
+  }
+
+  function openUpdateModal(title, message, actionLabel = "前往下载") {
+    const modal = screenElement("settings")?.querySelector(".update-modal");
+    if (!modal) return;
+    const titleElement = modal.querySelector("#update-dialog-title");
+    const messageElement = modal.querySelector(".update-dialog-message");
+    const action = modal.querySelector(".update-download-action");
+    if (titleElement) titleElement.textContent = title;
+    if (messageElement) messageElement.textContent = message;
+    if (action) action.textContent = actionLabel;
+    modal.classList.remove("is-hidden");
+    modal.setAttribute("aria-hidden", "false");
+  }
+
+  function closeUpdateModal() {
+    const modal = screenElement("settings")?.querySelector(".update-modal");
+    if (!modal) return;
+    modal.classList.add("is-hidden");
+    modal.setAttribute("aria-hidden", "true");
+  }
+
+  function openExternalUrl(url) {
+    const safeUrl = String(url || RELEASES_URL);
+    try {
+      if (window.FoodTimeNative?.openExternal) {
+        window.FoodTimeNative.openExternal(safeUrl);
+        return;
+      }
+    } catch (error) {
+      // Fall through to the browser preview behavior.
+    }
+    window.open(safeUrl, "_blank", "noopener,noreferrer");
+  }
+
+  async function checkForUpdates(button) {
+    const currentVersion = currentAppVersion();
+    const versionLabel = screenElement("settings")?.querySelector(".update-version-text");
+    if (button) button.disabled = true;
+    if (versionLabel) versionLabel.textContent = "检查中...";
+
+    try {
+      const response = await fetch(UPDATE_API_URL, { cache: "no-store" });
+      if (!response.ok) throw new Error(`GitHub ${response.status}`);
+      const release = await response.json();
+      const latestVersion = String(release.tag_name || release.name || "").trim();
+      if (!latestVersion) throw new Error("Missing release version");
+      pendingReleaseUrl = release.html_url || RELEASES_URL;
+
+      if (isNewerVersion(latestVersion, currentVersion)) {
+        openUpdateModal(
+          `发现新版本 ${latestVersion}`,
+          `当前版本 ${currentVersion}。是否更新由你决定，软件不会强制升级。`,
+          "前往下载",
+        );
+      } else {
+        openUpdateModal(
+          "已是最新版本",
+          `当前版本 ${currentVersion}，暂时没有发现更新。`,
+          "查看发布页",
+        );
+      }
+    } catch (error) {
+      pendingReleaseUrl = RELEASES_URL;
+      openUpdateModal(
+        "暂时无法检查更新",
+        "请检查网络后重试，也可以直接打开 GitHub 发布页查看。",
+        "打开发布页",
+      );
+    } finally {
+      if (button) button.disabled = false;
+      if (versionLabel) versionLabel.textContent = `当前 ${currentVersion}`;
+    }
   }
 
   function triggerHaptic(target) {
@@ -548,11 +683,25 @@
     return foodIconDefForName(name).type;
   }
 
+  function foodMatchScore(name, keyword) {
+    const normalizedName = String(name || "").normalize("NFKC").toLocaleLowerCase().replace(/\s+/g, "");
+    const normalizedKeyword = String(keyword || "").normalize("NFKC").toLocaleLowerCase().replace(/\s+/g, "");
+    if (!normalizedKeyword || !normalizedName.includes(normalizedKeyword)) return 0;
+    if (normalizedName === normalizedKeyword) return 30000 + Array.from(normalizedKeyword).length;
+    if (normalizedName.endsWith(normalizedKeyword)) return 25000 + Array.from(normalizedKeyword).length;
+    if (normalizedName.startsWith(normalizedKeyword)) return 20000 + Array.from(normalizedKeyword).length;
+    return 10000 + Array.from(normalizedKeyword).length;
+  }
+
   function foodIconDefForName(name) {
-    const normalized = String(name || "");
-    const alias = FOOD_ICON_ALIASES.find((item) => item.keywords.some((keyword) => normalized.includes(keyword)));
-    if (alias) return alias;
-    return FOOD_ICON_DEFS.find((item) => item.keywords.some((keyword) => normalized.includes(keyword))) || FOOD_ICON_DEFS[3];
+    let best = null;
+    [...FOOD_ICON_ALIASES, ...FOOD_ICON_DEFS].forEach((item) => {
+      item.keywords.forEach((keyword) => {
+        const score = foodMatchScore(name, keyword);
+        if (score && (!best || score > best.score)) best = { item, score };
+      });
+    });
+    return best?.item || FOOD_ICON_DEFS[3];
   }
 
   function foodIconSrc(food) {
@@ -1961,6 +2110,25 @@
       return;
     }
 
+    const updateCheckButton = target.closest(".update-check-button");
+    if (updateCheckButton) {
+      checkForUpdates(updateCheckButton);
+      return;
+    }
+
+    const updateDownloadAction = target.closest(".update-download-action");
+    if (updateDownloadAction) {
+      openExternalUrl(pendingReleaseUrl);
+      closeUpdateModal();
+      return;
+    }
+
+    const updateCloseAction = target.closest(".update-modal-close, .update-later-action");
+    if (updateCloseAction || target.classList?.contains("update-modal")) {
+      closeUpdateModal();
+      return;
+    }
+
     const syncNowButton = target.closest(".sync-now-button");
     if (syncNowButton) {
       requestSyncNow(syncNowButton);
@@ -2121,6 +2289,7 @@
     fillSyncSettingsForm();
     fillThemeSettingsForm();
     fillNotificationSettingsForm();
+    renderCurrentVersion();
     allScreens().forEach((screen, index) => {
       screen.classList.toggle("is-active", index === 0);
     });

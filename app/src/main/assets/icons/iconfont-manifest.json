@@ -154,13 +154,6 @@
     "source": "iconfont.cn collection 43742 cute food icons"
   },
   {
-    "file": "food-beef.svg",
-    "id": 34137134,
-    "name": "肉丸",
-    "keyword": "肉丸",
-    "source": "iconfont.cn collection 43742 cute food icons"
-  },
-  {
     "file": "food-blueberry.svg",
     "id": null,
     "name": "blueberry",
@@ -175,25 +168,11 @@
     "source": "iconfont.cn collection 43742 cute food icons"
   },
   {
-    "file": "food-bun.svg",
-    "id": null,
-    "name": "bun",
-    "keyword": "common-food-local-alias",
-    "source": "iconfont.cn downloaded base svg alias"
-  },
-  {
     "file": "food-butter.svg",
     "id": null,
     "name": "butter",
     "keyword": "common-food-local-alias",
     "source": "iconfont.cn downloaded base svg alias"
-  },
-  {
-    "file": "food-cabbage.svg",
-    "id": 40071841,
-    "name": "vegetables-filled",
-    "keyword": "vegetables-filled",
-    "source": "iconfont.cn collection 48811 iconPark colored local fallback"
   },
   {
     "file": "food-cake.svg",
@@ -259,25 +238,11 @@
     "source": "iconfont.cn collection 48811 iconPark colored local fallback"
   },
   {
-    "file": "food-dumpling.svg",
-    "id": null,
-    "name": "dumpling",
-    "keyword": "common-food-local-alias",
-    "source": "iconfont.cn downloaded base svg alias"
-  },
-  {
     "file": "food-egg.svg",
     "id": 34137098,
     "name": "煎蛋",
     "keyword": "煎蛋",
     "source": "iconfont.cn collection 43742 cute food icons"
-  },
-  {
-    "file": "food-fish.svg",
-    "id": 40071795,
-    "name": "fish-filled",
-    "keyword": "fish-filled",
-    "source": "iconfont.cn collection 48811 iconPark colored local fallback"
   },
   {
     "file": "food-fresh-milk.svg",
@@ -364,13 +329,6 @@
     "source": "iconfont.cn collection 43742 cute food icons"
   },
   {
-    "file": "food-noodle.svg",
-    "id": 40071805,
-    "name": "noodles-filled",
-    "keyword": "noodles-filled",
-    "source": "iconfont.cn collection 48811 iconPark colored local fallback"
-  },
-  {
     "file": "food-onion.svg",
     "id": 34137097,
     "name": "葱花",
@@ -434,13 +392,6 @@
     "source": "iconfont.cn downloaded base svg alias"
   },
   {
-    "file": "food-pork.svg",
-    "id": 34137134,
-    "name": "肉丸",
-    "keyword": "肉丸",
-    "source": "iconfont.cn collection 43742 cute food icons"
-  },
-  {
     "file": "food-potato.svg",
     "id": 34137139,
     "name": "薯条",
@@ -455,32 +406,11 @@
     "source": "iconfont.cn collection 48811 iconPark colored local fallback"
   },
   {
-    "file": "food-ribs.svg",
-    "id": 34137134,
-    "name": "肉丸",
-    "keyword": "肉丸",
-    "source": "iconfont.cn collection 43742 cute food icons"
-  },
-  {
-    "file": "food-rice.svg",
-    "id": 34137101,
-    "name": "饭团",
-    "keyword": "饭团",
-    "source": "iconfont.cn collection 43742 cute food icons"
-  },
-  {
     "file": "food-sausage.svg",
     "id": 34137114,
     "name": "热狗",
     "keyword": "热狗",
     "source": "iconfont.cn collection 43742 cute food icons"
-  },
-  {
-    "file": "food-shrimp.svg",
-    "id": 40071984,
-    "name": "shrimp",
-    "keyword": "shrimp",
-    "source": "iconfont.cn collection 48811 iconPark colored local fallback"
   },
   {
     "file": "food-soy-milk.svg",
@@ -509,13 +439,6 @@
     "name": "烤面包片",
     "keyword": "烤面包片",
     "source": "iconfont.cn collection 43742 cute food icons"
-  },
-  {
-    "file": "food-tofu.svg",
-    "id": null,
-    "name": "tofu",
-    "keyword": "common-food-local-alias",
-    "source": "iconfont.cn downloaded base svg alias"
   },
   {
     "file": "food-tomato.svg",
@@ -572,5 +495,201 @@
     "name": "???",
     "keyword": "???",
     "source": "user provided app/src/main/icon-sources/???.svg"
+  },
+  {
+    "id": 34137095,
+    "file": "food-pudding.svg",
+    "name": "布丁",
+    "keyword": "布丁、果冻",
+    "source": "iconfont.cn collection 43742"
+  },
+  {
+    "id": 34137100,
+    "file": "food-mustard.svg",
+    "name": "芥末",
+    "keyword": "芥末、芥末酱",
+    "source": "iconfont.cn collection 43742"
+  },
+  {
+    "id": 34137107,
+    "file": "food-hamburger.svg",
+    "name": "汉堡",
+    "keyword": "汉堡、汉堡包",
+    "source": "iconfont.cn collection 43742"
+  },
+  {
+    "id": 34137112,
+    "file": "food-croissant.svg",
+    "name": "牛角面包",
+    "keyword": "牛角包、可颂",
+    "source": "iconfont.cn collection 43742"
+  },
+  {
+    "id": 34137120,
+    "file": "food-peas.svg",
+    "name": "豌豆",
+    "keyword": "豌豆、青豆",
+    "source": "iconfont.cn collection 43742"
+  },
+  {
+    "id": 34137122,
+    "file": "food-sushi.svg",
+    "name": "寿司",
+    "keyword": "寿司",
+    "source": "iconfont.cn collection 43742"
+  },
+  {
+    "id": 34137127,
+    "file": "food-donut.svg",
+    "name": "甜甜圈",
+    "keyword": "甜甜圈",
+    "source": "iconfont.cn collection 43742"
+  },
+  {
+    "id": 34137129,
+    "file": "food-eggplant.svg",
+    "name": "茄子",
+    "keyword": "茄子",
+    "source": "iconfont.cn collection 43742"
+  },
+  {
+    "id": 34137131,
+    "file": "food-cookie.svg",
+    "name": "曲奇",
+    "keyword": "曲奇、曲奇饼干",
+    "source": "iconfont.cn collection 43742"
+  },
+  {
+    "id": 34137132,
+    "file": "food-cupcake.svg",
+    "name": "纸杯蛋糕",
+    "keyword": "纸杯蛋糕、杯子蛋糕",
+    "source": "iconfont.cn collection 43742"
+  },
+  {
+    "id": 34137133,
+    "file": "food-melon.svg",
+    "name": "甜瓜",
+    "keyword": "甜瓜、哈密瓜、香瓜",
+    "source": "iconfont.cn collection 43742"
+  },
+  {
+    "id": 3874542,
+    "file": "food-dumpling.svg",
+    "name": "饺子",
+    "keyword": "饺子皮、饺子、水饺、蒸饺、锅贴",
+    "source": "iconfont.cn repository 88617"
+  },
+  {
+    "id": 3869426,
+    "file": "food-bun.svg",
+    "name": "包子",
+    "keyword": "包子、肉包、菜包、小笼包、灌汤包、馒头",
+    "source": "iconfont.cn repository 88617"
+  },
+  {
+    "id": 5184509,
+    "file": "food-rice.svg",
+    "name": "米饭",
+    "keyword": "米饭、白米饭、大米饭、剩饭",
+    "source": "iconfont.cn repository 31418"
+  },
+  {
+    "id": 5184713,
+    "file": "food-noodle.svg",
+    "name": "面条",
+    "keyword": "面条、挂面、拉面、方便面、泡面、米线、粉丝、粉条",
+    "source": "iconfont.cn repository 31418"
+  },
+  {
+    "id": 47040084,
+    "file": "food-tofu.svg",
+    "name": "豆腐",
+    "keyword": "豆腐、豆干、香干、千张、豆皮",
+    "source": "iconfont.cn repository 551530"
+  },
+  {
+    "id": 1713580,
+    "file": "food-fish.svg",
+    "name": "鱼",
+    "keyword": "鱼、鱼肉、鲫鱼、鲈鱼、草鱼、带鱼",
+    "source": "iconfont.cn repository 41508"
+  },
+  {
+    "id": 1404288,
+    "file": "food-shrimp.svg",
+    "name": "虾",
+    "keyword": "虾、大虾、基围虾、虾仁",
+    "source": "iconfont.cn repository 15811"
+  },
+  {
+    "id": 3195578,
+    "file": "food-cabbage.svg",
+    "name": "白菜",
+    "keyword": "白菜、大白菜、娃娃菜",
+    "source": "iconfont.cn repository 74783"
+  },
+  {
+    "id": 7826835,
+    "file": "food-pork.svg",
+    "name": "猪肉脯",
+    "keyword": "猪肉、五花肉、里脊、肉馅",
+    "source": "iconfont.cn repository 158127"
+  },
+  {
+    "id": 47040074,
+    "file": "food-beef.svg",
+    "name": "牛肉",
+    "keyword": "牛肉、牛排、肥牛",
+    "source": "iconfont.cn repository 551530"
+  },
+  {
+    "id": 47040060,
+    "file": "food-ribs.svg",
+    "name": "排骨",
+    "keyword": "排骨、肋排、小排",
+    "source": "iconfont.cn repository 551530"
+  },
+  {
+    "id": 47040057,
+    "file": "food-greens.svg",
+    "name": "青菜",
+    "keyword": "青菜、上海青、油菜、菜心",
+    "source": "iconfont.cn repository 551530"
+  },
+  {
+    "id": 47040067,
+    "file": "food-chicken-cut.svg",
+    "name": "鸡肉",
+    "keyword": "鸡肉、鸡胸、鸡胸肉",
+    "source": "iconfont.cn repository 551530"
+  },
+  {
+    "id": 3869518,
+    "file": "food-hotpot.svg",
+    "name": "火锅",
+    "keyword": "火锅、涮锅",
+    "source": "iconfont.cn repository 88617"
+  },
+  {
+    "id": 4185104,
+    "file": "food-soup.svg",
+    "name": "汤",
+    "keyword": "汤、鸡汤、骨头汤、排骨汤、紫菜汤",
+    "source": "iconfont.cn repository 56275"
+  },
+  {
+    "id": 40195949,
+    "file": "food-fried-rice.svg",
+    "name": "蛋炒饭",
+    "keyword": "炒饭、蛋炒饭、扬州炒饭",
+    "source": "iconfont.cn repository 614950"
+  },
+  {
+    "id": 20861386,
+    "file": "food-tomato-egg.svg",
+    "name": "番茄炒蛋",
+    "keyword": "番茄炒蛋、西红柿炒鸡蛋",
+    "source": "iconfont.cn repository 347660"
   }
 ]
