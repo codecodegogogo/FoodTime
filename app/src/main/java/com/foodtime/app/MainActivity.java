@@ -129,12 +129,24 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public String appVersion() {
-            return BuildConfig.VERSION_NAME;
+            return currentAppVersion();
         }
 
         @JavascriptInterface
         public void openExternal(String url) {
             runOnUiThread(() -> openExternalUrl(url));
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private String currentAppVersion() {
+        try {
+            String versionName = getPackageManager()
+                    .getPackageInfo(getPackageName(), 0)
+                    .versionName;
+            return versionName == null || versionName.trim().isEmpty() ? "0.1.0" : versionName;
+        } catch (PackageManager.NameNotFoundException ignored) {
+            return "0.1.0";
         }
     }
 
