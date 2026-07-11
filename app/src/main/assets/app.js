@@ -5,6 +5,7 @@
   const CLEAR_ALL_AT_KEY = "foodtime.clearAllAt.v1";
   const THEME_SETTINGS_KEY = "foodtime.themeSettings.v1";
   const NOTIFICATION_SETTINGS_KEY = "foodtime.notificationSettings.v1";
+  const FOLDER_STORAGE_KEY = "foodtime.folders.v1";
   const DEFAULT_ADD_ICON = "icons/meal-provided.svg";
   const FIXED_DAILY_REMINDER_TIMES = ["09:00", "15:00", "20:00"];
   const ONE_DAY = 24 * 60 * 60 * 1000;
@@ -22,6 +23,7 @@
     stats: ".phone-stats",
     profile: ".phone-profile",
     settings: ".phone-settings",
+    folderSettings: ".phone-folder-settings",
     syncSettings: ".phone-sync-settings",
     themeSettings: ".phone-theme-settings",
     notificationSettings: ".phone-notification-settings",
@@ -221,9 +223,9 @@
     if (!control || control.matches(":disabled")) return;
 
     let type = "tap";
-    if (control.matches(".confirm-delete-action, .history-clear-action, [data-sheet-action='spoiled']")) {
+    if (control.matches(".confirm-delete-action, .history-clear-action, .folder-delete-action, [data-sheet-action='spoiled']")) {
       type = "reject";
-    } else if (control.matches(".confirm-add-button, .primary-action, .sync-now-button, .restore-action, [data-sheet-action='eaten'], [data-sheet-action='delay']")) {
+    } else if (control.matches(".confirm-add-button, .primary-action, .sync-now-button, .restore-action, .folder-add-action, .folder-rename-action[data-mode='save'], [data-sheet-action='eaten'], [data-sheet-action='delay']")) {
       type = "confirm";
     } else if (control.matches(".segmented button, .home-folder-options button, .storage-chips button, .choice-options button, .theme-inline-options button, .theme-options button, .history-filters button, .tabbar span, .stepper button, .unit-option-grid button")) {
       type = "selection";
@@ -296,6 +298,7 @@
       updatedAt: nowIso(),
       clearedAt: localStorage.getItem(CLEAR_ALL_AT_KEY) || "",
       foods: loadFoods().map(foodForSync),
+      folders: existingFolders(),
     };
   }
 
@@ -318,14 +321,15 @@
   }
 
   function parseRemotePayload(body) {
-    if (!body) return { foods: [], clearedAt: "" };
+    if (!body) return { foods: [], folders: [], clearedAt: "" };
     const parsed = JSON.parse(body);
     if (Array.isArray(parsed)) {
-      return { foods: normalizeFoods(parsed), clearedAt: "" };
+      return { foods: normalizeFoods(parsed), folders: [], clearedAt: "" };
     }
 
     return {
       foods: normalizeFoods(parsed.foods),
+      folders: normalizeFolderList(parsed.folders),
       clearedAt: parsed.clearedAt || "",
     };
   }
@@ -406,8 +410,10 @@
 
     if (!result.missing && result.body) {
       try {
-        const merged = mergeRemotePayload(loadFoods(), parseRemotePayload(result.body));
+        const remotePayload = parseRemotePayload(result.body);
+        const merged = mergeRemotePayload(loadFoods(), remotePayload);
         saveFoods(merged, { skipSync: true });
+        saveFolderNames([...existingFolders(), ...remotePayload.folders], { skipSync: true });
         renderAll();
       } catch (error) {
         syncInFlight = false;
@@ -762,6 +768,7 @@
     renderSyncSummary();
     renderThemeSummary();
     renderNotificationSummary();
+    renderFolderManagement();
   }
 
   function isSingleScreenMode() {
@@ -793,7 +800,7 @@
 
   function syncTabbars(screenName) {
     const fridgeActive = ["home", "homeSheet", "fridge", "room"].includes(screenName);
-    const profileActive = ["profile", "settings", "syncSettings", "themeSettings", "notificationSettings", "history"].includes(screenName);
+    const profileActive = ["profile", "settings", "folderSettings", "syncSettings", "themeSettings", "notificationSettings", "history"].includes(screenName);
     document.querySelectorAll(".tabbar").forEach((bar) => {
       const tabs = Array.from(bar.querySelectorAll("span"));
       tabs.forEach((tab, index) => {
@@ -904,12 +911,34 @@
   }
 
   function normalizedFolderName(value) {
-    const normalized = String(value || "").trim() || "默认";
-    return Array.from(normalized).slice(0, 5).join("");
+    return folderNameValue(value) || "默认";
+  }
+
+  function folderNameValue(value) {
+    return Array.from(String(value || "").trim()).slice(0, 5).join("");
+  }
+
+  function normalizeFolderList(values) {
+    const folders = [];
+    (Array.isArray(values) ? values : []).forEach((value) => {
+      const folder = folderNameValue(value);
+      if (!folder) return;
+      if (!folders.some((item) => item.toLocaleLowerCase() === folder.toLocaleLowerCase())) {
+        folders.push(folder);
+      }
+    });
+    return folders;
   }
 
   function existingFolders() {
-    const folders = ["默认"];
+    let storedFolders = [];
+    try {
+      storedFolders = normalizeFolderList(JSON.parse(localStorage.getItem(FOLDER_STORAGE_KEY) || "[]"));
+    } catch (error) {
+      localStorage.removeItem(FOLDER_STORAGE_KEY);
+    }
+
+    const folders = normalizeFolderList(["默认", ...storedFolders]);
     loadFoods().forEach((food) => {
       const folder = normalizedFolderName(food.folder);
       if (!folders.some((item) => item.toLocaleLowerCase() === folder.toLocaleLowerCase())) {
@@ -917,6 +946,15 @@
       }
     });
     return folders;
+  }
+
+  function saveFolderNames(folders, options = {}) {
+    const normalized = normalizeFolderList(["默认", ...folders]);
+    localStorage.setItem(FOLDER_STORAGE_KEY, JSON.stringify(normalized));
+    if (!options.skipSync) scheduleSync();
+    renderFolderManagement();
+    renderHomeScreens();
+    renderFolderOptions();
   }
 
   function resolveFolderName(value) {
@@ -936,6 +974,102 @@
     grid.innerHTML = existingFolders()
       .map((folder) => `<button type="button" data-value="${escapeHtml(folder)}" class="${folder.toLocaleLowerCase() === current.toLocaleLowerCase() ? "active" : ""}">${escapeHtml(folder)}</button>`)
       .join("");
+  }
+
+  function renderFolderManagement() {
+    const folders = existingFolders();
+    document.querySelectorAll(".folder-summary-text").forEach((item) => {
+      item.textContent = `${folders.length} 个文件夹`;
+    });
+
+    const list = screenElement("folderSettings")?.querySelector(".folder-manage-list");
+    if (!list) return;
+    list.innerHTML = folders
+      .map((folder) => {
+        const isDefault = folder === "默认";
+        return `
+          <article class="folder-manage-row" data-folder="${escapeHtml(folder)}">
+            <img src="icon/更多.svg" alt="" />
+            <input value="${escapeHtml(folder)}" maxlength="5" aria-label="文件夹名称" readonly />
+            <div class="folder-manage-actions">
+              <button class="folder-rename-action" type="button" ${isDefault ? "disabled" : ""}>重命名</button>
+              <button class="folder-delete-action" type="button" ${isDefault ? "disabled" : ""}>删除</button>
+            </div>
+          </article>
+        `;
+      })
+      .join("");
+  }
+
+  function addManagedFolder() {
+    const input = screenElement("folderSettings")?.querySelector("[aria-label='新文件夹名称']");
+    if (!input) return;
+    const folder = folderNameValue(input.value);
+    if (!folder) {
+      input.focus();
+      return;
+    }
+    if (existingFolders().some((item) => item.toLocaleLowerCase() === folder.toLocaleLowerCase())) {
+      input.select();
+      return;
+    }
+    saveFolderNames([...existingFolders(), folder]);
+    input.value = "";
+  }
+
+  function renameManagedFolder(button) {
+    const row = button.closest(".folder-manage-row");
+    const input = row?.querySelector("[aria-label='文件夹名称']");
+    const original = row?.dataset.folder || "";
+    if (!row || !input || !original || original === "默认") return;
+
+    if (button.dataset.mode !== "save") {
+      input.readOnly = false;
+      input.focus();
+      input.select();
+      button.dataset.mode = "save";
+      button.textContent = "保存";
+      return;
+    }
+
+    const nextName = folderNameValue(input.value);
+    const duplicate = existingFolders().some((folder) => (
+      folder.toLocaleLowerCase() === nextName.toLocaleLowerCase() &&
+      folder.toLocaleLowerCase() !== original.toLocaleLowerCase()
+    ));
+    if (!nextName || duplicate) {
+      input.focus();
+      input.select();
+      return;
+    }
+
+    const foods = loadFoods().map((food) => (
+      normalizedFolderName(food.folder).toLocaleLowerCase() === original.toLocaleLowerCase()
+        ? { ...food, folder: nextName, updatedAt: nowIso() }
+        : food
+    ));
+    const folders = existingFolders().map((folder) => folder === original ? nextName : folder);
+    if (currentHomeFolder === original) currentHomeFolder = nextName;
+    saveFolderNames(folders, { skipSync: true });
+    saveFoods(foods);
+    renderAll();
+  }
+
+  function deleteManagedFolder(button) {
+    const row = button.closest(".folder-manage-row");
+    const folder = row?.dataset.folder || "";
+    if (!folder || folder === "默认") return;
+
+    const foods = loadFoods().map((food) => (
+      normalizedFolderName(food.folder).toLocaleLowerCase() === folder.toLocaleLowerCase()
+        ? { ...food, folder: "默认", updatedAt: nowIso() }
+        : food
+    ));
+    const folders = existingFolders().filter((item) => item !== folder);
+    if (currentHomeFolder === folder) currentHomeFolder = "全部";
+    saveFolderNames(folders, { skipSync: true });
+    saveFoods(foods);
+    renderAll();
   }
 
   function closeUnitModal() {
@@ -1462,7 +1596,7 @@
 
   function clearAllFoodData() {
     const count = loadFoods().length;
-    if (!count) {
+    if (!count && existingFolders().length === 1) {
       updateSyncStatus("本地没有需要清除的食物数据");
       return;
     }
@@ -1474,6 +1608,7 @@
     homeFolderExpanded = false;
     currentHistoryFilter = "已吃完";
     saveFoods([], { skipSync: true });
+    localStorage.setItem(FOLDER_STORAGE_KEY, JSON.stringify(["默认"]));
     renderAll();
     showScreen("history", { replace: true });
     updateSyncStatus(syncSettingsReady() ? "本地已清空 · 正在同步云端清空" : "本地已清空 · 云端清空待同步设置");
@@ -1845,6 +1980,31 @@
       return;
     }
 
+    const folderSettingsButton = target.closest(".folder-settings-button");
+    if (folderSettingsButton) {
+      renderFolderManagement();
+      showScreen("folderSettings");
+      return;
+    }
+
+    const folderAddAction = target.closest(".folder-add-action");
+    if (folderAddAction) {
+      addManagedFolder();
+      return;
+    }
+
+    const folderRenameAction = target.closest(".folder-rename-action");
+    if (folderRenameAction) {
+      renameManagedFolder(folderRenameAction);
+      return;
+    }
+
+    const folderDeleteAction = target.closest(".folder-delete-action");
+    if (folderDeleteAction) {
+      deleteManagedFolder(folderDeleteAction);
+      return;
+    }
+
     const inlineThemeOption = target.closest(".theme-inline-options button");
     if (inlineThemeOption) {
       saveThemeMode(inlineThemeOption.dataset.themeMode || "light");
@@ -1941,6 +2101,10 @@
     const folderInput = event.target.closest(".phone-add [aria-label='存放文件夹']");
     if (folderInput) {
       folderInput.value = Array.from(folderInput.value).slice(0, 5).join("");
+    }
+    const managedFolderInput = event.target.closest(".phone-folder-settings input");
+    if (managedFolderInput) {
+      managedFolderInput.value = Array.from(managedFolderInput.value).slice(0, 5).join("");
     }
     if (event.target.closest(".phone-add [aria-label='食物名称']")) {
       updatePhotoPreviewFromName();

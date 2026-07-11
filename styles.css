@@ -4,8 +4,8 @@
   --line: #dfe8df;
   --paper: #fbf8ef;
   --surface: #ffffff;
-  --mint: #68c990;
-  --mint-dark: #68c990;
+  --mint: #5fc486;
+  --mint-dark: #5fc486;
   --leaf: #57a773;
   --coral: #f07867;
   --yellow: #f8c85f;
@@ -24,8 +24,8 @@ html.theme-system-dark {
   --line: #31443d;
   --paper: #101917;
   --surface: #182521;
-  --mint: #68c990;
-  --mint-dark: #68c990;
+  --mint: #5fc486;
+  --mint-dark: #5fc486;
   --shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
 }
 
@@ -36,8 +36,8 @@ html.theme-system-dark {
     --line: #31443d;
     --paper: #101917;
     --surface: #182521;
-    --mint: #68c990;
-    --mint-dark: #68c990;
+    --mint: #5fc486;
+    --mint-dark: #5fc486;
     --shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
   }
 }
@@ -1450,15 +1450,15 @@ legend {
 
 .chips button.active,
 .theme-options button.active {
-  border-color: #68c990;
+  border-color: #5fc486;
   color: #103e26;
   background: var(--mint-dark);
-  box-shadow: 0 8px 18px rgba(104, 201, 144, 0.22);
+  box-shadow: 0 8px 18px rgba(95, 196, 134, 0.22);
 }
 
 .quantity-input:focus,
 .reminder-input:focus {
-  border-color: #68c990;
+  border-color: #5fc486;
   background-color: #eef8ef;
 }
 
@@ -2010,6 +2010,89 @@ legend {
   --setting-icon-filter: none;
 }
 
+.folder-dot {
+  --setting-icon: url("icon/更多.svg");
+  --setting-icon-filter: none;
+}
+
+.folder-manager-panel {
+  margin: 0 20px;
+}
+
+.folder-create-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 72px;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.folder-create-row input,
+.folder-manage-row input {
+  min-height: 44px;
+  margin: 0;
+  border-radius: 12px;
+}
+
+.folder-add-action {
+  min-height: 44px;
+  border-radius: 12px;
+  color: #103e26;
+  background: var(--mint-dark);
+  font-weight: 900;
+}
+
+.folder-manage-list {
+  border-top: 1px solid var(--line);
+}
+
+.folder-manage-row {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  min-height: 72px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.folder-manage-row > img {
+  display: block;
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
+
+.folder-manage-row input[readonly] {
+  border-color: transparent;
+  background: transparent;
+}
+
+.folder-manage-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.folder-manage-actions button {
+  min-width: 44px;
+  min-height: 36px;
+  padding: 0 8px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--ink);
+  background: var(--surface);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.folder-manage-actions .folder-delete-action:not(:disabled) {
+  color: #a24b45;
+}
+
+.folder-manage-actions button:disabled {
+  opacity: 0.34;
+  cursor: default;
+}
+
 .settings-hint {
   margin: -2px 0 18px;
   color: var(--muted);
@@ -2503,14 +2586,14 @@ html.theme-dark .theme-options button.active,
 html.theme-system-dark .theme-options button.active,
 html.theme-dark .history-filters .active,
 html.theme-system-dark .history-filters .active {
-  border-color: #68c990;
+  border-color: #5fc486;
   color: #07110e;
-  background-color: #68c990;
+  background-color: #5fc486;
 }
 
 html.theme-dark .tabbar .active,
 html.theme-system-dark .tabbar .active {
-  color: #68c990;
+  color: #5fc486;
   background-color: transparent;
   box-shadow: none;
 }
@@ -2518,7 +2601,7 @@ html.theme-system-dark .tabbar .active {
 html.theme-dark .primary-action,
 html.theme-system-dark .primary-action {
   color: #07110e;
-  background-color: #68c990;
+  background-color: #5fc486;
 }
 
 html.theme-dark .photo-area > button,
@@ -2532,7 +2615,7 @@ html.theme-system-dark .photo-area.is-captured button {
 html.theme-dark .phone-add > .primary-action,
 html.theme-system-dark .phone-add > .primary-action {
   border-color: transparent;
-  background: #68c990;
+  background: #5fc486;
   box-shadow: none;
 }
 
@@ -2541,7 +2624,7 @@ html.theme-system-dark .stepper button:active,
 html.theme-dark .mini-stepper button:active,
 html.theme-system-dark .mini-stepper button:active {
   color: #07110e;
-  background-color: #68c990;
+  background-color: #5fc486;
 }
 
 html.theme-dark .sync-now-button.is-syncing,
@@ -2687,13 +2770,13 @@ html.theme-system-dark .sync-now-button.is-syncing {
   html.theme-system .choice-options .active,
   html.theme-system .theme-options button.active,
   html.theme-system .history-filters .active {
-    border-color: #68c990;
+    border-color: #5fc486;
     color: #07110e;
-    background-color: #68c990;
+    background-color: #5fc486;
   }
 
   html.theme-system .tabbar .active {
-    color: #68c990;
+    color: #5fc486;
     background-color: transparent;
     box-shadow: none;
   }
@@ -2702,7 +2785,7 @@ html.theme-system-dark .sync-now-button.is-syncing {
   html.theme-system .photo-area > button,
   html.theme-system .photo-area.is-captured button {
     color: #07110e;
-    background-color: #68c990;
+    background-color: #5fc486;
   }
 
   html.theme-system .photo-area > button,
@@ -2713,14 +2796,14 @@ html.theme-system-dark .sync-now-button.is-syncing {
 
   html.theme-system .phone-add > .primary-action {
     border-color: transparent;
-    background: #68c990;
+    background: #5fc486;
     box-shadow: none;
   }
 
   html.theme-system .stepper button:active,
   html.theme-system .mini-stepper button:active {
     color: #07110e;
-    background-color: #68c990;
+    background-color: #5fc486;
   }
 
   html.theme-system .sync-now-button.is-syncing {
