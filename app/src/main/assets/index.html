@@ -147,7 +147,7 @@
           </button>
         </header>
 
-        <section class="photo-area">
+        <section class="photo-area is-icon-preview" style="--preview-icon: url('icons/meal-provided.svg')">
           <div class="plate-illustration" aria-hidden="true">
             <span class="photo-shelf"></span>
             <span class="plate"></span>
@@ -186,9 +186,9 @@
               <span>数量</span>
               <div class="field-control split-control">
                 <input class="quantity-input" value="" inputmode="decimal" aria-label="数量" />
-                <input type="hidden" value="" aria-label="数量单位" />
+                <input type="hidden" value="斤" aria-label="数量单位" />
                 <button class="unit-picker-button" type="button" aria-label="选择数量单位">
-                  <span class="unit-picker-label"></span>
+                  <span class="unit-picker-label">斤</span>
                 </button>
               </div>
             </label>
@@ -196,7 +196,7 @@
             <fieldset class="storage-field">
               <legend>存放位置</legend>
               <div class="chips storage-chips">
-              <button type="button">冰箱</button>
+              <button type="button" class="active">冰箱</button>
               <button type="button">常温</button>
               </div>
             </fieldset>
@@ -207,9 +207,9 @@
               <span>提醒时间</span>
               <div class="field-control split-control">
                 <input class="reminder-input" value="" inputmode="decimal" aria-label="提醒数值" />
-                <input type="hidden" value="" aria-label="提醒单位" />
+                <input type="hidden" value="天" aria-label="提醒单位" />
                 <button class="reminder-unit-picker-button" type="button" aria-label="选择提醒单位">
-                  <span class="reminder-unit-picker-label"></span>
+                  <span class="reminder-unit-picker-label">天</span>
                 </button>
               </div>
             </label>
@@ -217,7 +217,7 @@
             <label class="form-field folder-field">
               <span>存放文件夹</span>
               <div class="field-control field-control-action">
-                <input value="" aria-label="存放文件夹" />
+                <input value="默认" maxlength="5" aria-label="存放文件夹" />
                 <button class="field-icon-button folder-more-button" type="button" aria-label="更多存放文件夹">
                   <img src="icon/更多.svg" alt="" />
                 </button>
@@ -394,7 +394,7 @@
             <div class="setting-dot notice-dot"></div>
             <div class="setting-copy">
               <h2>提醒通知</h2>
-              <p class="notification-summary-text">每天 09:00，紧急提醒 3 天</p>
+              <p class="notification-summary-text">每天 09:00、15:00、20:00，延期 1 天</p>
             </div>
           </button>
         </section>
@@ -467,18 +467,16 @@
         </header>
 
         <section class="setting-list settings-form">
+          <div class="fixed-reminder-times" aria-label="每日固定提醒时间">
+            <strong>每日固定提醒</strong>
+            <span>09:00 · 15:00 · 20:00</span>
+          </div>
           <fieldset>
-            <legend>每天提醒时间</legend>
-            <div class="notification-input-grid">
-              <label>
-                <input type="number" value="9" min="0" max="23" inputmode="numeric" aria-label="提醒小时" />
-                <span>时</span>
-              </label>
-              <label>
-                <input type="number" value="0" min="0" max="59" inputmode="numeric" aria-label="提醒分钟" />
-                <span>分</span>
-              </label>
-            </div>
+            <legend>每次延期时间</legend>
+            <label class="inline-number-field">
+              <input type="number" value="1" min="1" max="30" inputmode="numeric" aria-label="延期天数" />
+              <span>天</span>
+            </label>
           </fieldset>
           <fieldset>
             <legend>紧急提醒范围</legend>

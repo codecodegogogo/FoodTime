@@ -1440,6 +1440,30 @@ legend {
   margin-top: 8px;
 }
 
+.fixed-reminder-times {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  color: var(--ink);
+  background: var(--surface);
+}
+
+.fixed-reminder-times strong {
+  font-size: 14px;
+}
+
+.fixed-reminder-times span {
+  color: var(--mint-dark);
+  font-size: 13px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
 .notification-input-grid label,
 .inline-number-field {
   display: grid;

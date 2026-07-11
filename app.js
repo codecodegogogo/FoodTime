@@ -5,6 +5,8 @@
   const CLEAR_ALL_AT_KEY = "foodtime.clearAllAt.v1";
   const THEME_SETTINGS_KEY = "foodtime.themeSettings.v1";
   const NOTIFICATION_SETTINGS_KEY = "foodtime.notificationSettings.v1";
+  const DEFAULT_ADD_ICON = "icons/meal-provided.svg";
+  const FIXED_DAILY_REMINDER_TIMES = ["09:00", "15:00", "20:00"];
   const ONE_DAY = 24 * 60 * 60 * 1000;
   const PHOTO_THUMB_MAX_SIDE = 160;
   const PHOTO_THUMB_MIN_SIDE = 96;
@@ -130,6 +132,13 @@
 
   function nowIso() {
     return new Date().toISOString();
+  }
+
+  function localDateString(value = new Date()) {
+    const year = value.getFullYear();
+    const month = String(value.getMonth() + 1).padStart(2, "0");
+    const day = String(value.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   }
 
   function formatClock(value = new Date()) {
@@ -875,7 +884,8 @@
   }
 
   function normalizedFolderName(value) {
-    return String(value || "").trim() || "默认";
+    const normalized = String(value || "").trim() || "默认";
+    return Array.from(normalized).slice(0, 5).join("");
   }
 
   function existingFolders() {
@@ -1009,8 +1019,8 @@
 
     const name = formValue(".phone-add [aria-label='食物名称']");
     if (!name) {
-      area.classList.remove("is-icon-preview");
-      area.style.removeProperty("--preview-icon");
+      area.classList.add("is-icon-preview");
+      area.style.setProperty("--preview-icon", `url("${DEFAULT_ADD_ICON}")`);
       delete area.dataset.previewLabel;
       const illustration = area.querySelector(".plate-illustration");
       if (illustration) delete illustration.dataset.previewLabel;
@@ -1154,38 +1164,23 @@
   function loadNotificationSettings() {
     try {
       const settings = JSON.parse(localStorage.getItem(NOTIFICATION_SETTINGS_KEY) || "{}");
-      const dailyTime = /^\d{2}:\d{2}$/.test(settings.dailyTime || "") ? settings.dailyTime : "09:00";
       const emergencyDays = Math.min(30, Math.max(1, Number.parseInt(settings.emergencyDays, 10) || 3));
-      return { dailyTime, emergencyDays };
+      const delayDays = Math.min(30, Math.max(1, Number.parseInt(settings.delayDays, 10) || 1));
+      return { dailyTimes: FIXED_DAILY_REMINDER_TIMES, emergencyDays, delayDays };
     } catch (error) {
       localStorage.removeItem(NOTIFICATION_SETTINGS_KEY);
-      return { dailyTime: "09:00", emergencyDays: 3 };
+      return { dailyTimes: FIXED_DAILY_REMINDER_TIMES, emergencyDays: 3, delayDays: 1 };
     }
   }
 
   function notificationSummary(settings = loadNotificationSettings()) {
-    return `每天 ${settings.dailyTime}，紧急提醒 ${settings.emergencyDays} 天`;
+    return `每天 09:00、15:00、20:00，延期 ${settings.delayDays} 天`;
   }
 
   function clampNumber(value, min, max, fallback) {
     const parsed = Number.parseInt(value, 10);
     if (Number.isNaN(parsed)) return fallback;
     return Math.min(max, Math.max(min, parsed));
-  }
-
-  function splitDailyTime(value) {
-    const normalized = /^\d{2}:\d{2}$/.test(value || "") ? value : "09:00";
-    const [hour, minute] = normalized.split(":").map((item) => Number.parseInt(item, 10));
-    return {
-      hour: clampNumber(hour, 0, 23, 9),
-      minute: clampNumber(minute, 0, 59, 0),
-    };
-  }
-
-  function joinDailyTime(hour, minute) {
-    const safeHour = String(clampNumber(hour, 0, 23, 9)).padStart(2, "0");
-    const safeMinute = String(clampNumber(minute, 0, 59, 0)).padStart(2, "0");
-    return `${safeHour}:${safeMinute}`;
   }
 
   function renderNotificationSummary(settings = loadNotificationSettings()) {
@@ -1199,12 +1194,9 @@
     const screen = screenElement("notificationSettings");
     if (!screen) return;
 
-    const dailyTime = splitDailyTime(settings.dailyTime);
-    const dailyHour = screen.querySelector("[aria-label='提醒小时']");
-    const dailyMinute = screen.querySelector("[aria-label='提醒分钟']");
+    const delayDays = screen.querySelector("[aria-label='延期天数']");
     const emergencyDays = screen.querySelector("[aria-label='紧急提醒天数']");
-    if (dailyHour) dailyHour.value = dailyTime.hour;
-    if (dailyMinute) dailyMinute.value = dailyTime.minute;
+    if (delayDays) delayDays.value = settings.delayDays;
     if (emergencyDays) emergencyDays.value = settings.emergencyDays;
     renderNotificationSummary(settings);
   }
@@ -1214,10 +1206,8 @@
     if (!screen) return;
 
     const settings = {
-      dailyTime: joinDailyTime(
-        screen.querySelector("[aria-label='提醒小时']")?.value,
-        screen.querySelector("[aria-label='提醒分钟']")?.value,
-      ),
+      dailyTimes: FIXED_DAILY_REMINDER_TIMES,
+      delayDays: clampNumber(screen.querySelector("[aria-label='延期天数']")?.value, 1, 30, 1),
       emergencyDays: clampNumber(screen.querySelector("[aria-label='紧急提醒天数']")?.value, 1, 30, 3),
       emergencySchedule: [720, 360, 180, 90, 45, 30],
       updatedAt: nowIso(),
@@ -1240,14 +1230,14 @@
     editingFoodId = null;
     setAddFormMode(false);
     add.querySelector("[aria-label='食物名称']").value = "";
-    clearPurchaseDateValue();
+    setPurchaseDateValue(localDateString());
     add.querySelector("[aria-label='数量']").value = "";
-    setQuantityUnit("");
+    setQuantityUnit("斤");
     add.querySelector("[aria-label='提醒数值']").value = "";
-    setReminderUnit("");
-    add.querySelector("[aria-label='存放文件夹']").value = "";
+    setReminderUnit("天");
+    add.querySelector("[aria-label='存放文件夹']").value = "默认";
     add.querySelectorAll(".storage-chips button").forEach((button, index) => {
-      button.classList.remove("active");
+      button.classList.toggle("active", index === 0);
     });
     clearCapturedPhoto(add.querySelector(".photo-area"));
   }
@@ -1273,10 +1263,11 @@
   }
 
   function saveFoodFromForm() {
-    const name = formValue(".phone-add [aria-label='食物名称']") || "未命名食物";
+    const enteredName = formValue(".phone-add [aria-label='食物名称']");
+    const name = enteredName || "未命名食物";
     const purchaseDate = formValue(".phone-add [aria-label='购买时间']") || today.toISOString().slice(0, 10);
     const quantity = formValue(".phone-add [aria-label='数量']") || "1";
-    const unit = formValue(".phone-add [aria-label='数量单位']") || "个";
+    const unit = formValue(".phone-add [aria-label='数量单位']") || "斤";
     const storage = selectedOption(".phone-add .storage-chips .active") || "冰箱";
     const folder = resolveFolderName(formValue(".phone-add [aria-label='存放文件夹']"));
     const remindValue = reminderAmount(formValue(".phone-add [aria-label='提醒数值']"));
@@ -1284,7 +1275,7 @@
     const remindDays = reminderDaysCompat(remindValue, remindUnit);
     const purchaseAt = purchaseDate === today.toISOString().slice(0, 10) ? nowIso() : `${purchaseDate}T00:00:00`;
     const foods = loadFoods();
-    const visual = foodIconDefForName(name);
+    const visual = enteredName ? foodIconDefForName(name) : { type: "meal", file: DEFAULT_ADD_ICON };
 
     if (editingFoodId) {
       const food = foods.find((item) => item.id === editingFoodId);
@@ -1411,7 +1402,8 @@
     const food = foods.find((item) => item.id === selectedFoodId);
     if (!food) return;
 
-    const delayedDays = reminderDaysCompat(foodReminderMinutes(food) + 24 * 60, "分钟");
+    const delayDays = loadNotificationSettings().delayDays;
+    const delayedDays = reminderDaysCompat(foodReminderMinutes(food) + delayDays * 24 * 60, "分钟");
     food.remindValue = delayedDays;
     food.remindUnit = "天";
     food.remindDays = delayedDays;
@@ -1925,6 +1917,10 @@
   }
 
   function handleInput(event) {
+    const folderInput = event.target.closest(".phone-add [aria-label='存放文件夹']");
+    if (folderInput) {
+      folderInput.value = Array.from(folderInput.value).slice(0, 5).join("");
+    }
     if (event.target.closest(".phone-add [aria-label='食物名称']")) {
       updatePhotoPreviewFromName();
     }

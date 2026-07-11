@@ -37,7 +37,8 @@ final class FoodTimeNotificationScheduler {
     private static final String KEY_EMERGENCY_IDS = "emergency_ids";
     private static final String LEVEL_PREFIX = "level_";
     private static final String SIGNATURE_PREFIX = "signature_";
-    private static final int DAILY_REQUEST = 4101;
+    private static final int[] DAILY_HOURS = {9, 15, 20};
+    private static final int[] DAILY_REQUESTS = {4101, 4103, 4104};
     private static final int EMERGENCY_REQUEST = 4102;
     private static final long MINUTE = 60L * 1000L;
     private static final long DAY = 24L * 60L * 60L * 1000L;
@@ -95,17 +96,17 @@ final class FoodTimeNotificationScheduler {
     }
 
     private static void scheduleDaily(Context context) {
-        NotificationSettings settings = settings(context);
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, settings.dailyHour);
-        calendar.set(Calendar.MINUTE, settings.dailyMinute);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        if (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
-            calendar.add(Calendar.DAY_OF_YEAR, 1);
+        for (int index = 0; index < DAILY_HOURS.length; index++) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.HOUR_OF_DAY, DAILY_HOURS[index]);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+            if (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
+                calendar.add(Calendar.DAY_OF_YEAR, 1);
+            }
+            scheduleAlarm(context, ACTION_DAILY, DAILY_REQUESTS[index], calendar.getTimeInMillis());
         }
-
-        scheduleAlarm(context, ACTION_DAILY, DAILY_REQUEST, calendar.getTimeInMillis());
     }
 
     private static void scheduleEmergency(Context context) {
@@ -332,23 +333,15 @@ final class FoodTimeNotificationScheduler {
     }
 
     private static final class NotificationSettings {
-        final int dailyHour;
-        final int dailyMinute;
         final int emergencyDays;
 
-        NotificationSettings(int dailyHour, int dailyMinute, int emergencyDays) {
-            this.dailyHour = dailyHour;
-            this.dailyMinute = dailyMinute;
+        NotificationSettings(int emergencyDays) {
             this.emergencyDays = emergencyDays;
         }
 
         static NotificationSettings from(JSONObject json) {
-            String time = json.optString("dailyTime", "09:00");
-            String[] parts = time.split(":");
-            int hour = clamp(parts.length > 0 ? parseInt(parts[0], 9) : 9, 0, 23);
-            int minute = clamp(parts.length > 1 ? parseInt(parts[1], 0) : 0, 0, 59);
             int emergencyDays = clamp(json.optInt("emergencyDays", 3), 1, 30);
-            return new NotificationSettings(hour, minute, emergencyDays);
+            return new NotificationSettings(emergencyDays);
         }
     }
 
