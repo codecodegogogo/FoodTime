@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Base64;
+import android.view.HapticFeedbackConstants;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -50,6 +51,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         webView = new WebView(this);
+        webView.setHapticFeedbackEnabled(true);
         setContentView(webView);
 
         WebSettings settings = webView.getSettings();
@@ -119,6 +121,30 @@ public class MainActivity extends Activity {
         public void showDatePicker(String currentDate) {
             runOnUiThread(() -> openDatePicker(currentDate));
         }
+
+        @JavascriptInterface
+        public void haptic(String type) {
+            runOnUiThread(() -> performHapticFeedback(type));
+        }
+    }
+
+    private void performHapticFeedback(String type) {
+        if (webView == null) {
+            return;
+        }
+
+        int feedback = HapticFeedbackConstants.VIRTUAL_KEY;
+        if ("selection".equals(type)) {
+            feedback = HapticFeedbackConstants.CLOCK_TICK;
+        } else if ("confirm".equals(type) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            feedback = HapticFeedbackConstants.CONFIRM;
+        } else if ("reject".equals(type)) {
+            feedback = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+                    ? HapticFeedbackConstants.REJECT
+                    : HapticFeedbackConstants.LONG_PRESS;
+        }
+
+        webView.performHapticFeedback(feedback);
     }
 
     private void openDatePicker(String currentDate) {

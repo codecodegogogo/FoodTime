@@ -281,7 +281,7 @@ final class FoodTimeNotificationScheduler {
             JSONObject json = new JSONObject(raw);
             return NotificationSettings.from(json);
         } catch (Exception ignored) {
-            return new NotificationSettings(9, 0, 3);
+            return new NotificationSettings(3);
         }
     }
 

@@ -216,6 +216,26 @@
     return Boolean(window.FoodTimeNative && typeof window.FoodTimeNative.updateNotificationPlan === "function");
   }
 
+  function triggerHaptic(target) {
+    const control = target.closest("button, .tabbar span, .stats-grid article, .sync-entry");
+    if (!control || control.matches(":disabled")) return;
+
+    let type = "tap";
+    if (control.matches(".confirm-delete-action, .history-clear-action, [data-sheet-action='spoiled']")) {
+      type = "reject";
+    } else if (control.matches(".confirm-add-button, .primary-action, .sync-now-button, .restore-action, [data-sheet-action='eaten'], [data-sheet-action='delay']")) {
+      type = "confirm";
+    } else if (control.matches(".segmented button, .home-folder-options button, .storage-chips button, .choice-options button, .theme-inline-options button, .theme-options button, .history-filters button, .tabbar span, .stepper button, .unit-option-grid button")) {
+      type = "selection";
+    }
+
+    try {
+      window.FoodTimeNative?.haptic?.(type);
+    } catch (error) {
+      // Haptics are optional and must never block the interaction.
+    }
+  }
+
   function scheduleNativeNotifications(options = {}) {
     if (!nativeNotificationsAvailable()) return;
     window.clearTimeout(notificationTimer);
@@ -1635,6 +1655,7 @@
 
   function handleClick(event) {
     const target = event.target;
+    triggerHaptic(target);
 
     const addButton = target.closest(".icon-button");
     if (addButton && addButton.closest(".app-header")) {

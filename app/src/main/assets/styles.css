@@ -4,8 +4,8 @@
   --line: #dfe8df;
   --paper: #fbf8ef;
   --surface: #ffffff;
-  --mint: #9bd8bd;
-  --mint-dark: #2f8f6b;
+  --mint: #96e8ba;
+  --mint-dark: #96e8ba;
   --leaf: #57a773;
   --coral: #f07867;
   --yellow: #f8c85f;
@@ -24,8 +24,8 @@ html.theme-system-dark {
   --line: #31443d;
   --paper: #101917;
   --surface: #182521;
-  --mint: #65b58f;
-  --mint-dark: #59c292;
+  --mint: #96e8ba;
+  --mint-dark: #96e8ba;
   --shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
 }
 
@@ -36,8 +36,8 @@ html.theme-system-dark {
     --line: #31443d;
     --paper: #101917;
     --surface: #182521;
-    --mint: #65b58f;
-    --mint-dark: #59c292;
+    --mint: #96e8ba;
+    --mint-dark: #96e8ba;
     --shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
   }
 }
@@ -51,7 +51,7 @@ body {
   min-height: 100vh;
   color: var(--ink);
   background:
-    linear-gradient(120deg, rgba(155, 216, 189, 0.28), transparent 36%),
+    linear-gradient(120deg, rgba(150, 232, 186, 0.28), transparent 36%),
     linear-gradient(300deg, rgba(248, 200, 95, 0.22), transparent 34%),
     #f5f0e6;
 }
@@ -95,6 +95,32 @@ button {
 .unit-modal-close,
 .unit-option-grid button {
   cursor: pointer;
+}
+
+button,
+.tabbar span,
+.stats-grid article,
+.sync-entry {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 80ms ease, filter 80ms ease;
+}
+
+button:active,
+.tabbar span:active,
+.stats-grid article:active,
+.sync-entry:active {
+  transform: scale(0.97);
+  filter: brightness(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button,
+  .tabbar span,
+  .stats-grid article,
+  .sync-entry {
+    transition: none;
+  }
 }
 
 .board {
@@ -351,7 +377,7 @@ button {
 
 .segmented .active,
 .chips .active {
-  color: #ffffff;
+  color: #103e26;
   background: var(--mint-dark);
 }
 
@@ -375,7 +401,7 @@ button {
 }
 
 .home-folder-toggle.active {
-  color: #ffffff;
+  color: #103e26;
   border-color: transparent;
   background: var(--mint-dark);
 }
@@ -398,7 +424,7 @@ button {
 }
 
 .home-folder-options button.active {
-  color: #ffffff;
+  color: #103e26;
   background: var(--mint-dark);
 }
 
@@ -607,7 +633,7 @@ button {
   min-height: 54px;
   margin: 22px 20px 0;
   border-radius: 18px;
-  color: #ffffff;
+  color: #103e26;
   background: var(--mint-dark);
   font-size: 16px;
   font-weight: 900;
@@ -1298,7 +1324,7 @@ button {
 }
 
 .unit-option-grid button.active {
-  color: #ffffff;
+  color: #103e26;
   background: var(--mint-dark);
 }
 
@@ -1402,7 +1428,7 @@ legend {
 }
 
 .choice-options button.active {
-  color: #ffffff;
+  color: #103e26;
   background: var(--mint-dark);
 }
 
@@ -1421,15 +1447,15 @@ legend {
 
 .chips button.active,
 .theme-options button.active {
-  border-color: #1f7a58;
-  color: #ffffff;
+  border-color: #96e8ba;
+  color: #103e26;
   background: var(--mint-dark);
-  box-shadow: 0 8px 18px rgba(47, 143, 107, 0.22);
+  box-shadow: 0 8px 18px rgba(150, 232, 186, 0.22);
 }
 
 .quantity-input:focus,
 .reminder-input:focus {
-  border-color: #1f7a58;
+  border-color: #96e8ba;
   background-color: #eef8ef;
 }
 
@@ -1940,7 +1966,7 @@ legend {
 }
 
 .theme-inline-options button.active {
-  color: #ffffff;
+  color: #103e26;
   background: var(--mint-dark);
 }
 
@@ -2077,7 +2103,7 @@ legend {
 }
 
 .history-filters .active {
-  color: #ffffff;
+  color: #103e26;
   background: var(--mint-dark);
 }
 
@@ -2273,7 +2299,7 @@ legend {
 html.theme-dark body,
 html.theme-system-dark body {
   background:
-    linear-gradient(120deg, rgba(89, 194, 146, 0.14), transparent 38%),
+    linear-gradient(120deg, rgba(150, 232, 186, 0.14), transparent 38%),
     linear-gradient(300deg, rgba(120, 171, 212, 0.12), transparent 34%),
     #0b1210;
 }
@@ -2474,14 +2500,14 @@ html.theme-dark .theme-options button.active,
 html.theme-system-dark .theme-options button.active,
 html.theme-dark .history-filters .active,
 html.theme-system-dark .history-filters .active {
-  border-color: #59c292;
+  border-color: #96e8ba;
   color: #07110e;
-  background-color: #78d6a8;
+  background-color: #96e8ba;
 }
 
 html.theme-dark .tabbar .active,
 html.theme-system-dark .tabbar .active {
-  color: #78d6a8;
+  color: #96e8ba;
   background-color: transparent;
   box-shadow: none;
 }
@@ -2489,7 +2515,7 @@ html.theme-system-dark .tabbar .active {
 html.theme-dark .primary-action,
 html.theme-system-dark .primary-action {
   color: #07110e;
-  background-color: #78d6a8;
+  background-color: #96e8ba;
 }
 
 html.theme-dark .photo-area > button,
@@ -2503,7 +2529,7 @@ html.theme-system-dark .photo-area.is-captured button {
 html.theme-dark .phone-add > .primary-action,
 html.theme-system-dark .phone-add > .primary-action {
   border-color: transparent;
-  background: #78d6a8;
+  background: #96e8ba;
   box-shadow: none;
 }
 
@@ -2512,7 +2538,7 @@ html.theme-system-dark .stepper button:active,
 html.theme-dark .mini-stepper button:active,
 html.theme-system-dark .mini-stepper button:active {
   color: #07110e;
-  background-color: #78d6a8;
+  background-color: #96e8ba;
 }
 
 html.theme-dark .sync-now-button.is-syncing,
@@ -2524,7 +2550,7 @@ html.theme-system-dark .sync-now-button.is-syncing {
 @media (prefers-color-scheme: dark) {
   html.theme-system body {
     background:
-      linear-gradient(120deg, rgba(89, 194, 146, 0.14), transparent 38%),
+      linear-gradient(120deg, rgba(150, 232, 186, 0.14), transparent 38%),
       linear-gradient(300deg, rgba(120, 171, 212, 0.12), transparent 34%),
       #0b1210;
   }
@@ -2658,13 +2684,13 @@ html.theme-system-dark .sync-now-button.is-syncing {
   html.theme-system .choice-options .active,
   html.theme-system .theme-options button.active,
   html.theme-system .history-filters .active {
-    border-color: #59c292;
+    border-color: #96e8ba;
     color: #07110e;
-    background-color: #78d6a8;
+    background-color: #96e8ba;
   }
 
   html.theme-system .tabbar .active {
-    color: #78d6a8;
+    color: #96e8ba;
     background-color: transparent;
     box-shadow: none;
   }
@@ -2673,7 +2699,7 @@ html.theme-system-dark .sync-now-button.is-syncing {
   html.theme-system .photo-area > button,
   html.theme-system .photo-area.is-captured button {
     color: #07110e;
-    background-color: #78d6a8;
+    background-color: #96e8ba;
   }
 
   html.theme-system .photo-area > button,
@@ -2684,14 +2710,14 @@ html.theme-system-dark .sync-now-button.is-syncing {
 
   html.theme-system .phone-add > .primary-action {
     border-color: transparent;
-    background: #78d6a8;
+    background: #96e8ba;
     box-shadow: none;
   }
 
   html.theme-system .stepper button:active,
   html.theme-system .mini-stepper button:active {
     color: #07110e;
-    background-color: #78d6a8;
+    background-color: #96e8ba;
   }
 
   html.theme-system .sync-now-button.is-syncing {
