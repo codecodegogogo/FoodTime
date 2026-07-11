@@ -1875,6 +1875,24 @@ legend {
   text-align: left;
 }
 
+.settings-menu .setting-row {
+  justify-content: flex-start;
+  gap: 14px;
+  text-align: left;
+}
+
+.settings-menu .setting-row > div:not(.setting-dot) {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: left;
+}
+
+.settings-menu .setting-row h2,
+.settings-menu .setting-row p {
+  width: 100%;
+  text-align: left;
+}
+
 .setting-dot {
   --setting-icon: url("icons/settings-provided.svg");
   --setting-icon-filter: none;
@@ -2713,6 +2731,37 @@ html.app-runtime .phone::before {
   display: none;
 }
 
+html.app-runtime .phone-home,
+html.app-runtime .phone-profile {
+  padding-bottom: calc(112px + env(safe-area-inset-bottom));
+}
+
+html.app-runtime .food-list,
+html.app-runtime .stats-grid {
+  margin-bottom: 0;
+}
+
+html.app-runtime .tabbar {
+  position: fixed;
+  right: auto;
+  bottom: calc(14px + env(safe-area-inset-bottom));
+  left: 50%;
+  z-index: 25;
+}
+
+html.app-runtime .phone-home.is-active::after,
+html.app-runtime .phone-profile.is-active::after {
+  content: "";
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 24;
+  height: calc(108px + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, rgba(251, 248, 239, 0), var(--paper) 28%, var(--paper));
+  pointer-events: none;
+}
+
 html.app-runtime .action-sheet,
 html.app-runtime .unit-modal,
 html.app-runtime .reminder-unit-modal,
@@ -2722,7 +2771,7 @@ html.app-runtime .confirm-modal {
 }
 
 html.app-runtime .action-sheet {
-  z-index: 20;
+  z-index: 35;
   max-height: calc(100dvh - 18px);
   overflow-y: auto;
   padding-bottom: calc(34px + env(safe-area-inset-bottom));
@@ -2732,7 +2781,7 @@ html.app-runtime .unit-modal,
 html.app-runtime .reminder-unit-modal,
 html.app-runtime .folder-modal,
 html.app-runtime .confirm-modal {
-  z-index: 30;
+  z-index: 45;
 }
 
 html.app-runtime .unit-modal,
@@ -2743,6 +2792,37 @@ html.app-runtime .folder-modal {
 }
 
 @media (max-width: 450px) {
+  .phone-home,
+  .phone-profile {
+    padding-bottom: calc(112px + env(safe-area-inset-bottom));
+  }
+
+  .food-list,
+  .stats-grid {
+    margin-bottom: 0;
+  }
+
+  .tabbar {
+    position: fixed;
+    right: auto;
+    bottom: calc(14px + env(safe-area-inset-bottom));
+    left: 50%;
+    z-index: 25;
+  }
+
+  .phone-home.is-active::after,
+  .phone-profile.is-active::after {
+    content: "";
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 24;
+    height: calc(108px + env(safe-area-inset-bottom));
+    background: linear-gradient(180deg, rgba(251, 248, 239, 0), var(--paper) 28%, var(--paper));
+    pointer-events: none;
+  }
+
   .action-sheet,
   .unit-modal,
   .reminder-unit-modal,
@@ -2752,7 +2832,7 @@ html.app-runtime .folder-modal {
   }
 
   .action-sheet {
-    z-index: 20;
+    z-index: 35;
     max-height: calc(100dvh - 18px);
     overflow-y: auto;
     padding-bottom: calc(34px + env(safe-area-inset-bottom));
@@ -2762,7 +2842,7 @@ html.app-runtime .folder-modal {
   .reminder-unit-modal,
   .folder-modal,
   .confirm-modal {
-    z-index: 30;
+    z-index: 45;
   }
 
   .unit-modal,

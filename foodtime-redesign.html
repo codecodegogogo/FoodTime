@@ -932,11 +932,17 @@
 
       .setting-row {
         display: grid;
-        grid-template-columns: 96px 1fr 52px;
+        grid-template-columns: 96px minmax(0, 1fr);
         gap: 25px;
         align-items: center;
         min-height: 190px;
         border-bottom: 2px solid rgba(223, 218, 207, 0.78);
+      }
+
+      .setting-row > div:nth-child(2) {
+        min-width: 0;
+        justify-self: stretch;
+        text-align: left;
       }
 
       .setting-row:last-child {
