@@ -13,11 +13,6 @@ public class FoodTimeNotificationReceiver extends BroadcastReceiver {
         }
 
         String action = intent.getAction();
-        if (FoodTimeNotificationScheduler.ACTION_DAILY.equals(action)) {
-            FoodTimeNotificationScheduler.handleDaily(context);
-            return;
-        }
-
         if (FoodTimeNotificationScheduler.ACTION_EMERGENCY.equals(action)) {
             FoodTimeNotificationScheduler.handleEmergency(context);
             return;

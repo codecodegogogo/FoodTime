@@ -46,7 +46,10 @@ const cases = new Map([
   ["娃娃菜", "icons/food-cabbage.svg"],
   ["哈密瓜", "icons/food-melon.svg"],
   ["茄皇方便面", "icons/food-noodle.svg"],
-  ["各种面粉", "icons/food-bread.svg"],
+  ["燕麦", "icons/food-oatmeal-safe.svg"],
+  ["各种面粉", "icons/food-flour-safe.svg"],
+  ["面粉", "icons/food-flour-safe.svg"],
+  ["饼", "icons/food-pancake-safe.svg"],
   ["豆芽", "icons/food-greens.svg"],
   ["菜花", "icons/food-broccoli.svg"],
   ["胡豆", "icons/food-peas.svg"],
@@ -64,14 +67,14 @@ const correctedLegacyIcon = context.window.__foodIconSrc({
   type: "bread",
   icon: "icons/food-noodle.svg",
 });
-if (correctedLegacyIcon !== "icons/food-bread.svg") {
+if (correctedLegacyIcon !== "icons/food-flour-safe.svg") {
   throw new Error(`legacy icon was not corrected: ${correctedLegacyIcon}`);
 }
 console.log(`历史错误图标 -> ${correctedLegacyIcon}`);
 
 const noodleMarkup = context.window.__thumbMarkup({ name: "茄皇方便面", type: "bread", icon: "icons/food-noodle.svg" });
 if (noodleMarkup.includes("<img")) throw new Error(`bundled SVG still uses an img element: ${noodleMarkup}`);
-if (!noodleMarkup.includes("--food-icon") || !noodleMarkup.includes("20260711-svg-v4")) {
+if (!noodleMarkup.includes("--food-icon") || !noodleMarkup.includes("20260711-food-fix-v6")) {
   throw new Error(`bundled SVG background is not versioned: ${noodleMarkup}`);
 }
 console.log("内置 SVG 使用固定背景格渲染。");

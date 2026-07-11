@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FoodTime 食物期限管理原型</title>
-    <link rel="stylesheet" href="styles.css?v=20260711-svg-v4" />
+    <link rel="stylesheet" href="styles.css?v=20260711-food-fix-v6" />
   </head>
   <body>
     <main class="board" aria-label="FoodTime static app prototype">
@@ -394,7 +394,7 @@
             <div class="setting-dot notice-dot"></div>
             <div class="setting-copy">
               <h2>提醒通知</h2>
-              <p class="notification-summary-text">每天 09:00、15:00、20:00，延期 1 天</p>
+              <p class="notification-summary-text">3 天内，每隔 6 小时提醒</p>
             </div>
           </button>
           <button class="setting-row folder-settings-button" type="button">
@@ -516,10 +516,6 @@
         </header>
 
         <section class="setting-list settings-form">
-          <div class="fixed-reminder-times" aria-label="每日固定提醒时间">
-            <strong>每日固定提醒</strong>
-            <span>09:00 · 15:00 · 20:00</span>
-          </div>
           <fieldset>
             <legend>每次延期时间</legend>
             <label class="inline-number-field">
@@ -534,8 +530,35 @@
               <span>天内提醒</span>
             </label>
           </fieldset>
-          <p class="settings-hint">进入紧急提醒范围后，第一次间隔 12 小时，之后 6 小时、3 小时递减，最短每 30 分钟提醒一次，直到你标记吃完、坏掉或延期。</p>
+          <fieldset>
+            <legend>提醒时间间隔</legend>
+            <div class="field-control split-control notification-interval-control">
+              <input type="number" value="6" min="1" max="9999" inputmode="decimal" aria-label="提醒间隔数值" />
+              <input type="hidden" value="小时" aria-label="提醒间隔单位" />
+              <button class="notification-interval-unit-picker-button" type="button" aria-label="选择提醒间隔单位">
+                <span class="notification-interval-unit-label">小时</span>
+              </button>
+            </div>
+          </fieldset>
           <button class="primary-action notification-save-action">保存提醒设置</button>
+        </section>
+
+        <section class="reminder-unit-modal notification-interval-unit-modal is-hidden" aria-label="选择提醒间隔单位" aria-hidden="true">
+          <div class="unit-dialog" role="dialog" aria-modal="true" aria-labelledby="notification-interval-unit-title">
+            <header>
+              <h2 id="notification-interval-unit-title">选择时间单位</h2>
+              <button class="notification-interval-modal-close" type="button" aria-label="关闭提醒间隔单位选择">
+                <img src="icons/close.svg" alt="" />
+              </button>
+            </header>
+            <div class="unit-option-grid notification-interval-unit-option-grid">
+              <button type="button" data-value="分钟">分钟</button>
+              <button type="button" data-value="小时">小时</button>
+              <button type="button" data-value="天">天</button>
+              <button type="button" data-value="星期">星期</button>
+              <button type="button" data-value="月">月</button>
+            </div>
+          </div>
         </section>
       </section>
 
@@ -685,6 +708,6 @@
         </section>
       </section>
     </main>
-    <script src="app.js?v=20260711-svg-v4"></script>
+    <script src="app.js?v=20260711-food-fix-v6"></script>
   </body>
 </html>

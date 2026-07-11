@@ -8,13 +8,12 @@
   const FOLDER_STORAGE_KEY = "foodtime.folders.v1";
   const FOLDER_CHANGES_KEY = "foodtime.folderChanges.v1";
   const DEFAULT_ADD_ICON = "icons/meal-provided.svg";
-  const FIXED_DAILY_REMINDER_TIMES = ["09:00", "15:00", "20:00"];
   const ONE_DAY = 24 * 60 * 60 * 1000;
   const PHOTO_THUMB_MAX_SIDE = 160;
   const PHOTO_THUMB_MIN_SIDE = 96;
   const PHOTO_THUMB_QUALITY = 0.24;
   const PHOTO_SYNC_MAX_CHARS = 28000;
-  const FOOD_ICON_ASSET_VERSION = "20260711-svg-v4";
+  const FOOD_ICON_ASSET_VERSION = "20260711-food-fix-v6";
   const FALLBACK_APP_VERSION = "v1";
   const UPDATE_API_URL = "https://api.github.com/repos/codecodegogogo/FoodTime/releases/latest";
   const RELEASES_URL = "https://github.com/codecodegogogo/FoodTime/releases";
@@ -62,6 +61,9 @@
   ];
 
   const FOOD_ICON_ALIASES = [
+    { type: "bread", file: "icons/food-oatmeal-safe.svg", keywords: ["燕麦片", "燕麦", "麦片"] },
+    { type: "bread", file: "icons/food-flour-safe.svg", keywords: ["低筋面粉", "中筋面粉", "高筋面粉", "各种面粉", "面粉", "淀粉"] },
+    { type: "bread", file: "icons/food-pancake-safe.svg", keywords: ["葱油饼", "手抓饼", "煎饼", "烙饼", "饼"] },
     { type: "bread", file: "icons/food-dumpling.svg", keywords: ["饺子皮", "饺子", "水饺", "蒸饺", "锅贴"] },
     { type: "bread", file: "icons/food-bun.svg", keywords: ["包子", "肉包", "菜包", "小笼包", "灌汤包", "馒头"] },
     { type: "bread", file: "icons/food-rice.svg", keywords: ["米饭", "白米饭", "大米饭", "剩饭"] },
@@ -1543,15 +1545,17 @@
       const settings = JSON.parse(localStorage.getItem(NOTIFICATION_SETTINGS_KEY) || "{}");
       const emergencyDays = Math.min(30, Math.max(1, Number.parseInt(settings.emergencyDays, 10) || 3));
       const delayDays = Math.min(30, Math.max(1, Number.parseInt(settings.delayDays, 10) || 1));
-      return { dailyTimes: FIXED_DAILY_REMINDER_TIMES, emergencyDays, delayDays };
+      const intervalValue = Math.min(9999, Math.max(1, Number.parseFloat(settings.intervalValue) || 6));
+      const intervalUnit = reminderUnit(settings.intervalUnit || "小时");
+      return { emergencyDays, delayDays, intervalValue, intervalUnit };
     } catch (error) {
       localStorage.removeItem(NOTIFICATION_SETTINGS_KEY);
-      return { dailyTimes: FIXED_DAILY_REMINDER_TIMES, emergencyDays: 3, delayDays: 1 };
+      return { emergencyDays: 3, delayDays: 1, intervalValue: 6, intervalUnit: "小时" };
     }
   }
 
   function notificationSummary(settings = loadNotificationSettings()) {
-    return `每天 09:00、15:00、20:00，延期 ${settings.delayDays} 天`;
+    return `${settings.emergencyDays} 天内，每隔 ${settings.intervalValue} ${settings.intervalUnit}提醒`;
   }
 
   function clampNumber(value, min, max, fallback) {
@@ -1573,9 +1577,39 @@
 
     const delayDays = screen.querySelector("[aria-label='延期天数']");
     const emergencyDays = screen.querySelector("[aria-label='紧急提醒天数']");
+    const intervalValue = screen.querySelector("[aria-label='提醒间隔数值']");
     if (delayDays) delayDays.value = settings.delayDays;
     if (emergencyDays) emergencyDays.value = settings.emergencyDays;
+    if (intervalValue) intervalValue.value = settings.intervalValue;
+    setNotificationIntervalUnit(settings.intervalUnit);
     renderNotificationSummary(settings);
+  }
+
+  function setNotificationIntervalUnit(value) {
+    const screen = screenElement("notificationSettings");
+    const unit = reminderUnit(value || "小时");
+    const input = screen?.querySelector("[aria-label='提醒间隔单位']");
+    const label = screen?.querySelector(".notification-interval-unit-label");
+    if (input) input.value = unit;
+    if (label) label.textContent = unit;
+    screen?.querySelectorAll(".notification-interval-unit-option-grid button").forEach((button) => {
+      button.classList.toggle("active", button.dataset.value === unit);
+    });
+  }
+
+  function openNotificationIntervalUnitModal() {
+    const modal = screenElement("notificationSettings")?.querySelector(".notification-interval-unit-modal");
+    if (!modal) return;
+    setNotificationIntervalUnit(formValue(".phone-notification-settings [aria-label='提醒间隔单位']") || "小时");
+    modal.classList.remove("is-hidden");
+    modal.setAttribute("aria-hidden", "false");
+  }
+
+  function closeNotificationIntervalUnitModal() {
+    const modal = screenElement("notificationSettings")?.querySelector(".notification-interval-unit-modal");
+    if (!modal) return;
+    modal.classList.add("is-hidden");
+    modal.setAttribute("aria-hidden", "true");
   }
 
   function saveNotificationSettings() {
@@ -1583,10 +1617,10 @@
     if (!screen) return;
 
     const settings = {
-      dailyTimes: FIXED_DAILY_REMINDER_TIMES,
       delayDays: clampNumber(screen.querySelector("[aria-label='延期天数']")?.value, 1, 30, 1),
       emergencyDays: clampNumber(screen.querySelector("[aria-label='紧急提醒天数']")?.value, 1, 30, 3),
-      emergencySchedule: [720, 360, 180, 90, 45, 30],
+      intervalValue: Math.min(9999, Math.max(1, Number.parseFloat(screen.querySelector("[aria-label='提醒间隔数值']")?.value) || 6)),
+      intervalUnit: reminderUnit(screen.querySelector("[aria-label='提醒间隔单位']")?.value || "小时"),
       updatedAt: nowIso(),
     };
     localStorage.setItem(NOTIFICATION_SETTINGS_KEY, JSON.stringify(settings));
@@ -2060,6 +2094,19 @@
       return;
     }
 
+    const notificationIntervalUnitPicker = target.closest(".notification-interval-unit-picker-button");
+    if (notificationIntervalUnitPicker) {
+      openNotificationIntervalUnitModal();
+      return;
+    }
+
+    const notificationIntervalUnitOption = target.closest(".notification-interval-unit-option-grid button");
+    if (notificationIntervalUnitOption) {
+      setNotificationIntervalUnit(notificationIntervalUnitOption.dataset.value || notificationIntervalUnitOption.textContent.trim());
+      closeNotificationIntervalUnitModal();
+      return;
+    }
+
     const folderMore = target.closest(".folder-more-button");
     if (folderMore) {
       openFolderModal();
@@ -2078,6 +2125,12 @@
       closeUnitModal();
       closeReminderUnitModal();
       closeFolderModal();
+      return;
+    }
+
+    const notificationIntervalModalClose = target.closest(".notification-interval-modal-close");
+    if (notificationIntervalModalClose || target.classList?.contains("notification-interval-unit-modal")) {
+      closeNotificationIntervalUnitModal();
       return;
     }
 

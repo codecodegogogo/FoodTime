@@ -91,8 +91,10 @@ button {
 .field-icon-button,
 .unit-picker-button,
 .reminder-unit-picker-button,
+.notification-interval-unit-picker-button,
 .theme-inline-options button,
 .unit-modal-close,
+.notification-interval-modal-close,
 .unit-option-grid button {
   cursor: pointer;
 }
@@ -1225,7 +1227,8 @@ button:active,
 
 .field-icon-button,
 .unit-picker-button,
-.reminder-unit-picker-button {
+.reminder-unit-picker-button,
+.notification-interval-unit-picker-button {
   display: grid;
   height: 100%;
   min-height: 44px;
@@ -1262,7 +1265,8 @@ button:active,
 }
 
 .unit-picker-button,
-.reminder-unit-picker-button {
+.reminder-unit-picker-button,
+.notification-interval-unit-picker-button {
   color: #174d3d;
   font-size: 15px;
 }
@@ -1317,7 +1321,8 @@ button:active,
   font-size: 18px;
 }
 
-.unit-modal-close {
+.unit-modal-close,
+.notification-interval-modal-close {
   display: grid;
   width: 36px;
   height: 36px;
@@ -1327,7 +1332,8 @@ button:active,
   background: #fffdf8;
 }
 
-.unit-modal-close img {
+.unit-modal-close img,
+.notification-interval-modal-close img {
   width: 18px;
   height: 18px;
 }
@@ -1527,30 +1533,6 @@ legend {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   margin-top: 8px;
-}
-
-.fixed-reminder-times {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 18px;
-  padding: 14px;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  color: var(--ink);
-  background: var(--surface);
-}
-
-.fixed-reminder-times strong {
-  font-size: 14px;
-}
-
-.fixed-reminder-times span {
-  color: var(--mint-dark);
-  font-size: 13px;
-  font-weight: 900;
-  white-space: nowrap;
 }
 
 .notification-input-grid label,

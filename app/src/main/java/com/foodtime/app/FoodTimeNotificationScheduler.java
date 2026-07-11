@@ -1,10 +1,10 @@
 package com.foodtime.app;
 
+import android.Manifest;
 import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -21,142 +21,116 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
+import java.util.TimeZone;
 
 final class FoodTimeNotificationScheduler {
-    static final String ACTION_DAILY = "com.foodtime.app.action.DAILY_REMINDER";
     static final String ACTION_EMERGENCY = "com.foodtime.app.action.EMERGENCY_REMINDER";
     static final String CHANNEL_ID = "foodtime_reminders";
 
+    private static final String LEGACY_ACTION_DAILY = "com.foodtime.app.action.DAILY_REMINDER";
+    private static final int[] LEGACY_DAILY_REQUESTS = {4101, 4103, 4104};
+    private static final int EMERGENCY_REQUEST = 4102;
+    private static final int EMERGENCY_NOTIFICATION_ID = 5102;
     private static final String PREFS = "foodtime.notifications";
     private static final String KEY_SETTINGS = "settings";
     private static final String KEY_PAYLOAD = "payload";
-    private static final String KEY_EMERGENCY_IDS = "emergency_ids";
-    private static final String LEVEL_PREFIX = "level_";
-    private static final String SIGNATURE_PREFIX = "signature_";
-    private static final int[] DAILY_HOURS = {9, 15, 20};
-    private static final int[] DAILY_REQUESTS = {4101, 4103, 4104};
-    private static final int EMERGENCY_REQUEST = 4102;
+    private static final String KEY_NEXT_EMERGENCY_AT = "next_emergency_at";
+    private static final String KEY_INTERVAL_MILLIS = "interval_millis";
     private static final long MINUTE = 60L * 1000L;
-    private static final long DAY = 24L * 60L * 60L * 1000L;
-    private static final int[] EMERGENCY_INTERVALS = {720, 360, 180, 90, 45, 30};
+    private static final long HOUR = 60L * MINUTE;
+    private static final long DAY = 24L * HOUR;
 
     private FoodTimeNotificationScheduler() {
     }
 
     static void savePlan(Context context, String settingsJson, String payloadJson) {
-        SharedPreferences prefs = prefs(context);
+        SharedPreferences preferences = prefs(context);
+        SharedPreferences.Editor editor = preferences.edit();
         if (settingsJson != null && !settingsJson.isEmpty()) {
-            prefs.edit().putString(KEY_SETTINGS, settingsJson).apply();
+            editor.putString(KEY_SETTINGS, settingsJson);
         }
         if (payloadJson != null && !payloadJson.isEmpty()) {
-            prefs.edit().putString(KEY_PAYLOAD, payloadJson).apply();
+            editor.putString(KEY_PAYLOAD, payloadJson);
         }
+        editor.apply();
 
         ensureChannel(context);
-        scheduleDaily(context);
+        cancelLegacyDailyAlarms(context);
         scheduleEmergency(context);
     }
 
     static void restoreSchedules(Context context) {
         ensureChannel(context);
-        scheduleDaily(context);
+        cancelLegacyDailyAlarms(context);
         scheduleEmergency(context);
-    }
-
-    static void handleDaily(Context context) {
-        ensureChannel(context);
-        List<FoodItem> activeFoods = activeFoods(context);
-        List<FoodItem> urgentFoods = new ArrayList<>();
-        for (FoodItem food : activeFoods) {
-            if (food.daysRemaining() <= food.emergencyDays(context)) {
-                urgentFoods.add(food);
-            }
-        }
-
-        String title = urgentFoods.isEmpty() ? "FoodTime 今日提醒" : expiringTitle(urgentFoods);
-        String text = activeFoods.isEmpty()
-                ? "今天没有正在储存的食物"
-                : (urgentFoods.isEmpty() ? "今天没有即将过期的食物" : expiringText(urgentFoods));
-        notify(context, 5101, title, text);
-        scheduleDaily(context);
     }
 
     static void handleEmergency(Context context) {
         ensureChannel(context);
         List<FoodItem> foods = emergencyFoods(context);
-        if (!foods.isEmpty()) {
-            notify(context, 5102, expiringTitle(foods), expiringText(foods));
-            increaseEmergencyLevels(context, foods);
+        if (foods.isEmpty()) {
+            scheduleEmergency(context);
+            return;
         }
-        scheduleEmergency(context);
-    }
 
-    private static void scheduleDaily(Context context) {
-        for (int index = 0; index < DAILY_HOURS.length; index++) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.set(Calendar.HOUR_OF_DAY, DAILY_HOURS[index]);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.SECOND, 0);
-            calendar.set(Calendar.MILLISECOND, 0);
-            if (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
-                calendar.add(Calendar.DAY_OF_YEAR, 1);
-            }
-            scheduleAlarm(context, ACTION_DAILY, DAILY_REQUESTS[index], calendar.getTimeInMillis());
-        }
+        notify(context, EMERGENCY_NOTIFICATION_ID, expiringTitle(foods), expiringText(foods));
+        NotificationSettings settings = settings(context);
+        scheduleEmergencyAt(context, System.currentTimeMillis() + settings.intervalMillis(), settings.intervalMillis());
     }
 
     private static void scheduleEmergency(Context context) {
         NotificationSettings settings = settings(context);
-        List<FoodItem> foods = emergencyFoods(context);
-        if (foods.isEmpty()) {
-            long nextEntryAt = nextEmergencyEntryAt(context, settings);
+        long now = System.currentTimeMillis();
+        List<FoodItem> urgentFoods = emergencyFoods(context);
+        if (urgentFoods.isEmpty()) {
+            long nextEntryAt = nextEmergencyEntryAt(context, settings, now);
             if (nextEntryAt > 0L) {
-                scheduleAlarm(context, ACTION_EMERGENCY, EMERGENCY_REQUEST, nextEntryAt);
+                scheduleEmergencyAt(context, nextEntryAt, settings.intervalMillis());
             } else {
                 cancelAlarm(context, ACTION_EMERGENCY, EMERGENCY_REQUEST);
+                prefs(context).edit().remove(KEY_NEXT_EMERGENCY_AT).putLong(KEY_INTERVAL_MILLIS, settings.intervalMillis()).apply();
             }
-            saveEmergencyIds(context, new HashSet<>());
             return;
         }
 
-        SharedPreferences prefs = prefs(context);
-        Set<String> ids = new HashSet<>();
-        SharedPreferences.Editor editor = prefs.edit();
-        int interval = EMERGENCY_INTERVALS[0];
-        for (FoodItem food : foods) {
-            ids.add(food.id);
-            String signature = food.signature(settings.emergencyDays);
-            String signatureKey = SIGNATURE_PREFIX + food.id;
-            int level = prefs.getInt(LEVEL_PREFIX + food.id, 0);
-            if (!signature.equals(prefs.getString(signatureKey, ""))) {
-                level = 0;
-                editor.putInt(LEVEL_PREFIX + food.id, 0);
-                editor.putString(signatureKey, signature);
-            }
-            int candidate = intervalForLevel(level);
-            interval = Math.min(interval, candidate);
+        SharedPreferences preferences = prefs(context);
+        long intervalMillis = settings.intervalMillis();
+        long savedInterval = preferences.getLong(KEY_INTERVAL_MILLIS, 0L);
+        long savedNextAt = preferences.getLong(KEY_NEXT_EMERGENCY_AT, 0L);
+        if (savedInterval == intervalMillis && savedNextAt > now) {
+            scheduleAlarm(context, ACTION_EMERGENCY, EMERGENCY_REQUEST, savedNextAt);
+            return;
         }
-        editor.apply();
-        saveEmergencyIds(context, ids);
 
-        long triggerAt = System.currentTimeMillis() + (interval * MINUTE);
-        scheduleAlarm(context, ACTION_EMERGENCY, EMERGENCY_REQUEST, triggerAt);
+        long triggerAt = savedInterval == 0L ? now + 1000L : now + intervalMillis;
+        scheduleEmergencyAt(context, triggerAt, intervalMillis);
     }
 
-    private static long nextEmergencyEntryAt(Context context, NotificationSettings settings) {
-        long now = System.currentTimeMillis();
+    private static void scheduleEmergencyAt(Context context, long triggerAtMillis, long intervalMillis) {
+        prefs(context).edit()
+                .putLong(KEY_NEXT_EMERGENCY_AT, triggerAtMillis)
+                .putLong(KEY_INTERVAL_MILLIS, intervalMillis)
+                .apply();
+        scheduleAlarm(context, ACTION_EMERGENCY, EMERGENCY_REQUEST, triggerAtMillis);
+    }
+
+    private static long nextEmergencyEntryAt(Context context, NotificationSettings settings, long now) {
         long next = Long.MAX_VALUE;
         for (FoodItem food : activeFoods(context)) {
-            long entryAt = food.emergencyStartMillis(settings.emergencyDays) + (EMERGENCY_INTERVALS[0] * MINUTE);
+            long entryAt = food.emergencyStartMillis(settings.emergencyDays);
             if (entryAt > now && entryAt < next) {
                 next = entryAt;
             }
         }
         return next == Long.MAX_VALUE ? 0L : next;
+    }
+
+    private static void cancelLegacyDailyAlarms(Context context) {
+        for (int requestCode : LEGACY_DAILY_REQUESTS) {
+            cancelAlarm(context, LEGACY_ACTION_DAILY, requestCode);
+        }
     }
 
     private static void scheduleAlarm(Context context, String action, int requestCode, long triggerAtMillis) {
@@ -236,15 +210,16 @@ final class FoodTimeNotificationScheduler {
                 CHANNEL_ID,
                 "食物提醒",
                 NotificationManager.IMPORTANCE_HIGH);
-        channel.setDescription("FoodTime 每日提醒和紧急过期提醒");
+        channel.setDescription("FoodTime 紧急期限循环提醒");
         manager.createNotificationChannel(channel);
     }
 
     private static List<FoodItem> emergencyFoods(Context context) {
         NotificationSettings settings = settings(context);
+        long now = System.currentTimeMillis();
         List<FoodItem> result = new ArrayList<>();
         for (FoodItem food : activeFoods(context)) {
-            if (food.daysRemaining() <= settings.emergencyDays) {
+            if (food.emergencyStartMillis(settings.emergencyDays) <= now) {
                 result.add(food);
             }
         }
@@ -278,49 +253,20 @@ final class FoodTimeNotificationScheduler {
     private static NotificationSettings settings(Context context) {
         try {
             String raw = prefs(context).getString(KEY_SETTINGS, "{}");
-            JSONObject json = new JSONObject(raw);
-            return NotificationSettings.from(json);
+            return NotificationSettings.from(new JSONObject(raw));
         } catch (Exception ignored) {
-            return new NotificationSettings(3);
+            return new NotificationSettings(3, 6d, "小时");
         }
-    }
-
-    private static void increaseEmergencyLevels(Context context, List<FoodItem> foods) {
-        SharedPreferences.Editor editor = prefs(context).edit();
-        for (FoodItem food : foods) {
-            int current = prefs(context).getInt(LEVEL_PREFIX + food.id, 0);
-            editor.putInt(LEVEL_PREFIX + food.id, Math.min(current + 1, EMERGENCY_INTERVALS.length - 1));
-        }
-        editor.apply();
-    }
-
-    private static void saveEmergencyIds(Context context, Set<String> ids) {
-        SharedPreferences.Editor editor = prefs(context).edit();
-        Set<String> previous = prefs(context).getStringSet(KEY_EMERGENCY_IDS, new HashSet<>());
-        for (String id : previous) {
-            if (!ids.contains(id)) {
-                editor.remove(LEVEL_PREFIX + id);
-                editor.remove(SIGNATURE_PREFIX + id);
-            }
-        }
-        editor.putStringSet(KEY_EMERGENCY_IDS, ids);
-        editor.apply();
     }
 
     private static String expiringTitle(List<FoodItem> foods) {
-        if (foods.isEmpty()) {
-            return "FoodTime 今日提醒";
-        }
         String name = displayName(foods.get(0).name);
-        return foods.size() > 1 ? name + "等即将过期" : name + "即将过期";
+        return foods.size() > 1 ? name + "等食物需要处理" : name + "需要处理";
     }
 
     private static String expiringText(List<FoodItem> foods) {
-        if (foods.isEmpty()) {
-            return "今天没有即将过期的食物";
-        }
         String name = displayName(foods.get(0).name);
-        return foods.size() > 1 ? name + "等即将过期，请尽快处理。" : name + "即将过期，请尽快处理。";
+        return foods.size() > 1 ? name + "等已进入紧急提醒范围，请尽快处理。" : name + "已进入紧急提醒范围，请尽快处理。";
     }
 
     private static String displayName(String value) {
@@ -332,122 +278,149 @@ final class FoodTimeNotificationScheduler {
         return name.substring(0, endIndex) + "...";
     }
 
-    private static int intervalForLevel(int level) {
-        int index = Math.max(0, Math.min(level, EMERGENCY_INTERVALS.length - 1));
-        return EMERGENCY_INTERVALS[index];
-    }
-
     private static SharedPreferences prefs(Context context) {
         return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
     }
 
     private static final class NotificationSettings {
         final int emergencyDays;
+        final double intervalValue;
+        final String intervalUnit;
 
-        NotificationSettings(int emergencyDays) {
+        NotificationSettings(int emergencyDays, double intervalValue, String intervalUnit) {
             this.emergencyDays = emergencyDays;
+            this.intervalValue = intervalValue;
+            this.intervalUnit = intervalUnit;
         }
 
         static NotificationSettings from(JSONObject json) {
             int emergencyDays = clamp(json.optInt("emergencyDays", 3), 1, 30);
-            return new NotificationSettings(emergencyDays);
+            double intervalValue = clamp(json.optDouble("intervalValue", 6d), 1d, 9999d);
+            String intervalUnit = normalizeUnit(json.optString("intervalUnit", "小时"));
+            return new NotificationSettings(emergencyDays, intervalValue, intervalUnit);
+        }
+
+        long intervalMillis() {
+            double minutes = intervalValue;
+            if ("小时".equals(intervalUnit)) minutes *= 60d;
+            if ("天".equals(intervalUnit)) minutes *= 24d * 60d;
+            if ("星期".equals(intervalUnit)) minutes *= 7d * 24d * 60d;
+            if ("月".equals(intervalUnit)) minutes *= 30d * 24d * 60d;
+            return Math.max(MINUTE, Math.round(minutes * MINUTE));
         }
     }
 
     private static final class FoodItem {
         final String id;
         final String name;
+        final String purchaseAt;
         final String purchaseDate;
+        final double remindValue;
+        final String remindUnit;
         final int remindDays;
-        final String updatedAt;
 
-        FoodItem(String id, String name, String purchaseDate, int remindDays, String updatedAt) {
+        FoodItem(
+                String id,
+                String name,
+                String purchaseAt,
+                String purchaseDate,
+                double remindValue,
+                String remindUnit,
+                int remindDays) {
             this.id = id;
             this.name = name;
+            this.purchaseAt = purchaseAt;
             this.purchaseDate = purchaseDate;
+            this.remindValue = remindValue;
+            this.remindUnit = remindUnit;
             this.remindDays = remindDays;
-            this.updatedAt = updatedAt;
         }
 
         static FoodItem from(JSONObject json) {
             String id = json.optString("id", "");
-            String name = json.optString("name", "食物");
             String purchaseDate = json.optString("purchaseDate", "");
             if (id.isEmpty() || purchaseDate.isEmpty()) {
                 return null;
             }
-            String updatedAt = json.optString("updatedAt", "");
-            return new FoodItem(id, name, purchaseDate, Math.max(1, json.optInt("remindDays", 3)), updatedAt);
-        }
-
-        int emergencyDays(Context context) {
-            return settings(context).emergencyDays;
-        }
-
-        int daysRemaining() {
-            try {
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-                formatter.setLenient(false);
-                Date purchasedAt = formatter.parse(purchaseDate);
-                if (purchasedAt == null) {
-                    return Integer.MAX_VALUE;
-                }
-
-                Calendar dueAt = Calendar.getInstance();
-                dueAt.setTime(purchasedAt);
-                dueAt.add(Calendar.DAY_OF_YEAR, remindDays);
-                long diff = dueAt.getTimeInMillis() - startOfToday();
-                return (int) Math.ceil(diff / (double) DAY);
-            } catch (Exception ignored) {
-                return Integer.MAX_VALUE;
-            }
+            return new FoodItem(
+                    id,
+                    json.optString("name", "食物"),
+                    json.optString("purchaseAt", ""),
+                    purchaseDate,
+                    json.optDouble("remindValue", 0d),
+                    normalizeUnit(json.optString("remindUnit", "天")),
+                    Math.max(1, json.optInt("remindDays", 3)));
         }
 
         long emergencyStartMillis(int emergencyDays) {
-            try {
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-                formatter.setLenient(false);
-                Date purchasedAt = formatter.parse(purchaseDate);
-                if (purchasedAt == null) {
-                    return 0L;
-                }
+            return dueAtMillis() - (emergencyDays * DAY);
+        }
 
-                Calendar startsAt = Calendar.getInstance();
-                startsAt.setTime(purchasedAt);
-                startsAt.add(Calendar.DAY_OF_YEAR, remindDays - emergencyDays);
-                startsAt.set(Calendar.HOUR_OF_DAY, 0);
-                startsAt.set(Calendar.MINUTE, 0);
-                startsAt.set(Calendar.SECOND, 0);
-                startsAt.set(Calendar.MILLISECOND, 0);
-                return startsAt.getTimeInMillis();
+        private long dueAtMillis() {
+            long purchasedAt = purchaseMillis();
+            if (remindValue <= 0d) {
+                return purchasedAt + (remindDays * DAY);
+            }
+
+            double minutes = remindValue;
+            if ("小时".equals(remindUnit)) minutes *= 60d;
+            if ("天".equals(remindUnit)) minutes *= 24d * 60d;
+            if ("星期".equals(remindUnit)) minutes *= 7d * 24d * 60d;
+            if ("月".equals(remindUnit)) minutes *= 30d * 24d * 60d;
+            return purchasedAt + Math.round(minutes * MINUTE);
+        }
+
+        private long purchaseMillis() {
+            Date parsed = parseDate(purchaseAt);
+            if (parsed == null) {
+                parsed = parseDate(purchaseDate);
+            }
+            return parsed == null ? System.currentTimeMillis() : parsed.getTime();
+        }
+    }
+
+    private static Date parseDate(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return null;
+        }
+        String input = value.trim();
+        String[] patterns = {
+                "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+                "yyyy-MM-dd'T'HH:mm:ss'Z'",
+                "yyyy-MM-dd'T'HH:mm:ss.SSS",
+                "yyyy-MM-dd'T'HH:mm:ss",
+                "yyyy-MM-dd"
+        };
+        for (String pattern : patterns) {
+            try {
+                SimpleDateFormat formatter = new SimpleDateFormat(pattern, Locale.US);
+                formatter.setLenient(false);
+                if (input.endsWith("Z")) {
+                    formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+                }
+                Date parsed = formatter.parse(input);
+                if (parsed != null) {
+                    return parsed;
+                }
             } catch (Exception ignored) {
-                return 0L;
             }
         }
-
-        String signature(int emergencyDays) {
-            return purchaseDate + "|" + remindDays + "|" + updatedAt + "|" + emergencyDays;
-        }
+        return null;
     }
 
-    private static long startOfToday() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        return calendar.getTimeInMillis();
-    }
-
-    private static int parseInt(String value, int fallback) {
-        try {
-            return Integer.parseInt(value);
-        } catch (Exception ignored) {
-            return fallback;
+    private static String normalizeUnit(String value) {
+        if ("分钟".equals(value) || "小时".equals(value) || "天".equals(value)
+                || "星期".equals(value) || "月".equals(value)) {
+            return value;
         }
+        return "小时";
     }
 
     private static int clamp(int value, int min, int max) {
+        return Math.min(max, Math.max(min, value));
+    }
+
+    private static double clamp(double value, double min, double max) {
         return Math.min(max, Math.max(min, value));
     }
 }
