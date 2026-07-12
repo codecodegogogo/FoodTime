@@ -3,6 +3,7 @@ package com.foodtime.app;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.Manifest;
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.content.res.Configuration;
 import android.content.Intent;
@@ -11,6 +12,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.util.Base64;
 import android.view.HapticFeedbackConstants;
 import android.webkit.JavascriptInterface;
@@ -44,6 +46,7 @@ public class MainActivity extends Activity {
     private WebView webView;
     private ValueCallback<Uri[]> filePathCallback;
     private Uri cameraPhotoUri;
+    private boolean exactAlarmSettingsOpened;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -79,12 +82,13 @@ public class MainActivity extends Activity {
             }
         });
         webView.loadUrl("file:///android_asset/index.html");
-        requestNotificationPermissionIfNeeded();
+        requestReminderPermissions();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        new Thread(() -> FoodTimeNotificationScheduler.restoreSchedules(this)).start();
         if (webView != null) {
             webView.evaluateJavascript(
                     "window.FoodTimeApp&&window.FoodTimeApp.refreshTheme&&window.FoodTimeApp.refreshTheme()",
@@ -230,18 +234,53 @@ public class MainActivity extends Activity {
                 null));
     }
 
-    private void requestNotificationPermissionIfNeeded() {
+    private void requestReminderPermissions() {
+        if (!requestNotificationPermissionIfNeeded()) {
+            requestExactAlarmPermissionIfNeeded();
+        }
+    }
+
+    private boolean requestNotificationPermissionIfNeeded() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            return;
+            return false;
         }
 
         if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-            return;
+            return false;
         }
 
         requestPermissions(
                 new String[]{Manifest.permission.POST_NOTIFICATIONS},
                 NOTIFICATION_PERMISSION_REQUEST);
+        return true;
+    }
+
+    private void requestExactAlarmPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || exactAlarmSettingsOpened) {
+            return;
+        }
+
+        AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        if (manager == null || manager.canScheduleExactAlarms()) {
+            return;
+        }
+
+        exactAlarmSettingsOpened = true;
+        try {
+            Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
+            intent.setData(Uri.parse("package:" + getPackageName()));
+            startActivity(intent);
+        } catch (Exception ignored) {
+            // The scheduler will keep using an inexact alarm if this settings page is unavailable.
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == NOTIFICATION_PERMISSION_REQUEST) {
+            requestExactAlarmPermissionIfNeeded();
+        }
     }
 
     private JSONObject performPull(String settingsJson) {

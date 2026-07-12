@@ -54,7 +54,7 @@ final class FoodTimeNotificationScheduler {
         if (payloadJson != null && !payloadJson.isEmpty()) {
             editor.putString(KEY_PAYLOAD, payloadJson);
         }
-        editor.apply();
+        editor.commit();
 
         ensureChannel(context);
         cancelLegacyDailyAlarms(context);
@@ -90,7 +90,10 @@ final class FoodTimeNotificationScheduler {
                 scheduleEmergencyAt(context, nextEntryAt, settings.intervalMillis());
             } else {
                 cancelAlarm(context, ACTION_EMERGENCY, EMERGENCY_REQUEST);
-                prefs(context).edit().remove(KEY_NEXT_EMERGENCY_AT).putLong(KEY_INTERVAL_MILLIS, settings.intervalMillis()).apply();
+                prefs(context).edit()
+                        .remove(KEY_NEXT_EMERGENCY_AT)
+                        .putLong(KEY_INTERVAL_MILLIS, settings.intervalMillis())
+                        .commit();
             }
             return;
         }
@@ -112,7 +115,7 @@ final class FoodTimeNotificationScheduler {
         prefs(context).edit()
                 .putLong(KEY_NEXT_EMERGENCY_AT, triggerAtMillis)
                 .putLong(KEY_INTERVAL_MILLIS, intervalMillis)
-                .apply();
+                .commit();
         scheduleAlarm(context, ACTION_EMERGENCY, EMERGENCY_REQUEST, triggerAtMillis);
     }
 
@@ -140,10 +143,12 @@ final class FoodTimeNotificationScheduler {
         }
 
         PendingIntent pendingIntent = alarmIntent(context, action, requestCode);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !manager.canScheduleExactAlarms()) {
             manager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent);
         } else {
-            manager.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent);
+            manager.setExact(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent);
         }
     }
 

@@ -57,8 +57,27 @@ const java = fs.readFileSync("app/src/main/java/com/foodtime/app/FoodTimeNotific
 for (const legacy of ["static final String ACTION_DAILY", "handleDaily(", "scheduleDaily(", "EMERGENCY_INTERVALS", "LEVEL_PREFIX"]) {
   if (java.includes(legacy)) throw new Error(`legacy native reminder logic remains: ${legacy}`);
 }
-for (const required of ["intervalValue", "intervalUnit", "intervalMillis()", '"active".equals', "emergencyStartMillis"]) {
+for (const required of [
+  "intervalValue",
+  "intervalUnit",
+  "intervalMillis()",
+  '"active".equals',
+  "emergencyStartMillis(settings.emergencyDays) <= now",
+  "setExactAndAllowWhileIdle",
+  "canScheduleExactAlarms",
+  ".commit()",
+]) {
   if (!java.includes(required)) throw new Error(`new native reminder logic is incomplete: ${required}`);
+}
+
+const manifest = fs.readFileSync("app/src/main/AndroidManifest.xml", "utf8");
+if (!manifest.includes("android.permission.SCHEDULE_EXACT_ALARM")) {
+  throw new Error("exact alarm permission is missing from the Android manifest");
+}
+
+const activity = fs.readFileSync("app/src/main/java/com/foodtime/app/MainActivity.java", "utf8");
+for (const required of ["ACTION_REQUEST_SCHEDULE_EXACT_ALARM", "requestExactAlarmPermissionIfNeeded", "restoreSchedules(this)"]) {
+  if (!activity.includes(required)) throw new Error(`exact alarm permission flow is incomplete: ${required}`);
 }
 
 console.log("Notification settings migration and native interval checks passed.");
